@@ -354,7 +354,7 @@ pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_virid
 gdpp <- read_csv("Data/GDPP_rcp45_Amazon.csv") %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=mean(pr)* 86400)
 gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
 
-pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+pr %>% select(date,tmmx,pr) # %>% filter( year(date)==2019)
 gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
 gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
@@ -372,7 +372,7 @@ gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_
 #
 # Export Files for Netlogo Model
 #
-gdpp_exp <- gdpp %>% select(date,fit,ucl,lcl)
+gdpp_exp <- gdpp %>% select(date,fit,se.fit,ucl,lcl)
 #
 # repeat the last date
 #
@@ -410,7 +410,7 @@ gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridi
 #
 # Export Files for Netlogo Model
 #
-gdpp_exp <- gdpp %>% select(date,fit,ucl,lcl)
+gdpp_exp <- gdpp %>% select(date,fit,se.fit,ucl,lcl)
 #
 # repeat the last date
 #
