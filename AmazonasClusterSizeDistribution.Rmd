@@ -1,0 +1,935 @@
+---
+title: "Amazon Compute Cluster Size Distribution"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+## setup
+
+* Using http://worldmap.harvard.edu/data/geonode:amapoly_ivb
+
+* Update files in server
+
+rsync -azP --exclude "*.zip" -e 'ssh -p 33100' /home/leonardo/Academicos/GitProjects/AustraliaTippingPoint/ leonardo@127.0.0.1:~/GitProjects/AustraliaTippingPoint
+
+```{r setup, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+source("R/functions.r")
+require(raster)
+require(dplyr)
+require(stringr)
+require(spatialwarnings)
+require(future.apply)
+require(tictoc)
+require(readr)
+
+# Data Path
+#
+if( Sys.info()['nodename'] =="ls-pro") {
+  
+  data_path <- "~/Academicos/GitProjects/AustraliaTippingPoint/Data"
+} else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
+  data_path <- "~/GitProjects/AustraliaTippingPoint/Data"
+
+}
+
+
+file_pattern <- "^BurnedAreaAmazon20"
+fire_bricks <- list.files(path=data_path,pattern=file_pattern)
+fire_bricks
+region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
+
+```
+
+## Get the data in sparse format
+
+* The file Data/patch_df_BurnedArea_Amazon.rds has the distribution fitted by month
+
+```{r readFilesAustralia, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+
+fname <- paste0("Data/patch_sparse_BurnedArea_", region_name, ".rds" )
+if(file.exists(fname)) {
+  patch_sparse <- readRDS(fname)
+} else {
+  patch_sparse <- tibble()
+}
+
+
+tic()
+plan(multisession)
+
+patch_add <- convert_to_sparse_days(fire_bricks,region_name,data_path)
+
+plan(sequential)
+toc()
+
+str(patch_add)
+patch_sparse <- bind_rows(patch_sparse, patch_add)
+
+saveRDS(patch_sparse,fname)
+
+rm(patch_add)
+```
+
+
+# Read Files and fit patch distribution by month
+
+```{r FitByMonthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+source("R/functions.r")
+require(raster)
+require(dplyr)
+require(stringr)
+require(spatialwarnings)
+require(future.apply)
+require(tictoc)
+require(readr)
+
+
+patch_df_name <- paste0("Data/patch_df_BurnedArea_",region_name, ".rds")
+
+# Read the data.frame with fitted EWS data
+#
+if(file.exists(patch_df_name)) {
+  patch_df <- readRDS(patch_df_name)
+} else {
+  patch_df <- tibble()
+}
+
+# Main lapply for fitting distributions of patch size 
+#
+tic()
+plan(multisession)
+p_df <- lapply( seq_along(fire_bricks), function(i){
+  br <- brick(paste0(data_path,"/",fire_bricks[i]))
+  df <- future_lapply(seq_len(nbands(br)), function(x){evaluate_patch_distr(br[[x]]) })
+  df <- bind_rows(df) %>% mutate(region= region_name)  %>% select(region, date, everything())
+})
+patch_df <- bind_rows(patch_df,do.call(rbind,p_df))
+toc()
+
+saveRDS(patch_df,patch_df_name)
+```
+
+# Save Patch distribution
+
+```{r SavePatchByMonthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+#
+# Save patch distribution
+#
+patch_size_name <- paste0("Data/patch_size_BurnedArea_",region_name, ".rds")
+
+if(file.exists(patch_size_name)) {
+  patch_size <- readRDS(patch_size_name)
+} else {
+  patch_size <- tibble()
+}
+
+tic()
+plan(multisession)
+p_df <- lapply( seq_along(fire_bricks), function(i){
+  br <- brick(paste0(data_path,"/",fire_bricks[i]))
+  df <- future_lapply(seq_len(nbands(br)), function(x){evaluate_patch_distr(br[[x]], FALSE) }) # future_
+  df <- bind_rows(df) %>% mutate(region= region_name)  %>% select(region, date, everything())
+
+})
+plan(sequential)
+
+patch_size <- bind_rows(patch_size,do.call(rbind,p_df))
+toc()
+
+saveRDS(patch_size,patch_size_name)
+
+#
+# Calculate total forest region area in pixels 
+#
+fire_bricks <- list.files(path=data_path,pattern="^BurnedAreaAmazon_.*tif$")
+fire_bricks
+patch_sparse <- convert_to_sparse(fire_bricks,region_name,data_path)
+total_forest <- nrow(patch_sparse)
+
+#
+# Total Area in pixels 31364191
+#
+total_forest <- 31364191
+
+#
+# Patch Plots 
+#
+require(ggrepel)
+require(lubridate)
+require(plotly)
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+  filter( month(date) %in% c(4,5,6,7,8,9,10)) %>% 
+  ggplot(  aes(no_patch,tot_patch, label=label,color=year(date) ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      xlab("Number of Patches") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))   #+ scale_x_log10() + scale_y_log10()
+ggplotly(p1)
+
+patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+   filter( month(date) %in% c(4,5,6,7,8,9,10)) %>% 
+  mutate( label =ifelse(date =="2010-08-01" | date=="2005-08-01" | date=="2020-08-01" | date=="2010-09-01" | date=="2007-09-01" | date=="2004-09-01",as.character(date),"")) %>%
+  ggplot(  aes(no_patch,tot_patch, label=label,color=year(date) ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      xlab("Number of Patches") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + geom_text_repel()
+
+ggsave("figure/Amazon_NumberVsSize_Month.jpg",width=8,height=6,units="in",dpi=600)
+
+
+
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=max(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+  filter( month(date) %in% c(4,5,6,7,8,9,10)) %>%
+  ggplot(  aes(no_patch,tot_patch, label=label,color=year(date) ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      xlab("Number of Patches") +  
+      ylab("Max Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1))   + geom_text_repel()
+ggplotly(p1)
+
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=max(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+  filter( month(date) %in% c(4,5,6,7,8,9,10)) %>%
+  mutate( label =ifelse(date =="2010-08-01" | date=="2007-09-01" | date=="2010-09-01" | date=="2005-09-01" | date=="2004-08-01",as.character(date),"")) %>%
+  ggplot(  aes(no_patch,tot_patch, label=label,color=year(date) ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      xlab("Number of Patches") +  
+      ylab("Max Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1))   + geom_text_repel()
+ggsave("figure/Amazon_MaxSizeVsNumber_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Max Patch Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/Amazon_MaxSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(max_patch=n()/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Number of Patches %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/Amazon_NumberPatches_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(max_patch=sum(size)/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Total Patch Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/Amazon_TotSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_size %>% mutate(date=year(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+   ggplot(  aes(no_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c()  + 
+      xlab("Number of Patches") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + geom_text_repel()
+ggplotly(p1)
+ggsave("figure/Amazon_TotSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_size %>% mutate(date=year(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,tot_patch=max(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+   ggplot(  aes(no_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c()  + 
+      xlab("Number of Patches") +  
+      ylab("Max Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + geom_text_repel()
+ggplotly(p1)
+ggsave("figure/Amazon_MaxSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+```
+
+## Fit Power Laws Centered on the month of max fire 
+
+* For Amazon/Dry Chaco  the months of max fire are 08 09 10
+
+```{r AmazonSeasonalPatchDistr, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+require(lubridate)
+require(Matrix)
+require(ggplot2)
+
+file_pattern <- "^BurnedAreaAmazon20"
+fire_bricks <- list.files(path=data_path,pattern=file_pattern)
+fire_bricks
+region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
+fname <- paste0("Data/patch_sparse_BurnedArea_", region_name, ".rds" )
+
+
+if(file.exists(fname)) {
+  patch_sparse <- readRDS(fname)
+} else {
+  stop("Patch sparse file don't exist")
+}
+
+# Calculate period from month 01 - 12 07 because the peak is always 07-08-09 
+#
+if( !("period" %in% names(patch_sparse))) {
+  patch_sparse <- patch_sparse %>% mutate(period = year(date) -2000)
+  saveRDS(patch_sparse,fname)
+}
+str(patch_sparse)
+
+## Check if period is well defined 
+i <- 0
+
+patch_sparse %>% filter(date=="2000-12-01") 
+patch_sparse %>% filter(date=="2001-01-01") 
+patch_sparse %>% filter(date=="2019-06-01") 
+patch_sparse %>% filter(date=="2019-07-01") 
+patch_sparse %>% filter(date=="2020-06-01") 
+patch_sparse %>% filter(date=="2021-01-01") 
+ 
+
+#
+# Calculate distribution parameters and store in a data.frame and generic sews
+#
+patch_dfp_fname <- paste0("Data/patch_dfp_BurnedArea_", region_name, ".rds" )
+
+if(file.exists(patch_dfp_fname)) {
+  patch_dfp <- readRDS(patch_dfp_fname)
+} else {
+  
+  patch_dfp <- tibble()
+}
+
+plan(multisession)
+p_df <- future_lapply( unique(patch_sparse$period), function(i){
+  br <- patch_sparse[patch_sparse$period == i,]
+  spm <- sparseMatrix(br$i,br$j) 
+  df <- evaluate_patch_distr(spm,TRUE) %>% mutate(period=i,region= region_name)  %>% select(region, date,period, everything())
+  #g1 <- generic_sews(as.matrix(spm),subsize = 2) 
+  #df <- bind_cols(df, data.frame(t(g1$value)))
+})
+patch_dfp <- bind_rows(patch_dfp,p_df)
+
+patch_dfp <- patch_dfp %>% mutate(date=2000+period )
+
+saveRDS(patch_dfp,patch_dfp_fname)
+
+
+
+#
+# Save patch distribution by period
+#
+patch_size_pfname <- paste0("Data/patch_sizes_p_BurnedArea_", region_name, ".rds" )
+if(file.exists(patch_size_pfname)) {
+  patch_sizes_p <- readRDS(patch_size_pfname)
+} else {
+  
+  patch_sizes_p <- tibble()
+}
+
+
+p_df <- future_lapply( unique(patch_sparse$period), function(i){
+  br <- patch_sparse[patch_sparse$period == i,]
+  spm <- sparseMatrix(br$i,br$j)
+  df <- evaluate_patch_distr(spm,FALSE) %>% mutate(period=i,region= region_name)  %>% select(region, date,period, everything())
+})
+patch_sizes_p <- bind_rows(patch_sizes_p,p_df) 
+patch_sizes_p <- patch_sizes_p %>% mutate(date = 2000+ period)
+saveRDS(patch_sizes_p,patch_size_pfname)
+
+
+
+#
+# Which years have power law distribution
+#
+knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)))
+
+#
+# Power exponent vs Relative range
+#
+pl <-  patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc), type=="pl") %>% mutate(range=range/total_forest) %>% ggplot(  aes(range,expo, color=factor(date )))+ geom_point() + theme_bw() + xlab("Relative Range") + ylab("Exponent") + 
+      scale_color_viridis_d(guide=FALSE)  + geom_abline(intercept = 2, slope =0,alpha=0.3) 
+
+pl
+
+patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc),type=="pl") %>% ungroup() %>% summarize(range(expo),mean(expo)) 
+
+#
+# Plot power law fittings!
+#
+plots_fname <- paste0("Data/Plots_p_BurnedArea_", region_name, ".rds" )
+if(file.exists(plots_fname)) {
+  patch_sizes_p <- readRDS(plots_fname)
+} else {
+
+  p_df <- future_lapply( unique(patch_sparse$period), function(i){
+    br <- patch_sparse[patch_sparse$period == i,]
+    spm <- sparseMatrix(br$i,br$j) 
+    df <- evaluate_patch_distr(spm,returnOBJ = TRUE)
+  })
+  saveRDS(p_df,plots_fname)
+}
+plan(sequential)
+
+
+require(cowplot)
+require(scales)
+gp <- lapply(seq_len(length(p_df)), function(x){
+  
+  gg <- p_df[[x]] + ggtitle(1999+x) 
+})
+gp[[2]]
+prow <- plot_grid(
+  gp[[4]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), 
+  gp[[5]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))),
+  gp[[6]] + theme(legend.position="none") + scale_x_log10(breaks = 10^(0:5), labels = trans_format("log10", math_format(10^.x))),
+  gp[[7]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[8]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[9]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2020"),
+  align = 'vh',
+  nrow= 2
+  )
+legend_b <- get_legend(
+  gp[[4]] +
+    guides(color = guide_legend(nrow = 2)) +
+    theme(legend.position = "bottom")
+)
+pg <- plot_grid(prow, legend_b, nrow = 2, rel_heights = c(1, .1))
+save_plot("figure/Amazon_PatchDistr_2003-2008.png",pg,base_width=8,base_height=6,dpi=600)
+
+prow <- plot_grid(
+  gp[[10]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), 
+  gp[[11]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))),
+  gp[[12]] + theme(legend.position="none") + scale_x_log10(breaks = 10^(0:5), labels = trans_format("log10", math_format(10^.x))),
+  gp[[13]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[14]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[15]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2020"),
+  align = 'vh',
+  nrow= 2
+  )
+legend_b <- get_legend(
+  gp[[4]] +
+    guides(color = guide_legend(nrow = 2)) +
+    theme(legend.position = "bottom")
+)
+pg <- plot_grid(prow, legend_b, nrow = 2, rel_heights = c(1, .1))
+save_plot("figure/Amazon_PatchDistr_2009-2014.png",pg,base_width=8,base_height=6,dpi=600)
+
+
+prow <- plot_grid(
+  gp[[16]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), 
+  gp[[17]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))),
+  gp[[18]] + theme(legend.position="none") + scale_x_log10(breaks = 10^(0:5), labels = trans_format("log10", math_format(10^.x))),
+  gp[[19]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[20]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2010"),
+  gp[[21]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), # + ggtitle("2020"),
+  align = 'vh',
+  nrow= 2
+  )
+legend_b <- get_legend(
+  gp[[4]] +
+    guides(color = guide_legend(nrow = 2)) +
+    theme(legend.position = "bottom")
+)
+pg <- plot_grid(prow, legend_b, nrow = 2, rel_heights = c(1, .1))
+save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6,dpi=600)
+
+```
+
+
+# Change of regime
+
+|region | date| period|type |      expo|      rate| xmin|      AICc| range|
+|:------|----:|------:|:----|---------:|---------:|----:|---------:|-----:|
+|Amazon | 2001|      1|ln   | -1.236398| 2.1531997|   54|  6950.870|    NA|
+|Amazon | 2002|      2|pexp |  2.217215| 0.0002646|   90|  8629.256|    NA|
+|Amazon | 2003|      3|pexp |  2.169919| 0.0005622|   44| 14556.177|    NA|
+|Amazon | 2004|      4|pexp |  2.142637| 0.0001151|   66| 13023.416|    NA|
+|Amazon | 2005|      5|ln   | -9.180169| 3.5026064|   70| 13842.223|    NA|
+|Amazon | 2006|      6|pexp |  2.041499| 0.0002795|   29| 19285.119|    NA|
+|Amazon | 2007|      7|pl   |  2.176596|        NA|   54| 15042.315| 47132|
+|Amazon | 2008|      8|pexp |  2.139883| 0.0002042|   48| 10688.426|    NA|
+|Amazon | 2009|      9|pl   |  2.400407|        NA|   45|  8154.537|  3117|
+|Amazon | 2010|     10|pl   |  1.997016|        NA|   41| 19977.859| 75967|
+|Amazon | 2011|     11|pexp |  1.954160| 0.0001630|   27| 14112.897|    NA|
+|Amazon | 2012|     12|pexp |  1.981832| 0.0003285|   25| 17126.664|    NA|
+|Amazon | 2013|     13|pl   |  2.323158|        NA|   49|  6013.017|  5440|
+|Amazon | 2014|     14|ln   | -2.007573| 2.3653178|   30| 12775.172|    NA|
+|Amazon | 2015|     15|pexp |  2.262959| 0.0001455|   74|  7857.954|    NA|
+|Amazon | 2016|     16|pexp |  2.111907| 0.0001705|   59| 10315.595|    NA|
+|Amazon | 2017|     17|pexp |  2.035952| 0.0000956|   36| 17060.737|    NA|
+|Amazon | 2018|     18|pl   |  2.459423|        NA|   60|  5837.460|  3596|
+|Amazon | 2019|     19|pexp |  2.155401| 0.0000982|   56| 11285.548|    NA|
+|Amazon | 2020|     20|pl   |  2.251879|        NA|   86|  8554.237| 17718|
+
+1. The years 2009/2013/2018 are year with low total sizes, and 2007/2010/2020 have the high total size, both have power law patch distributions.
+
+2. In contrast the years 2005 have very high number of patches with smaller sizes, no power law distribution
+
+3. These are the extremes in the distribution 
+
+4. The range of power law exponent is 2.00 2.46
+
+
+# Estimate fire parameters from globfire data   
+
+```{r globfiredata, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+
+require(lubridate)
+glf <- read_csv("Data/GlobFireAmazon.csv") %>% mutate(FinalDate= as_datetime(FinalDate/1000),InitialDate= as_datetime(InitialDate/1000))
+
+# MODIS pixel size
+pixelArea <-  463.3127165275 * 463.3127165275
+total_area <-  6696597793354.449 # from GEE
+total_forest <- 31364191
+names(glf)
+total_area/total_forest
+#
+# Estimate lambdaF
+#
+glf <- glf %>% mutate( deltaDays = as.numeric(FinalDate - InitialDate, "days")+1,size= area/pixelArea, lambdaF =if_else(deltaDays==0, size, size/deltaDays), date=strftime(FinalDate,"%Y-%m"))
+
+
+
+#
+# Patch Plots 
+#
+require(ggrepel)
+require(lubridate)
+require(plotly)
+p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Max Patch Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/glf_Amazon_MaxSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
+  summarize(max_patch=n()/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Number of Patches %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/glf_Amazon_NumberPatches_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
+  summarize(max_patch=sum(size)/total_forest*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Total Size%") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+ggsave("figure/glf_Amazon_TotSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+p1 <- glf %>% mutate(date=year(FinalDate)) %>% group_by(date) %>%  
+  summarize(max_patch=sum(area)/total_area*100) %>%  
+  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("GLF Total Size%") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + scale_x_continuous(breaks=2000:2020)
+ggplotly(p1)
+ggsave("figure/glf_Amazon_TotSize_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+
+
+```
+
+# 
+
+```{r readFileswithPrecipitationTmaxPatch, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+require(tidyverse)
+require(lubridate)
+require(plotly)
+# MODIS pixel size
+pixelArea <-  463.3127165275 * 463.3127165275
+total_area <-  6696597793354.449 # from GEE
+total_forest <- 31364191
+# 31635980 * pixelArea - 6696597793354.449
+# total_forest*pixelArea - 6696597793354.449
+
+region_name <- "Amazon"
+patch_size_name <- paste0("Data/patch_size_BurnedArea_",region_name, ".rds")
+
+patch_size <- readRDS(patch_size_name)
+
+pat <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+  summarize(no_patch=n()/total_forest*100,total_patch=sum(size)/total_forest*100,max_patch=max(size)/total_forest*100) 
+ 
+pr <- read_csv("Data/TerraClimatePrAmazonas.csv") %>% inner_join(pat) 
+
+#evi <- read_csv("Data/EVI_by_month_Amazon.csv") %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(evi=mean(EVI)) %>% mutate(date=ym(date)) 
+#pr <- pr %>% inner_join(evi)
+
+p1 <- pr %>% 
+  ggplot(  aes(date,pr ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c()  + 
+      ylab("Accumulated Precitpitation mm") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
+ggplotly(p1)
+
+
+p1 <- pr %>% mutate(pr1=lag(pr,1),pr2=lag(pr,2),pr3=lag(pr,3),pr4=lag(pr,4)) %>% pivot_longer(cols = starts_with("pr"),names_to="lag",values_to = "pp" ) %>%
+  ggplot(  aes(pp,total_patch,color=lag ))+ geom_point() + theme_bw() +
+      scale_color_viridis_d()  + 
+      #ylab("Accumulated Precitpitation mm") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) 
+ggplotly(p1)
+
+p1 <- pr %>% mutate(tmmx1=lag(tmmx,1),tmmx2=lag(tmmx,2),tmmx3=lag(tmmx,3),tmmx4=lag(tmmx,4)) %>% pivot_longer(cols = starts_with("tmmx"),names_to="lag",values_to = "pp" ) %>%
+  ggplot(  aes(pp,total_patch,color=lag ))+ geom_point() + theme_bw() +
+      scale_color_viridis_d()  + 
+      xlab("Max temp") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) 
+ggplotly(p1)
+
+
+p1 <- pr %>% 
+  ggplot(  aes(pr,max_patch ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c()  + 
+      #ylab("Accumulated Precitpitation mm") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) 
+ggplotly(p1)
+
+```
+
+# Using Empirical dynamic modelling (dataframe from previous chunk) with maxtemp y monthly precipitation
+
+```{r EDMPatchGrowth, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+require(rEDM)
+
+#
+# Initial analysis of total_patch 
+#
+simplex_out <- simplex(pr$total_patch)
+rho_E <- EmbedDimension(dataFrame=pr, lib="1 242", pred="1 242",columns="total_patch", target="total_patch",maxE=12)
+E <- 10
+rho_theta_e9 = PredictNonlinear(dataFrame = pr, columns = "total_patch", target = "total_patch", lib = "1 240", pred = "1 240", E = E)
+
+rho_E <- EmbedDimension(dataFrame=pr, lib="1 242", pred="1 242",columns="max_patch", target="max_patch")
+E <- 9
+rho_theta_e9 = PredictNonlinear(dataFrame = pr, columns = "max_patch", target = "max_patch", lib = "1 242", pred = "1 242", E = E)
+
+rho_E <- EmbedDimension(dataFrame=pr, lib="1 242", pred="1 242",columns="no_patch", target="no_patch",maxE=16)
+E <- which.max(rho_E$rho) 
+rho_theta_e9 = PredictNonlinear(dataFrame = pr, columns = "no_patch", target = "no_patch", lib = "1 240", pred = "1 240", E = E)
+
+#
+rho_Tp <- PredictInterval(dataFrame = pr, lib = "1 121", pred = "122 242", target = "total_patch",
+columns = "total_patch", E = 10,maxTp = 20)
+
+simplex = Simplex( dataFrame = pr, 
+                   lib     = "1   121", # portion of data to train
+                   pred    = "122 242", # portion of data to predict
+                   columns = "total_patch",
+                   target  = "total_patch",
+                   E       = 10,
+                   Tp      = 6)
+
+plot( pr$date, pr$total_patch, type = "l", lwd = 2,
+      xlab = "year", ylab = "total_patch")
+lines( simplex$date, simplex$Predictions, col = "red", lwd = 2)
+legend( 'topleft', legend = c( "Observed", "Predicted (year + 1)" ),
+        fill = c( 'black', 'red' ), bty = 'n', cex = 1.3 )
+
+err = ComputeError(simplex$Observations, simplex$Predictions)
+plot(simplex$Observations, simplex$Predictions, pch = 19, cex = 0.5,xlab = "Observations", ylab = "Predictions", main = "3 Species x_t")
+abline(a = 0, b = 1, lty = 2, col = "blue")
+text(-1, 1, paste(capture.output(cbind(err)), collapse = "\n"))
+
+
+Mview = Multiview(dataFrame = pr, lib = "1 121", pred = "122 242", E = 10,
+columns = "total_patch pr tmmx", target = "total_patch",Tp=6)
+
+Mview$View  %>% arrange(desc(rho))
+
+plot(Mview$Predictions$Observations, Mview$Predictions$Predictions, pch = 19, cex = 0.5,xlab = "Observations", ylab = "Predictions", main = "Total pr tmmx")
+abline(a = 0, b = 1, lty = 2, col = "blue")
+text(-1, 1, paste(capture.output(cbind(err)), collapse = "\n"))
+
+plot( Mview$Predictions$date, Mview$Predictions$Observations, type = "l", lwd = 2,
+      xlab = "year", ylab = "total_patch")
+lines( Mview$Predictions$date, Mview$Predictions$Predictions, col = "red", lwd = 2)
+legend( 'topleft', legend = c( "Observed", "Predicted (year + 10)" ),
+        fill = c( 'black', 'red' ), bty = 'n', cex = 1.3 )
+
+
+
+
+#
+# Convergetn cross mapping 
+#
+cmap <- CCM(dataFrame = pr, E = 9, Tp = 0, columns = "total_patch",
+            target = "pr", libSizes = "10 70 5", sample = 100, showPlot = TRUE)
+
+cmap <- CCM(dataFrame = pr, E = 9, Tp = 0, columns = "total_patch",
+            target = "tmmx", libSizes = "10 70 5", sample = 100, showPlot = TRUE)
+
+head(Thrips, 2)
+
+# Embedding dimension
+#
+rho_E <- EmbedDimension(dataFrame = pr, columns = "total_patch", target = "total_patch",
+                        lib = "1 230", pred = "1 230", showPlot = TRUE,maxE=12)
+E <- which.max(rho_E$rho)
+# Test for nonlinearity
+#
+rho_theta_e9 = PredictNonlinear(dataFrame = pr, columns = "total_patch", target = "total_patch", lib = "1 230", pred = "1 230", E = E)
+
+# add Seasonal component to pr
+ssp <- spectrum(pr$pr)
+per <- 1/ssp$freq[ssp$spec==max(ssp$spec)]
+pr$t <- 1:nrow(pr)
+reslm <- lm(pr ~ sin(2*pi/per*t)+cos(2*pi/per*t),data=pr)
+pr$season <-  fitted(reslm)
+summary(reslm)
+
+vars <- colnames(pr)[c(5,2,3,8)]
+
+var_pairs = combn(vars, 2) # Combinations of vars, 2 at a time
+libSize = paste(NROW(pr) - E, NROW(pr) - E, 10, collapse = " ")
+ccm_matrix = array(NA, dim = c(length(vars), length(vars)), dimnames = list(vars,
+                                                                            vars))
+for (i in 1:ncol(var_pairs)) {
+  ccm_out = CCM(dataFrame = pr, columns = var_pairs[1, i], target = var_pairs[2,i], libSizes = libSize, Tp = 0, E = E, sample = 100)
+  outVars = names(ccm_out)
+  var_out = unlist(strsplit(outVars[2], ":"))
+  ccm_matrix[var_out[2], var_out[1]] = ccm_out[1, 2]
+  ccm_matrix[var_out[1], var_out[2]] = ccm_out[1, 3]
+}
+
+
+corr_matrix <- array(NA, dim = c(length(vars), length(vars)), dimnames = list(vars,
+                                                                              vars))
+for (ccm_from in vars) {
+  for (ccm_to in vars[vars != ccm_from]) {
+    ccf_out <- ccf(pr[, ccm_from], pr[, ccm_to], type = "correlation",
+                   lag.max = 6, plot = FALSE)$acf
+    corr_matrix[ccm_from, ccm_to] <- max(abs(ccf_out))
+  }
+}
+
+ccm_matrix
+corr_matrix
+
+total_patch_xmap_pr <- CCM(dataFrame = pr, E = E, Tp = 0, columns = "total_patch",
+                        target = "pr", libSizes = "15 230 3", sample = 300, showPlot = TRUE)
+abline(h = corr_matrix["total_patch", "pr"], col = "black", lty = 2)
+
+total_patch_xmap_tmmx <- CCM(dataFrame = pr, E = E, Tp = 0, columns = "total_patch",
+                             target = "tmmx", libSizes = "15 230 3", sample = 300, showPlot = TRUE)
+abline(h = corr_matrix["total_patch", "tmmx"], col = "black", lty = 2)
+
+total_patch_xmap_season <- CCM(dataFrame = pr, E = E, Tp = 0, columns = "total_patch",
+                        target = "season", libSizes = "15 230 3", sample = 300, showPlot = TRUE)
+abline(h = corr_matrix["total_patch", "season"], col = "black", lty = 2)
+
+
+# data.frame to hold CCM rho values between Thrips abundance and variable
+rho_surr <- data.frame(maxT = numeric(1000), Rain = numeric(1000))
+
+# For Precipitation
+#
+surr_pr = SurrogateData(pr$pr, method = "seasonal", T_period = 12, num_surr = 1000,
+                          alpha = 3)
+
+maxT_data = as.data.frame(cbind(seq(1:nrow(pr)), pr$total_patch, surr_pr))
+names(maxT_data) = c("time", "total_patch", paste("T", as.character(seq(1, 1000)),
+                                                      sep = ""))
+# Cross mapping
+for (i in 1:1000) {
+  targetCol = paste("T", i, sep = "")
+  # as in maxT_data
+  ccm_out = CCM(dataFrame = maxT_data, E = E, Tp = 0, columns = "total_patch",
+                target = targetCol, libSizes = "230 230 5", sample = 1)
+  col = paste("total_patch", ":", targetCol, sep = "")
+  rho_surr$maxT[i] = ccm_out[1, col]
+}
+1 - ecdf(rho_surr$maxT)(ccm_matrix["pr", "total_patch"])
+
+# 0.231
+
+# For max Temp
+#
+surr_pr = SurrogateData(pr$tmmx, method = "seasonal", T_period = 12, num_surr = 1000,
+                        alpha = 3)
+
+maxT_data = as.data.frame(cbind(seq(1:nrow(pr)), pr$total_patch, surr_pr))
+names(maxT_data) = c("time", "total_patch", paste("T", as.character(seq(1, 1000)),
+                                                  sep = ""))
+# Cross mapping
+for (i in 1:1000) {
+  targetCol = paste("T", i, sep = "")
+  # as in maxT_data
+  ccm_out = CCM(dataFrame = maxT_data, E = E, Tp = 0, columns = "total_patch",
+                target = targetCol, libSizes = "230 230 5", sample = 1)
+  col = paste("total_patch", ":", targetCol, sep = "")
+  rho_surr$maxT[i] = ccm_out[1, col]
+}
+1 - ecdf(rho_surr$maxT)(ccm_matrix["tmmx", "total_patch"])
+
+# 0 ------------------------->  Significant for temperature 
+
+```
+
+# GAM models
+
+```{r gamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+require(mgcv)
+require(gratia)
+require(ggplot2)
+
+
+pr  %>% ggplot( aes(pr,log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
+pr  %>% ggplot( aes(lag(pr,8),log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
+pr  %>% ggplot( aes(tmmx,log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
+
+
+#
+# Linear Model
+#
+lm01 <- lm( log(max_patch) ~ pr*tmmx, data=pr)
+summary(lm01)
+drop1(lm01,test = "F")
+plot(lm01,which=1,add.smooth = FALSE)
+E <- resid(lm01)
+hist(E, xlab = "Residuals", main = "")
+
+pr <- pr %>% mutate( modL = exp(predict(lm01, type="response")))
+p1 <- pr %>% mutate(year=year(date),date=str_sub(date,1,7)) %>% filter(year>2000) %>% ggplot(aes(date,max_patch, color="Data")) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_point(aes(date,modL, color="Prediction"))
+
+ggplotly(p1)
+
+#
+# GAM Model 
+#
+
+gam01 <- gam(log(max_patch) ~ s(pr, bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+
+draw(gam01,residuals=T) 
+appraise(gam01) 
+summary(gam01)
+
+gam01a <- gam(log(max_patch) ~ s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+
+draw(gam01a,residuals=T) 
+appraise(gam01a) 
+summary(gam01a)
+
+AIC(gam01,gam01a)
+
+gam02 <- gam(log(max_patch) ~ s(tmmx, bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+gam.check(gam02)
+draw(gam02,residuals=T) 
+appraise(gam02) 
+summary(gam02)
+
+gam03 <- gam(log(max_patch) ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03,residuals=T) 
+appraise(gam03) 
+summary(gam03)
+gam.check(gam03)
+
+pr$month <- month(pr$date)
+gam03b <- gam(log(max_patch) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03b,residuals=T) 
+appraise(gam03b) 
+summary(gam03b)
+gam.check(gam03b)
+
+
+# Add lagged pr
+pr$pr1 <- lag(pr$pr)
+
+gam03a <- gam(log(max_patch) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03a,residuals=T) 
+appraise(gam03a) 
+summary(gam03a)
+gam.check(gam03a)
+
+
+AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b)
+
+#
+# Break Data in training 
+#
+pr_train <- subset(pr, year(date)<2019 )
+pr_test  <- subset(pr, year(date)>=2019 ) 
+gam02 <- gam(log(max_patch) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+
+
+
+p1<- predict(gam02,newdata=pr_test, se.fit = TRUE)
+pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+pr_test %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
+
+#
+# 
+#
+# kg m-2 s-1 = (kg m-3) x (m/s) So, to go from m/s to mm/day you multiply by 86400x1000 But to take out density (measured in kg m-3) you divide by 1000.
+
+
+gdpp <- read_csv("Data/GDPP_rcp45_Amazon.csv")
+gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=sum(pr) * 86400/24 ) %>% mutate(date=ym(date),pr1=lag(pr))
+
+pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+gdpp <- left_join(gdpp, pr%>% select(date, max_patch) ) %>% mutate(month=month(date))
+p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+gdpp %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+
+
+gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
+
+
+#
+# 
+#
+gdpp <- read_csv("Data/GDPP_rcp85_Amazon.csv")
+gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=sum(pr) * 86400/24 ) %>% mutate(date=ym(date),pr1=lag(pr))
+
+pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+gdpp <- left_join(gdpp, pr%>% select(date, max_patch) ) %>% mutate(month=month(date))
+p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+gdpp %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
+
+gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
+
+
+```

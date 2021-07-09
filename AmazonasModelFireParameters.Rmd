@@ -1,0 +1,424 @@
+---
+title: "Estimate model fire parameters"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+## setup
+
+```{r setup, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+source("R/functions.r")
+require(raster)
+require(spatialwarnings)
+require(future.apply)
+require(tidyverse)
+require(lubridate)
+
+# Data Path
+#
+# Data Path
+#
+if( Sys.info()['nodename'] =="ls-pro") {
+  
+  data_path <- "~/Academicos/GitProjects/AustraliaTippingPoint/Data"
+} else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
+  data_path <- "~/GitProjects/AustraliaTippingPoint/Data"
+
+}
+
+
+file_pattern <- "^BurnedAreaAmazon20"
+fire_bricks <- list.files(path=data_path,pattern=file_pattern)
+fire_bricks
+region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
+
+```
+
+
+## Calculate patch growth/shrink 
+
+```{r calcPatchGrowthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+require(Matrix)
+
+patch_df_name <- paste0("Data/patch_growth_",region_name, ".rds")
+
+plan(multicore,workers=parallel::detectCores() - 3 )
+
+patch_growth <- patch_growth_from_GEE_files(fire_bricks,data_path,region_name)
+
+saveRDS(patch_growth,patch_df_name)
+
+plan(sequential)
+```
+
+
+# Estimate parameters from fuel patch growth shrink  
+
+
+```{r fireParamshAustralia, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+
+if(!exists("patch_growth")) {
+  patch_df_name <- paste0("Data/patch_growth_",region_name, ".rds")
+  patch_growth <- readRDS(patch_df_name)
+}
+
+
+# Plot patch growth and shrink
+
+names(patch_growth)
+
+#pg <- patch_growth %>% mutate(delta=abs(delta/size1)) %>% filter(type=="g") %>% arrange(delta)
+#pg %>% ggplot(aes(size1,delta, colour=type)) + geom_point() +theme_bw() + scale_colour_viridis_d()  
+#ps <- patch_growth %>% mutate(delta=abs(delta)) %>% filter(type=="s",size1>0) 
+#ps %>% ggplot(aes(size0,delta, colour=type)) + geom_point() +theme_bw() + scale_colour_viridis_d() + scale_x_log10() +  scale_y_log10()
+
+#
+# The number of patches that has grew from 0 divided by the total Forest Area is the bF
+#
+total_forest <- 31364191
+pg <- patch_growth %>% ungroup() %>% filter(type=="g",size0==0) %>% count(date) %>% mutate(bF = n/total_forest)
+ignition_prob <- pg
+write_csv(pg,"Data/ignitionProb_bF.csv")
+saveRDS(ignition_prob, "Data/ignition_prob.rds")
+
+pg %>% mutate(year=year(date),date=str_sub(date,1,7)) %>% filter(year>2000) %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x")
+ggsave("figure/Amazon_bF_Month.jpg",width=8,height=6,units="in",dpi=600)
+
+require(fitdistrplus)
+descdist(pg$bF, boot = 1000)
+
+# pg %>% summarise(med_bF=median(bF),max_bF=max(bF),min_bF=min(bF))
+as_tibble(t(quantile(pg$bF, probs=c(.025,0.5,.975))))
+
+# For all these patches lambdaF = 1 assuming that they growth on all the available V sites
+# 
+pg <- patch_growth %>% ungroup() %>% filter(type=="g") %>% 
+  mutate(lambdaF = if_else(size0==0, delta/15, delta/(size0*30) ))  # lambdaF =delta/size0/30)
+
+pg %>%  filter(date>"2000-12-31") %>% group_by(date) %>% summarise(lambdaF = mean(lambdaF)) %>% mutate(year=year(date),date=str_sub(date,1,7)) %>% ggplot(aes(date,lambdaF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x")
+
+descdist(pg$lambdaF, boot = 1000)
+
+# pg %>% summarise(med_lambdaF=median(lambdaF),max_lambdaF=max(lambdaF),min_lambdaF=min(lambdaF))
+as_tibble(t(quantile(pg$lambdaF, probs=c(.025,0.5,.975))))
+mean(pg$lambdaF)
+
+pg <- patch_growth %>% ungroup() %>% filter(type=="g") %>% mutate(equal0= (size0==0)) %>% count(equal0) %>% mutate(freq=n/sum(n))
+
+
+
+```
+
+
+# Results Fire paramters state F (Not Globfire Data )
+
+* bF = Number of patches that start from 0  
+     `2.5%`     `50%`  `97.5%`
+ 0.0000106 0.0000473 0.000388
+
+* lambdaF = for patches starting != 0 delta/ (size0 * 30)  , from patches starting from 0 delta/ 15 (assuming they growth inside a month)  
+
+meam(lambdaF) 0.6260821
+
+  `2.5%` `50%` `97.5%`
+  0.0667 0.133    3.87
+
+
+* Most patches growth from 0
+
+  equal0      n   freq
+  FALSE    3026 0.0112
+  TRUE   266072 0.989 
+
+
+# Estimate fire parameters from globfire data   
+
+```{r ndviPatchGrowthAustralia, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+#
+# Estimating parameters using GlobFire data 
+#
+
+require(lubridate)
+glf <- read_csv("Data/GlobFireAmazon.csv") %>% mutate(FinalDate= as_datetime(FinalDate/1000),InitialDate= as_datetime(InitialDate/1000))
+
+# MODIS pixel size
+pixelArea <-  463.3127165275 * 463.3127165275
+total_area <-  6696597793354.449 # from GEE
+total_forest <- 31364191
+(total_forest * pixelArea / 100000) -( total_area / 100000 )
+
+# the total area calculated with GEE is smaller than the area calculated based in the number of pixels
+
+
+#
+# Estimate lambdaF
+#
+glf <- glf %>% mutate( deltaDays = as.numeric(FinalDate - InitialDate, "days")+1,size= area/pixelArea, lambdaF =if_else(deltaDays==0, size, size/deltaDays), date=strftime(FinalDate,"%Y-%m"))
+
+glf %>%  filter(date>"2000-12") %>% group_by(date) %>% summarise(lambdaF = mean(lambdaF)) %>% mutate(year=str_sub(date,1,4)) %>% ggplot(aes(date,lambdaF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x")
+
+as_tibble(t(quantile(glf %>% filter(lambdaF>0) %>% pull(lambdaF) , probs=c(.025,0.5,.975))))
+
+
+#
+# Estimate bF
+#
+pg <- glf %>% filter(InitialDate>"2001-01-01") %>% count(InitialDate) %>% mutate(bF = n/total_forest, date=strftime(InitialDate,"%Y-%m")) 
+
+pgm <- pg %>% group_by(date) %>% summarise(n=sum(n),mean_bF=mean(bF)) %>% mutate(bF=n/total_forest) # Calculated by month
+
+pg %>% mutate(year=year(InitialDate)) %>% group_by(year,date) %>% summarize(bF = sum(bF)) %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x") + 
+ggsave("figure/glf_Amazon_bF_Month.jpg",width=8,height=6,units="in",dpi=600)
+
+as_tibble(t(quantile(pg$bF , probs=c(.025,0.5,.975))))
+
+# Add an initial copy of the same data to give some time for transients
+#
+pg$fecha <- pr$date - months(nrow(pr))
+write_csv( bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF), "Data/Estimated_bF.csv")
+
+
+```
+
+* LambdaF from GlobFire 
+
+  `2.5%` `50%` `97.5%`
+   0.547  1.11    6.74
+
+* bF from GlobFire
+
+       `2.5%`      `50%`   `97.5%`
+  0.000000255 0.00000191 0.0000154
+
+
+# Calculate the fire return time
+
+```{r calcPatchGrowthDryChaco, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+require(Matrix)
+require(stringr)
+fname <- paste0("Data/patch_sparse_BurnedArea_", region_name, ".rds" )
+if(!exists("patch_sparse")) {
+  patch_sparse <- readRDS(fname)
+}
+
+pd <- patch_sparse %>% arrange(i, j, date) %>%  group_by(i, j) %>%
+  transmute(fini = date, fend = lead(date), deltaD = as.numeric(fend - fini)) %>%
+  na.omit() %>%
+  ungroup
+  
+  
+pd  %>% ggplot(aes(deltaD))+ geom_density() + theme_bw()
+
+descdist(pd$deltaD, boot = 1000)
+as_tibble(t(quantile(pd$deltaD, probs=c(.025,0.5,.975))))
+
+pd1 <- pd %>% filter(fini<"2011-01-01") %>% mutate(periodo="Hasta 2010")
+pd1  %>% ggplot(aes(deltaD))+ geom_density() + theme_bw()
+#descdist(pd1$deltaD, boot = 1000)
+as_tibble(t(quantile(pd1$deltaD, probs=c(.025,0.5,.975))))
+
+pd2 <- pd %>% filter(fini>="2011-01-01")%>% mutate(periodo="Despues 2010")
+pd3 <- bind_rows(pd1,pd2, pd %>% mutate(periodo="Total"))
+require(plotly)
+ggplotly(pd3  %>% ggplot(aes(deltaD,color=periodo))+ geom_density() + theme_bw())
+
+pd3  %>% ggplot(aes(deltaD,color=periodo))+ geom_density() + theme_bw() + scale_color_viridis_d() + xlab("Dias retorno de fuego")
+ggsave("figure/Amazon_FireReturn.jpg",width=8,height=6,units="in",dpi=600)
+
+descdist(pd2$deltaD, boot = 1000)
+as_tibble(t(quantile(pd2$deltaD, probs=c(.025,0.5,.975))))
+
+pd3 %>% group_by(periodo) %>% summarise(meanReturnTime = mean(deltaD), meanRT_years = meanReturnTime / 365)
+
+```
+
+# Results return time amazonas
+
+  periodo      meanReturnTime meanRT_years
+ Despues 2010           907.         2.49
+ Hasta 2010            1326.         3.63
+ Total                 1194.         3.27
+
+
+
+
+# Ignition Rate from pp/tmax using GAM
+
+```{r gamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+require(mgcv)
+require(gratia)
+require(ggplot2)
+
+
+ignition_prob <- readRDS("Data/ignition_prob.rds")
+pr <- read_csv("Data/TerraClimatePrAmazonas.csv") %>% inner_join(ignition_prob %>% mutate(date=ymd(date))) 
+
+pr  %>% ggplot( aes(pr,log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
+pr  %>% ggplot( aes(lag(pr,8),log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
+pr  %>% ggplot( aes(tmmx,log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
+
+
+#
+# Linear Model
+#
+lm01 <- lm( log(bF) ~ pr*tmmx, data=pr)
+summary(lm01)
+drop1(lm01,test = "F")
+plot(lm01,which=1,add.smooth = FALSE)
+E <- resid(lm01)
+hist(E, xlab = "Residuals", main = "")
+
+pr <- pr %>% mutate( modL = exp(predict(lm01, type="response")))
+pr %>% mutate(year=year(date),date=str_sub(date,1,7)) %>% filter(year>2000) %>% ggplot(aes(date,bF, color="Data")) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_point(aes(date,modL, color="Prediction"))
+
+
+#
+# GAM Model 
+#
+
+gam01 <- gam(log(bF) ~ s(pr, bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+
+draw(gam01,residuals=T) 
+appraise(gam01) 
+summary(gam01)
+
+gam01a <- gam(log(bF) ~ s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+
+draw(gam01a,residuals=T) 
+appraise(gam01a) 
+summary(gam01a)
+
+AIC(gam01,gam01a)
+
+gam02 <- gam(log(bF) ~ s(tmmx, bs = "tp", k = 12), data=pr,method="REML",
+             family = gaussian)
+gam.check(gam02)
+draw(gam02,residuals=T) 
+appraise(gam02) 
+summary(gam02)
+
+gam03 <- gam(log(bF) ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03,residuals=T) 
+appraise(gam03) 
+summary(gam03)
+gam.check(gam03)
+
+pr$month <- month(pr$date)
+gam03b <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03b,residuals=T) 
+appraise(gam03b) 
+summary(gam03b)
+gam.check(gam03b)
+
+
+# Add lagged pr
+pr$pr1 <- lag(pr$pr)
+
+gam03a <- gam(log(bF) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = gaussian)
+draw(gam03a,residuals=T) 
+appraise(gam03a) 
+summary(gam03a)
+gam.check(gam03a)
+
+
+AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b)
+
+#
+# Break Data in training 
+#
+pr_train <- subset(pr, year(date)<2019 )
+pr_test  <- subset(pr, year(date)>=2019 ) 
+
+p1<- predict(gam03a,newdata=pr_test, se.fit = TRUE)
+pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
+ 
+#
+# 
+#
+# kg m-2 s-1 = (kg m-3) x (m/s) So, to go from m/s to mm/day you multiply by 86400x1000 But to take out density (measured in kg m-3) you divide by 1000.
+
+
+gdpp <- read_csv("Data/GDPP_rcp45_Amazon.csv") %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=mean(pr)* 86400)
+gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
+
+pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
+p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+gdpp %>% filter(date<"2035-01-01") %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+
+
+gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
+
+
+gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+
+#
+# Export Files for Netlogo Model
+#
+gdpp_exp <- gdpp %>% select(date,fit,ucl,lcl)
+#
+# repeat the last date
+#
+gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)])
+write_csv(gdpp_exp %>% select(date,fit,ucl,lcl), "Data/Predicted_bF_rcp45.csv")
+
+# Add an initial copy of the same data to give some time for transients 
+#
+pr$fecha <- pr$date - months(nrow(pr))
+pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF)
+pr_exp <- pr_exp %>% add_row(date= pr_exp$date[nrow(pr_exp)] + months(1), bF= pr_exp$bF[nrow(pr_exp)])
+
+write_csv( pr_exp, "Data/Estimated_bF.csv")
+
+# add one row repeat the last month with 
+
+
+# 
+# Predict and save bF for rcp85
+#
+gdpp <- read_csv("Data/GDPP_rcp85_Amazon.csv") %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=mean(pr)* 86400)
+gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
+
+pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
+p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
+
+
+gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
+
+#
+# Export Files for Netlogo Model
+#
+gdpp_exp <- gdpp %>% select(date,fit,ucl,lcl)
+#
+# repeat the last date
+#
+gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)])
+write_csv(gdpp_exp %>% select(date,fit,ucl,lcl), "Data/Predicted_bF_rcp85.csv")
+
+
+```
+
+
+# Calcular max y min anual para ver la tendencia!!!!!!!!!!!!
