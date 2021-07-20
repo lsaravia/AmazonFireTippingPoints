@@ -7,7 +7,7 @@ editor_options:
 
 ## setup
 
-* Using http://worldmap.harvard.edu/data/geonode:amapoly_ivb
+* Using Amazonas shape from http://worldmap.harvard.edu/data/geonode:amapoly_ivb
 
 * Update files in server
 
@@ -328,7 +328,7 @@ p_df <- future_lapply( unique(patch_sparse$period), function(i){
 patch_dfp <- bind_rows(patch_dfp,p_df)
 
 patch_dfp <- patch_dfp %>% mutate(date=2000+period )
-
+patch_dfp <- patch_dfp %>%  arrange(date, range) %>% group_by( date) %>% mutate( range=first(range)) 
 saveRDS(patch_dfp,patch_dfp_fname)
 
 
@@ -352,6 +352,7 @@ p_df <- future_lapply( unique(patch_sparse$period), function(i){
 })
 patch_sizes_p <- bind_rows(patch_sizes_p,p_df) 
 patch_sizes_p <- patch_sizes_p %>% mutate(date = 2000+ period)
+
 saveRDS(patch_sizes_p,patch_size_pfname)
 
 
@@ -360,7 +361,6 @@ saveRDS(patch_sizes_p,patch_size_pfname)
 # Which years have power law distribution
 #
 knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)))
-
 #
 # Power exponent vs Relative range
 #

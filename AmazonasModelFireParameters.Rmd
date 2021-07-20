@@ -243,7 +243,7 @@ pd3 %>% group_by(periodo) %>% summarise(meanReturnTime = mean(deltaD), meanRT_ye
  Hasta 2010            1326.         3.63
  Total                 1194.         3.27
 
-
+* Probably the same places get burned repeatedly
 
 
 # Ignition Rate from pp/tmax using GAM
@@ -329,24 +329,90 @@ draw(gam03a,residuals=T)
 appraise(gam03a) 
 summary(gam03a)
 gam.check(gam03a)
-
-
 AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b)
+
+#
+# Check gamma model
+#
+
+gam04 <- gam(bF ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma(link="log"))
+draw(gam04,residuals=T) 
+appraise(gam04) 
+summary(gam04)
+gam.check(gam04)
+
+gam04a <- gam(bF ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma(link="log"))
+draw(gam04a,residuals=T) 
+appraise(gam04a) 
+summary(gam04a)
+gam.check(gam04a)
+
+gam04b <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma(link="log"))
+draw(gam04b,residuals=T) 
+appraise(gam04b) 
+summary(gam04b)
+gam.check(gam04b)
+
+AIC(gam04,gam04a,gam04b)
 
 #
 # Break Data in training 
 #
-pr_train <- subset(pr, year(date)<2019 )
-pr_test  <- subset(pr, year(date)>=2019 ) 
+pr_train <- subset(pr, year(date)<2018 )
+gam03bt <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr_train,method="REML",
+             family = gaussian)
 
-p1<- predict(gam03a,newdata=pr_test, se.fit = TRUE)
+pr_test  <- subset(pr, year(date)>=2018 ) 
+
+p1<- predict(gam03bt,newdata=pr_test, se.fit = TRUE)
 pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
- 
+
+pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+
+gam04bt <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
+             family = Gamma(link="log"))
+
+p1<- predict(gam04bt,newdata=pr_test, se.fit = TRUE)
+pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+
+pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
+
+pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+
 #
-# 
+# MAPE Normal GAM 54.5
+#      Gamma  GAM 63.8
+#
+# with all data
+#
+p1<- predict(gam03b,newdata=pr, se.fit = TRUE)
+pr_all <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_all %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
+ggsave("figure/Amazon_bF_fitted.png",width=8,height=6,units="in",dpi=600)
+
+pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+ 
+p1<- predict(gam04b,newdata=pr, se.fit = TRUE)
+pr_all <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_all %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
+
+pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+
+# MAPE Normal GAM 41.5
+#      Gamma  GAM 47.8
+#
+
+#
+# using the gaussian distributions seems to be sligthly better with lower MAPE 
 #
 # kg m-2 s-1 = (kg m-3) x (m/s) So, to go from m/s to mm/day you multiply by 86400x1000 But to take out density (measured in kg m-3) you divide by 1000.
 
@@ -368,6 +434,8 @@ gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridi
 
 gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+ggsave("figure/Amazon_bF_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+
 
 #
 # Export Files for Netlogo Model
@@ -376,18 +444,10 @@ gdpp_exp <- gdpp %>% select(date,fit,se.fit,ucl,lcl)
 #
 # repeat the last date
 #
-gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)])
-write_csv(gdpp_exp %>% select(date,fit,ucl,lcl), "Data/Predicted_bF_rcp45.csv")
+gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
+write_csv(gdpp_exp , "Data/Predicted_bF_rcp45.csv")
 
-# Add an initial copy of the same data to give some time for transients 
-#
-pr$fecha <- pr$date - months(nrow(pr))
-pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF)
-pr_exp <- pr_exp %>% add_row(date= pr_exp$date[nrow(pr_exp)] + months(1), bF= pr_exp$bF[nrow(pr_exp)])
 
-write_csv( pr_exp, "Data/Estimated_bF.csv")
-
-# add one row repeat the last month with 
 
 
 # 
@@ -396,13 +456,14 @@ write_csv( pr_exp, "Data/Estimated_bF.csv")
 gdpp <- read_csv("Data/GDPP_rcp85_Amazon.csv") %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=mean(pr)* 86400)
 gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
 
-pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
+pr %>% filter( year(date)==2010) %>% select(date,tmmx,pr) 
 gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
 gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
 gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
+ggsave("figure/Amazon_bF_RCP8.5.png",width=8,height=6,units="in",dpi=600)
 
 
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
@@ -414,11 +475,42 @@ gdpp_exp <- gdpp %>% select(date,fit,se.fit,ucl,lcl)
 #
 # repeat the last date
 #
-gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)])
-write_csv(gdpp_exp %>% select(date,fit,ucl,lcl), "Data/Predicted_bF_rcp85.csv")
+gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
+write_csv(gdpp_exp, "Data/Predicted_bF_rcp85.csv")
 
+
+#
+# Export estimated bF from Data 2000- 2020 for NetLogo Simulations
+#
+# Add an initial copy of the same data to give some time for transients 
+#
+pr$fecha <- pr$date - months(nrow(pr))
+pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF)
+
+# add one row repeat the last month  
+pr_exp <- pr_exp %>% add_row(date= pr_exp$date[nrow(pr_exp)] + months(1), bF= pr_exp$bF[nrow(pr_exp)])
+
+write_csv( pr_exp, "Data/Estimated_bF.csv")
+
+
+#
+# Export modeled bF from gam03b 2000- 2020 for NetLogo Simulations
+#
+# Add an initial copy of the same data to give some time for transients 
+#
+p1<- predict(gam03b,newdata=pr, se.fit = TRUE)
+pr_exp <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_exp <- pr_exp %>% select(date,fit,se.fit,ucl,lcl)
+pr_exp$fecha <- pr_exp$date - months(nrow(pr_exp))
+
+pr_exp <- bind_rows(pr_exp %>% mutate(date = fecha) ,pr_exp) %>% select(date,,fit,se.fit,ucl,lcl)
+
+# add one row repeat the last month  
+pr_exp <- pr_exp %>% 
+  bind_rows(pr_exp[rep(nrow(pr_exp), 1),] %>% 
+              mutate(date = date + months(1)))
+
+write_csv( pr_exp, "Data/EstimatedGam_bF.csv")
 
 ```
 
-
-# Calcular max y min anual para ver la tendencia!!!!!!!!!!!!

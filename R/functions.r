@@ -197,7 +197,7 @@ evaluate_patch_distr <- function(br,returnEWS=TRUE,returnOBJ=FALSE,xmin=1){
   
   m_pexp <- discpowerexp.fit(patch_distr,est$xmin)
   pe <- data.frame(x=dd$x,y=ppowerexp(dd$x,est$xmin,m_pexp$exponent,m_pexp$rate,lower.tail=F))
-  pe$y <- pe$y* dd$y[est$xmin]
+  pe$y <- pe$y*  dd$y[which(dd$x==est$xmin)]
   gp <- ggplot( dd, aes(x,y) ) + geom_point() + theme_bw() + scale_x_log10() + scale_y_log10() + 
     geom_line(data=ll,aes(x,y, color="Pl.")) + 
     geom_line(data=ee,aes(x,y, color="Exp.")) + ylab("Frequency (P>=x)") + xlab( "Patch size") +
@@ -522,7 +522,7 @@ netlogo_evaluate_patch_distr <- function(br) {
   pp <-  str_remove_all(br, "[\\[\\]]") %>% str_split(" ") %>% unlist() %>% as.numeric() 
   message(br)
   if( length(unique(pp))>2) {
-    evaluate_patch_distr( pp )
+    evaluate_patch_distr( pp ) %>% mutate(max_patch=max(pp),tot_patch=sum(pp))
   } else {
     tibble(date=NA,  type=NA, expo=NA,rate=NA,  xmin=NA,  AICc=NA, range=NA)
   }

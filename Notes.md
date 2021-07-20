@@ -48,7 +48,7 @@ Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon
 Brando, P. M. et al. 2014. Abrupt increases in Amazonian tree mortality due to drought–fire interactions. - PNAS 111: 6347–6352.
 
 Aragão, L. E. O. C. et al. 2018. 21st Century drought-related fires counteract the decline of Amazon deforestation carbon emissions. - Nature Communications 9: 536.
-
+Global tipping points in forest wildfires
 Amigo, I. 2020. When will the Amazon hit a tipping point? - Nature 578: 505–507. @Amigo2020
 
 ## Abstract

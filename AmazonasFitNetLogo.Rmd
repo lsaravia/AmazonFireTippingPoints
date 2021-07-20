@@ -273,7 +273,7 @@ msim %>% inner_join(best %>% slice_min(rmse,n=1)) %>% inner_join(mdat, by=c("Dat
 # Yearly comparison of predicted vs data (Max)
 #
 msim %>% inner_join(best %>% slice_min(rmse,n=1)) %>% inner_join(mdat, by=c("Date" = "Date") ) %>%  mutate(year=year(Date)) %>% group_by(year,world_width) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch)) %>% ggplot(  aes(burned_by_month,total_patch, color=factor(world_width )))+ geom_point() + theme_bw() + xlab("Predicted") + ylab("Data") + 
-      scale_color_viridis_d(name="Size")  + geom_abline(intercept = 0, slope =1,alpha=0.3) 
+      scale_color_viridis_d(name="Size")  + geom_abline(intercept = 0, slope =1,alpha=0.3) + coord_cartesian(xlim=c(0,1.5))
 
 
 ```
@@ -440,7 +440,7 @@ write_simoutput(nl)
 
 * Load 10 best simulations then make new simulations to estimate the patch size distributions
 
-```{r sim_distinct449cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_distinct449cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
 
@@ -450,6 +450,9 @@ grow_best <- best %>% filter( world_width==449) %>% select(Forest_growth) %>% de
 names(disp_best) <- NULL
 names(grow_best) <- NULL
 
+eval_times <- as.numeric(lapply(0:19, function(x){ymd("2000-12-31") + years(x) - ymd("1980-11-01") }))
+ymd("1980-11-01") + days(eval_times)
+
 nl@experiment <- experiment(expname="Amazon20years449sp",
                             outpath=outpath,
                             repetition=1,
@@ -458,7 +461,7 @@ nl@experiment <- experiment(expname="Amazon20years449sp",
                             idgo="go",
                             #idrunnum="nlrx-experiment",
                             runtime=0,
-                            evalticks= c(14671,14305,13940,13575,13210,12844,12479,12114,11749,11383),          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
+                            evalticks=eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 0:19
                             metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
                             variables = list("forest-dispersal-distance" = list(values=disp_best),
                                              "Forest-growth" = list(values=grow_best)),
@@ -473,7 +476,7 @@ nl@experiment <- experiment(expname="Amazon20years449sp",
                                                "Fire-probability" = 1E-6,
 #                                               "forest-dispersal-distance" = 2.38,
 #                                               "Forest-growth" = 2963,
-                                               "eval-burned-clusters"="\"[14671 14305 13940 13575 13210 12844 12479 12114 11749 11383]\""
+                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\"")
                                              ))
 
 
@@ -512,21 +515,17 @@ write_simoutput(nl)
 * We selected the 10 best fitted parameters and estimate the anual fire patch distributions
 
 
-```{r comp_fit_lhs249cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r comp_fit_lhs249cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
+# Read previously saved fitted exponents file
+#
 pexp <- readRDS(file.path("Simulations", "fittedExponentsAmazon20years.rds"))
-
-# sim <- read_netlogo_simul(file.path(outpath,"Amazon20years249sp_distinct.csv"),skip=0)
-# 
-# pexp <- sim %>% group_by(forest_dispersal_distance,Forest_growth,Date) %>% summarise(convert_evaluate_patch_distr(burned_clusters_365) )
-# pexp$world_width <- 249
-# 
+#pexp <- pexp %>% filter(world_width!=449)
+pexp %>% distinct(world_width)
 
 #sim <- read_netlogo_simul(file.path(outpath,"Amazon20years349sp_distinct.csv"),skip=0)
 sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449sp_distinct.csv"),skip=0)
 
-# pexp1 <- sim %>% group_by(forest_dispersal_distance,Forest_growth,Date,random_seed) %>% summarise(netlogo_evaluate_patch_distr(burned_clusters_365) )
-# pexp1$world_width <- 349
 plan(multisession)
 p_df <- future_lapply( 1:nrow(sim) , function(i){
   df <- netlogo_evaluate_patch_distr(sim$burned_clusters_365[i]) %>%
@@ -538,25 +537,24 @@ plan(sequential)
 
 saveRDS(pexp, file.path("Simulations", "fittedExponentsAmazon20years.rds"))
 
-
-
 best_pexp <- pexp %>% group_by(forest_dispersal_distance,Forest_growth,Date,random_seed) %>% filter(AICc == min(AICc))
 
 best_pexp %>% group_by(world_width,type) %>% summarise(n = n()) %>%  mutate(freq = n / sum(n))
 
 pl_best_pexp <- best_pexp %>% filter(type == "pl") # %>% mutate(relative_range=range/(350*350))
 
-pl_best_pexp %>% group_by(world_width,forest_dispersal_distance,Forest_growth) %>% summarize(expo=mean(expo)) %>% mutate(distance = 2.27 - expo) %>% arrange(distance)
+pl_best_pexp <- pl_best_pexp %>% group_by(world_width,forest_dispersal_distance,Forest_growth) %>% summarize(expo=mean(expo)) %>% mutate(distance = 2.27 - expo) %>% arrange(distance)
 
+saveRDS(pl_best_pexp, file.path("Simulations", "bestFittedExponentsAmazon20years.rds"))
 
 #
 # The model with mean exponent closer to 2.27 
 #
 
-pl <- pl_best_pexp %>% filter(world_width==449, forest_dispersal_distance %in% c(1.61,1.97,1.74)) %>% mutate(relative_range = range/(450*450)) %>%  ggplot(  aes(relative_range,expo, color=factor(forest_dispersal_distance )))+ geom_point() + theme_bw() + xlab("Range") + ylab("Exponent") + 
+pl <- best_pexp %>% filter(world_width==449, forest_dispersal_distance %in% c(1.61,1.97,1.74)) %>% mutate(relative_range = range/(450*450)) %>%  ggplot(  aes(relative_range,expo, color=factor(forest_dispersal_distance )))+ geom_point() + theme_bw() + xlab("Range") + ylab("Exponent") + 
       scale_color_viridis_d(guide=FALSE)  + geom_abline(intercept = 2, slope =0,alpha=0.3) 
 
-plotly::ggplotly(pl)
+#plotly::ggplotly(pl)
 
 
 ```
@@ -587,6 +585,286 @@ plotly::ggplotly(pl)
  1         449                      1.61         1419.  2.13    0.139
  2         449                      1.97         1778.  2.13    0.144
  3         449                      1.74         1361.  2.05    0.221
+ world_width forest_dispersal_distance Forest_growth  expo distance  (additional simulations)
+         <dbl>                     <dbl>         <dbl> <dbl>    <dbl>
+ 1         449                      1.52         1170.  2.31  -0.0388
+ 2         449                      1.85         1493.  2.19   0.0830
+ 3         449                      1.61         1419.  2.18   0.0881
 
 
- 
+## Simulations with best parameters and GAM fitted bF (ignition prob) 2000-2020
+
+
+```{r sim_simple449fittedBF, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+
+# eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
+# ymd("1980-11-01") + days(eval_times)
+eval_times <- as.numeric(lapply(0:19, function(x){ymd("2000-12-31") + years(x) - ymd("1980-11-01") }))
+ymd("1980-11-01") + days(eval_times)
+
+
+nl@experiment <- experiment(expname="Amazon20years449fittedBF",
+                            outpath=outpath,
+                            repetition=1,
+                            tickmetrics="true",
+                            idsetup="setup",
+                            idgo="go",
+                            #idrunnum="nlrx-experiment",
+                            runtime=0,
+                            evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
+                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
+                            # variables = list("forest-dispersal-distance" = list(values=c(1.61,1.97,1.74)),
+                            #                  "Forest-growth" = list(values=c(1419,1778,1361))),
+                            constants = list("world-width" = 449,
+                                             "world-height" = 449,
+                                               "fire-prob-filename"="\"Data/EstimatedGam_bF.csv\"",
+                                               "Save-view" =  "false",
+                                               "video" = "false",
+                                               "end-simulation"= 14641,
+                                               "Initial-forest-density" = 0.6,
+                                               "Periodicity" = "false",
+                                               "Fire-probability" = 1E-6,
+                                               "forest-dispersal-distance" = 1.61,
+                                               "Forest-growth" = 1419,
+                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\"")
+                                             ))
+
+
+#
+# Run 10 times this do not set the run variable for output 
+#
+nl@simdesign <- simdesign_simple(nl=nl,
+                               nseeds=100)
+# 
+# nl@simdesign <- simdesign_distinct(nl=nl,
+#                                nseeds=50)
+
+# run in Paralell 
+#
+plan(multisession)
+tic()
+results <- run_nl_all(nl)
+#results <- run_nl_all(nl,split = 4)
+toc()
+plan(sequential)
+names(results)
+
+#
+# Write the output 
+#
+setsim(nl, "simoutput") <- results 
+write_simoutput(nl)
+
+```
+
+# Calculate patch distributions from best fitted parameters and GAM estimated bF (ignition prob) 2000-2020
+
+```{r calcPatchDist449gamBF, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+
+
+# Read previous simulations for RCP 4.5 and fitted parameters
+#
+list.files(outpath)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449fittedBF_simple.csv"),skip=0)
+# Calculate power law exponents and max/total patch size by year 
+#
+pexp <- tibble()
+
+plan(multisession)
+p_df <- future_lapply( 1:nrow(sim) , function(i){
+  df <- netlogo_evaluate_patch_distr(sim$burned_clusters_365[i]) %>%
+    mutate(world_width=sim$world_width[i], forest_dispersal_distance=sim$forest_dispersal_distance[i],Forest_growth=sim$Forest_growth[i],Date=sim$Date[i],random_seed=sim$random_seed[i]) %>%
+    select(world_width,forest_dispersal_distance,Forest_growth,Date,random_seed, everything())
+})
+pexp <- bind_rows(p_df)
+plan(sequential)
+
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonfittedBF.rds"))
+```
+
+
+
+
+## Simulations with best parameters and patch size distribution RCP 4.5 (2021 - 2059)
+
+* wordl_width = 450 
+* RCP 4.5
+
+
+```{r sim_simple449clusterRCP45, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+
+# eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
+# ymd("1980-11-01") + days(eval_times)
+
+eval_times <- as.numeric(lapply(0:38, function(x){ymd("2021-12-31") + years(x) - ymd("2010-01-01") }))
+ymd("2010-01-01") + days(eval_times)
+
+nl@experiment <- experiment(expname="Amazon39years449rcp45",
+                            outpath=outpath,
+                            repetition=1,
+                            tickmetrics="true",
+                            idsetup="setup",
+                            idgo="go",
+                            #idrunnum="nlrx-experiment",
+                            runtime=0,
+                            evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
+                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
+                            # variables = list("forest-dispersal-distance" = list(values=c(1.61,1.97,1.74)),
+                            #                  "Forest-growth" = list(values=c(1419,1778,1361))),
+                            constants = list("world-width" = 449,
+                                             "world-height" = 449,
+                                               "fire-prob-filename"="\"Data/Predicted_bF_rcp45.csv\"",
+                                               "Save-view" =  "false",
+                                               "video" = "false",
+                                               "end-simulation"= 14641,
+                                               "Initial-forest-density" = 0.6,
+                                               "Periodicity" = "false",
+                                               "Fire-probability" = 1E-6,
+                                               "forest-dispersal-distance" = 1.61,
+                                               "Forest-growth" = 1419,
+                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
+                                               "use-fire-prob-se" = "true"
+                                             ))
+
+
+#
+# Run 10 times this do not set the run variable for output 
+#
+nl@simdesign <- simdesign_simple(nl=nl,
+                               nseeds=100)
+# 
+# nl@simdesign <- simdesign_distinct(nl=nl,
+#                                nseeds=50)
+
+# run in Paralell 
+#
+plan(multisession)
+tic()
+results <- run_nl_all(nl)
+#results <- run_nl_all(nl,split = 4)
+toc()
+plan(sequential)
+names(results)
+
+#
+# Write the output 
+#
+setsim(nl, "simoutput") <- results 
+write_simoutput(nl)
+
+```
+
+# Calculate patch distributions from best fitted parameteres forced with RCP 4.5
+
+```{r calcPatchDistSimRCP45, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+
+# Read previous simulations for RCP 4.5 and fitted parameters
+#
+list.files(outpath)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon39years449rcp45_simple.csv"),skip=0)
+# Calculate power law exponents and max/total patch size by year 
+#
+pexp <- tibble()
+
+plan(multisession)
+p_df <- future_lapply( 1:nrow(sim) , function(i){
+  df <- netlogo_evaluate_patch_distr(sim$burned_clusters_365[i]) %>%
+    mutate(world_width=sim$world_width[i], forest_dispersal_distance=sim$forest_dispersal_distance[i],Forest_growth=sim$Forest_growth[i],Date=sim$Date[i],random_seed=sim$random_seed[i]) %>%
+    select(world_width,forest_dispersal_distance,Forest_growth,Date,random_seed, everything())
+})
+pexp <- bind_rows(p_df)
+plan(sequential)
+
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45.rds"))
+```
+
+
+# Compare with data using total burned area by year and max by year RCP 4.5
+
+```{r readCompareSimRCP45, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+#
+# Read experimental data
+#
+
+patch_size_pfname <- paste0("Data/patch_sizes_p_BurnedArea_", region_name, ".rds" )
+patch_sizes_p <- readRDS(patch_size_pfname)
+patch_sizes_p <- patch_sizes_p %>% group_by(date) %>% summarise(max_patch=max(size)/total_forest,tot_patch=sum(size)/total_forest) %>% mutate(decade="Data", type = "pl",year = date)
+
+patch_dfp_fname <- paste0("Data/patch_dfp_BurnedArea_", region_name, ".rds" )
+patch_dfp <- readRDS(patch_dfp_fname) %>%  group_by(date) %>% filter(AICc == min(AICc))%>% filter(type=="pl") %>% mutate(decade="Data")
+patch_dfp %>% ungroup() %>% summarise(across(expo,list(median=median,mean=mean)))
+
+#
+# Read simulations based on actual data
+#
+
+# pexp_data <- readRDS(file.path("Simulations", "simExponentsAmazonfittedBF.rds")) %>% 
+# #pexp_data <- readRDS(file.path("Simulations", "fittedExponentsAmazon20years.rds")) %>% 
+#   filter(world_width==449,forest_dispersal_distance==1.61,trunc(Forest_growth)==1419) %>% mutate(decade="Simul",tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450), year= year(Date)) %>% filter(max_patch<0.025)
+
+#
+# Read simulations based on RCP 4.5
+#
+
+pexp <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45.rds"))  %>% mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),
+                                             year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=factor(decade))
+
+#pexp <- bind_rows(pexp,pexp_data)
+pexp %>% count(decade)
+
+#
+# Comparison by decade
+#
+
+pexp <- pexp %>% bind_rows(patch_sizes_p)
+pexp %>% count(decade)
+
+patch_m <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% group_by(decade) %>% summarise(across(c(max_patch,tot_patch),list(median=median,mean=mean))) 
+
+expo_m <- pexp %>% group_by(random_seed,Date) %>% filter(AICc == min(AICc), type == "pl") %>% group_by(decade) %>% summarise(across(expo,list(median=median,mean=mean)))
+
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ungroup() %>% count(decade)
+
+# Max size
+#
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(max_patch,fill=decade)) + geom_histogram(bins=80, alpha=0.7) + scale_fill_viridis_d() +   geom_vline(data=patch_m,aes(xintercept=max_patch_median,color=decade),linetype="dashed", size=.5) + scale_color_viridis_d() +  xlab("Max Fire Size") + coord_cartesian(xlim = c(0,0.010))
+
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(max_patch,fill=decade)) + geom_density( alpha=0.7) + scale_fill_viridis_d() +   geom_vline(data=patch_m,aes(xintercept=max_patch_median,color=decade),linetype="dashed", size=.5) + scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + xlab("Max Fire Size") + coord_cartesian(xlim = c(0,0.015))
+
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(decade,max_patch,fill=decade)) + geom_violin() + scale_fill_viridis_d(guide=FALSE) +    scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + xlab("Max Fire Size")  +  stat_summary(fun.y=median, geom="point", size=2) 
+ggsave("figure/Amazon_Max_Size_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+
+# Total size
+#
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(tot_patch,fill=decade)) + geom_histogram(bins=80, alpha=0.7) + scale_fill_viridis_d() +   geom_vline(data=patch_m,aes(xintercept=tot_patch_median,color=decade),linetype="dashed", size=.5) + scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + xlab("Total Fire Size")
+
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(tot_patch,fill=decade)) + geom_density( alpha=0.5)  + scale_fill_viridis_d() +   geom_vline(data=patch_m,aes(xintercept=tot_patch_median,color=decade),linetype="dashed", size=.5) + scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + xlab("Total Fire Size")
+
+pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(decade,tot_patch,fill=decade)) + geom_violin() + scale_fill_viridis_d(guide=FALSE) +    scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + ylab("Total Fire Size")  +  stat_summary(fun.y=median, geom="point", size=2) 
+ggsave("figure/Amazon_Tot_Size_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+
+
+pexp %>% group_by(random_seed,Date) %>% filter(AICc == min(AICc), type == "pl") %>% ggplot( aes(expo,fill=decade)) +  geom_density( alpha=0.5)  + scale_fill_viridis_d() +   geom_vline(data=expo_m,aes(xintercept=expo_mean,color=decade),linetype="dashed", size=.5) + scale_color_viridis_d() + geom_vline(aes(xintercept=2.27,color="Data"),color="black") + ggtitle("Amazon RCP4.5") + coord_cartesian(xlim = c(1.2,5.5))
+
+
+pexp %>% group_by(random_seed,Date) %>% filter(AICc == min(AICc), type == "pl") %>% bind_rows(patch_dfp) %>% ggplot( aes(decade,expo,fill=decade)) + geom_violin() + scale_fill_viridis_d(guide=FALSE) +    scale_color_viridis_d() + ggtitle("Amazon RCP4.5") + ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2) 
+ggsave("figure/Amazon_PatchExponent_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+
+
+require(plotly)
+p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl")
+
+
+p1 <- p1 %>% ggplot(  aes(max_patch,tot_patch, color=year ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c()  + 
+      xlab("Max Patch size") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_wrap( ~decade)
+ggplotly(p1)
+ggsave("figure/Amazon_TotSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+
+```
