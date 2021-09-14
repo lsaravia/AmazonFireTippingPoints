@@ -172,11 +172,14 @@ evaluate_patch_distr <- function(br,returnEWS=TRUE,returnOBJ=FALSE,xmin=1){
     if( !is.logical(brTF) )
         brTF <- brTF>0
   
-    require(poweRlaw)
     patch_distr <- patchsizes(brTF)
   } else {
     patch_distr <- br
   }
+  if( length(unique(patch_distr))<4 ){
+    return(tibble(date=NA,size=NA))
+  }
+    
   m_pl = displ$new(patch_distr)
   est = estimate_xmin(m_pl)
   m_pl$setXmin(est)
@@ -526,4 +529,58 @@ netlogo_evaluate_patch_distr <- function(br) {
   } else {
     tibble(date=NA,  type=NA, expo=NA,rate=NA,  xmin=NA,  AICc=NA, range=NA)
   }
+}
+
+
+
+#' Coarse graining using majority rule 
+#' 
+#' We assume the matrix is 0 and 1 
+#' If subsize^2 is even when the value is equal to subsize^2 / 2 
+#' we chose the value at random 
+#'
+#' @param mat numeric matrix with 0 and 1s
+#' @param subsize coarse grain factor e.g. if 2 divide the size by 2
+#'
+#' @return a matriz `ncol(mat) / 2` by `nrow(mat) / 2`
+#' @export
+#'
+#' @examples
+coarse_grain_mr <- function(mat, subsize=2) {
+  
+  # Integer division (round down to nearest integer). We convert to (int) 
+  # as mat.n_rows may be a uword.
+  nr <- trunc(nrow(mat) / subsize)
+  nc <- trunc(ncol(mat) / subsize)
+  
+  reduced_matrix <- matrix(0,nrow=nr, ncol=nc)
+  mrule <-  floor(subsize * subsize / 2 )
+  even  <- ((subsize * subsize) %% 2) == 0 
+  # Fill in values of the submatrix
+  for ( j in seq_len(nc) ) {
+    for (  i in seq_len(nr) ) {
+      
+      # Compute mean of the corresponding cells in the original matrix
+      sum <- 0.0;
+      for ( l in seq.int(((j-1)*subsize)+1,(j*subsize))) {
+        for ( k in seq.int(((i-1)*subsize)+1,(i*subsize)) ) {
+          sum <- sum + mat[k,l]
+        }
+      }
+      if( sum > mrule )
+        reduced_matrix[i,j] <-  1
+      else if( even && sum==mrule){
+        rr <-  runif(1)
+        if(rr>0.5)
+          reduced_matrix[i,j] <-  1
+        else
+          reduced_matrix[i,j] <-  0
+        #Rcout << "Even: " << reduced_matrix(i,j) << "\n" ;
+      } else {
+        reduced_matrix[i,j] <-  0
+      }
+    }
+  }
+  
+  return( reduced_matrix )
 }

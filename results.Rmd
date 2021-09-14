@@ -1,0 +1,155 @@
+---
+title: "Draft for Amazon"
+author: "Leonardo A. Saravia [UNGS]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+bibliography: GlobalFireTippingPoints.bib
+subtitle: Global tipping points in forest wildfires
+csl: plos.csl
+---
+
+
+
+## Introduction
+
+Very few regions in the terrestrial biosphere are unaffected by fire often caused directly or indirectly by human activities [@Bowman2020], fire has different characteristics, including spatial patterns, severity, burn frequency, seasonality, extension that produces contrasting ecological consequences [@Steel2021].
+In recent years have seen an increase in fire intensity and extension in different regions [@Pivello2021;@McWethy2019 ] <!-- this ref is only about USA -->, partially attributable to the fact we are experiencing a biosphere with a 1C above historical records [@Masson-Delmotte2021].    
+
+This intensification of fires could reduce the spatial and temporal variation in fire regimes, called pyrodiversity [@Kelly2017], that in turn will generate substantial reductions in biodiversity and ecosystem processes as carbon storage [@Dieleman2020;@Furlaud2021]. But probably the most affected regions will be the ones in which fire has been historically rare or absent as tropical forest [@Barlow2020], besides extensive loss on biodiversite extreme fires could trigger major ecosystems changes as transitions from forest to savanah or shrublands [@Hirota2011; @Fairman2015]. 
+
+Environmental factors play a major role in the generation of fires and many predictions are statistically based, others take into account more detailed processes and few take into account spatial dynamical phenomena [@Bowman2020]. 
+
+Simple models of fire have been used as an example of ‘self-organized criticality’ (SOC): where systems can self-organize into a state characterized by a power law in the size frequency distribution of disturbance events [@Jensen1998], this is the case of the Drossel & Schwabl model @Drossel1992. Albeit simple, some modifications of the Drossell & Schwabl model have been used to predict fire responses to climate change [@Pueyo2007a], and some can reproduce features observed in empirical studies [@Ratz1995] as the power law distribution of the fire sizes, the size and shape of unburned areas and the relationship between annual burned area and diversity of ecological stages [@Zinck2009]. A unification of different models showed that changing the scale of grid cells to represent several hectares, and the ‘memory effect’: flammability increases with the time since a site last fire, where the key process for reproducing all three patterns [@Zinck2009; @Zinck2011]. But the exponent of the fire size distribution observed in different ecoregions was still not reproduced by these models. 
+
+* Fire size distributions in nature are not always power-laws but have important variations between years [ Nicoletti2021 Preprint ] 
+
+* Complex systems approach and the use of relatively simple models coupling dynamics with forcing environmental variables.
+
+* Forest dispersal with power-law dispersal kernel @Clark2005 @Seri2012
+
+<--! Thus, predicting ‘black swan’ extreme fire events — which, by definition, have no historical precedent, such as the protracted, enormous and severe Australian 2019–2020 fires — seriously challenge the capacity of Earth-system-model projections. -->
+
+
+In this work we developed a simple model that reproduce the observed seasonal fire patterns and the power-law exponent of fire sizes, forced by environmental variables trough the probability of ignition. We use the model to predict for the Amazonas basin, the annual total and the maximal fire extension up to 2060 based on General Circulation Model scenarios under different greenhouse gas emissions.
+
+
+## methods and results 
+
+### Regions
+
+* Our region of study is the Amazonas Basin (from http://worldmap.harvard.edu/data/geonode:amapoly_ivb), one of the reasons to choose this regions is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point. 
+
+### Fire data and parameters
+
+* We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 @Giglio2016, which has a 500 m pixel resolution. To download the data for each region we used Google Earth Engine restricted to each region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month.
+
+
+![](figure/Amazonas201806-202006.gif)
+
+### Fire size distribution 
+
+* To estimate the distribution of fire sizes we used an annual period. We agregated the monthly using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood [@Clauset2009] to decide which is the data distribution. 
+   
+
+![](figure/Amazon_PatchDistr_2001-2006.png) 
+
+![](figure/Amazon_PatchDistr_2009-2014.png) 
+
+![](figure/Amazon_PatchDistr_2015-2020.png) 
+
+\newpage 
+
+|region | date| period|type |      expo|      rate| xmin| range|
+|:------|----:|------:|:----|---------:|---------:|----:|-----:|
+|Amazon | 2000|      0|pexp |  1.989164| 0.0054980|    8|   187|
+|Amazon | 2001|      1|ln   | -1.236398| 2.1531997|   54|  4916|
+|Amazon | 2002|      2|pexp |  2.217215| 0.0002646|   90|  7128|
+|Amazon | 2003|      3|pexp |  2.169919| 0.0005622|   44|  4625|
+|Amazon | 2004|      4|pexp |  2.142637| 0.0001151|   66| 11254|
+|Amazon | 2005|      5|ln   | -9.180169| 3.5026064|   70| 13234|
+|Amazon | 2006|      6|pexp |  2.041499| 0.0002795|   29|  3826|
+|Amazon | 2007|      7|pl   |  2.176596|        NA|   54| 47132|
+|Amazon | 2008|      8|pexp |  2.139883| 0.0002042|   48|  6508|
+|Amazon | 2009|      9|pl   |  2.400407|        NA|   45|  3117|
+|Amazon | 2010|     10|pl   |  1.997016|        NA|   41| 75967|
+|Amazon | 2011|     11|pexp |  1.954160| 0.0001630|   27| 10626|
+|Amazon | 2012|     12|pexp |  1.981832| 0.0003285|   25|  3515|
+|Amazon | 2013|     13|pl   |  2.323158|        NA|   49|  5440|
+|Amazon | 2014|     14|ln   | -2.007573| 2.3653178|   30|  7516|
+|Amazon | 2015|     15|pexp |  2.262959| 0.0001455|   74|  5306|
+|Amazon | 2016|     16|pexp |  2.111907| 0.0001705|   59|  5032|
+|Amazon | 2017|     17|pexp |  2.035952| 0.0000956|   36| 10852|
+|Amazon | 2018|     18|pl   |  2.459423|        NA|   60|  3596|
+|Amazon | 2019|     19|pexp |  2.155401| 0.0000982|   56|  6798|
+|Amazon | 2020|     20|pl   |  2.251879|        NA|   86| 17718|
+|Amazon | 2021|     21|ln   |  0.844610| 1.4663970|   26|  1297|
+
+Table: Distribution fitting for annual fire sizes. The biggest ranges are power law 2007,2010,2020. Median exponent of the power law 2.29
+
+## GAM Models for predicting fire ignition probability
+
+
+* We estimate the probability of ignition by month as the number of fire clusters divided by the total number of pixels in the region considered.
+
+![](figure/Amazon_bF_Month.jpg)
+
+
+* We fitted a series of GAM model to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables are used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM). We use an spatial average of these variables over the study region obtained from the TerraClimate dataset [@Abatzoglou2018]. The best model included the interaction between a seasonal term and maximal temperature. 
+
+* We obtained the monthly spatial averages of the previous variables from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
+
+<--! We predicted the ignition probability up to 2060 based in the Coupled Model Intercomparison Project Phase 5 (CMIP5, see @Taylor2012) and across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs, see @Meinshausen2011), RCP 4.5 and RCP 8.5. -->
+
+
+![](figure/Amazon_bF_RCP4.5.png)
+
+![](figure/Amazon_bF_RCP8.5.png)
+
+## Fitting the spatial fire model
+
+* Our fire model has 3 parameters, the fire ignition probability, the probability of forest regrowth expresed in the number of days that a forested site will produce another forested site (probability= 1/numberofdays), and the forest dispersal distance. The fire spread is deterministic all neighbors sites with vegetation are burned.
+
+
+* To simulate forest fires for each region we used the estimated probability of ignition for the years 2001-202, using this probabilty flawlessly incorporates the variations observed in fire-weather-season [@Jolly2015].
+
+* We fitted the two free parameters of the model in two steps. First performed 1000 simulations to sample the parameter space using latin hypercubic sampling with ample limits: DD from 1.4 to 100 pixels (each pixel 500m approx.) and FR (forest recovery ) 90 to 7300. Then we do a second run of 1000 simulations with a more restricted range and selected the 10 best simulations comparing the maximum monthly fire size of the year against data with the root mean squared error (RMSE).
+
+* We used this comparison as our objective is to predict changes in fire regimes produced by extreme events and not to predict exactly the monthly fire extension.
+
+![](figure/Amazon_monthly_fitted_450.png)
+
+* With these 10 sets of parameters for each model size we estimate the annual patch size distribution and fitted different probabilty distributions as we made with MODIS data, then we finally select the best parameter set with the exponent closest to data (2.27)
+
+| world_width| forest_dispersal_distance| Forest_growth|     expo|   distance|
+|-----------:|-------------------------:|-------------:|--------:|----------:|
+|         449|                      1.52|       1169.56| 2.308788| -0.0387879|
+|         449|                      1.85|       1492.75| 2.186952|  0.0830477|
+|         449|                      1.61|       1419.16| 2.181885|  0.0881152|
+
+## Simulations using the predicted ignition probability RCP 4.5 and RCP 8.5
+
+* We observe and increase in max fire size for 2030-2039, and then a decrease up to 2050-2059 to values moderately higher than the actual ones, for RCP 8.5 is similar but the max variability is in 2030-2039. The same with total fire size increasing up to 2030-2039, them decreasing.  In both cases there is an increased variability.
+
+
+![](figure/Amazon_Max_Size_RCP4.5.png)
+![](figure/Amazon_Max_Size_RCP8.5.png)
+
+![](figure/Amazon_Tot_Size_RCP4.5.png)
+![](figure/Amazon_Tot_Size_RCP8.5.png)
+
+![](figure/Amazon_PatchExponent_RCP4.5.png)
+![](figure/Amazon_PatchExponent_RCP8.5.png)
+
+![](figure/Amazon_TotSizeVsMax_year_RCP45.png)
+![](figure/Amazon_TotSizeVsMax_year_RCP85.png)
+
+
+## References
+
+
+
+
+

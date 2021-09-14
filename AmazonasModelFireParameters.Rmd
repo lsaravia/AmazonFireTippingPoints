@@ -113,7 +113,7 @@ pg <- patch_growth %>% ungroup() %>% filter(type=="g") %>% mutate(equal0= (size0
 ```
 
 
-# Results Fire paramters state F (Not Globfire Data )
+# Results Fire paramters state F 
 
 * bF = Number of patches that start from 0  
      `2.5%`     `50%`  `97.5%`
@@ -133,70 +133,9 @@ meam(lambdaF) 0.6260821
   FALSE    3026 0.0112
   TRUE   266072 0.989 
 
-
-# Estimate fire parameters from globfire data   
-
-```{r ndviPatchGrowthAustralia, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
-#
-# Estimating parameters using GlobFire data 
-#
-
-require(lubridate)
-glf <- read_csv("Data/GlobFireAmazon.csv") %>% mutate(FinalDate= as_datetime(FinalDate/1000),InitialDate= as_datetime(InitialDate/1000))
-
-# MODIS pixel size
-pixelArea <-  463.3127165275 * 463.3127165275
-total_area <-  6696597793354.449 # from GEE
-total_forest <- 31364191
-(total_forest * pixelArea / 100000) -( total_area / 100000 )
-
-# the total area calculated with GEE is smaller than the area calculated based in the number of pixels
-
-
-#
-# Estimate lambdaF
-#
-glf <- glf %>% mutate( deltaDays = as.numeric(FinalDate - InitialDate, "days")+1,size= area/pixelArea, lambdaF =if_else(deltaDays==0, size, size/deltaDays), date=strftime(FinalDate,"%Y-%m"))
-
-glf %>%  filter(date>"2000-12") %>% group_by(date) %>% summarise(lambdaF = mean(lambdaF)) %>% mutate(year=str_sub(date,1,4)) %>% ggplot(aes(date,lambdaF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x")
-
-as_tibble(t(quantile(glf %>% filter(lambdaF>0) %>% pull(lambdaF) , probs=c(.025,0.5,.975))))
-
-
-#
-# Estimate bF
-#
-pg <- glf %>% filter(InitialDate>"2001-01-01") %>% count(InitialDate) %>% mutate(bF = n/total_forest, date=strftime(InitialDate,"%Y-%m")) 
-
-pgm <- pg %>% group_by(date) %>% summarise(n=sum(n),mean_bF=mean(bF)) %>% mutate(bF=n/total_forest) # Calculated by month
-
-pg %>% mutate(year=year(InitialDate)) %>% group_by(year,date) %>% summarize(bF = sum(bF)) %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + facet_wrap(~ year, scales = "free_x") + 
-ggsave("figure/glf_Amazon_bF_Month.jpg",width=8,height=6,units="in",dpi=600)
-
-as_tibble(t(quantile(pg$bF , probs=c(.025,0.5,.975))))
-
-# Add an initial copy of the same data to give some time for transients
-#
-pg$fecha <- pr$date - months(nrow(pr))
-write_csv( bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF), "Data/Estimated_bF.csv")
-
-
-```
-
-* LambdaF from GlobFire 
-
-  `2.5%` `50%` `97.5%`
-   0.547  1.11    6.74
-
-* bF from GlobFire
-
-       `2.5%`      `50%`   `97.5%`
-  0.000000255 0.00000191 0.0000154
-
-
 # Calculate the fire return time
 
-```{r calcPatchGrowthDryChaco, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+```{r calcFireReturn, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 require(Matrix)
 require(stringr)
@@ -206,17 +145,23 @@ if(!exists("patch_sparse")) {
 }
 
 pd <- patch_sparse %>% arrange(i, j, date) %>%  group_by(i, j) %>%
-  transmute(fini = date, fend = lead(date), deltaD = as.numeric(fend - fini)) %>%
+  transmute(fini = date, fend = lead(date), deltaD = as.numeric(fend - fini),times = seq(1,nrow(cur_data()))) %>%
   na.omit() %>%
   ungroup
-  
-  
-pd  %>% ggplot(aes(deltaD))+ geom_density() + theme_bw()
+
+# Estimate the number of times that the sites are burned
+#
+pd %>% count(times)  %>% mutate( prop = n / total_forest) 
+
+pd %>% ggplot(aes(deltaD))+ geom_histogram() + theme_bw()
+
+pd %>% group_by(times) %>% summarise(quantile(deltaD, probs=c(0.5)))
 
 descdist(pd$deltaD, boot = 1000)
 as_tibble(t(quantile(pd$deltaD, probs=c(.025,0.5,.975))))
 
 pd1 <- pd %>% filter(fini<"2011-01-01") %>% mutate(periodo="Hasta 2010")
+
 pd1  %>% ggplot(aes(deltaD))+ geom_density() + theme_bw()
 #descdist(pd1$deltaD, boot = 1000)
 as_tibble(t(quantile(pd1$deltaD, probs=c(.025,0.5,.975))))

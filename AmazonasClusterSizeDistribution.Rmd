@@ -369,7 +369,7 @@ pl <-  patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc), type=="pl") %>
 
 pl
 
-patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc),type=="pl") %>% ungroup() %>% summarize(range(expo),mean(expo)) 
+patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc),type=="pl") %>% ungroup() %>% summarize(range(expo),median(expo)) 
 
 #
 # Plot power law fittings!
@@ -453,6 +453,13 @@ save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6
 
 ```
 
+## power Law range and median 
+
+  `range(expo)` `median(expo)`
+          <dbl>          <dbl>
+1          2.00           2.29
+2          2.46           2.29
+
 
 # Change of regime
 
@@ -488,75 +495,8 @@ save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6
 4. The range of power law exponent is 2.00 2.46
 
 
-# Estimate fire parameters from globfire data   
 
-```{r globfiredata, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
-
-require(lubridate)
-glf <- read_csv("Data/GlobFireAmazon.csv") %>% mutate(FinalDate= as_datetime(FinalDate/1000),InitialDate= as_datetime(InitialDate/1000))
-
-# MODIS pixel size
-pixelArea <-  463.3127165275 * 463.3127165275
-total_area <-  6696597793354.449 # from GEE
-total_forest <- 31364191
-names(glf)
-total_area/total_forest
-#
-# Estimate lambdaF
-#
-glf <- glf %>% mutate( deltaDays = as.numeric(FinalDate - InitialDate, "days")+1,size= area/pixelArea, lambdaF =if_else(deltaDays==0, size, size/deltaDays), date=strftime(FinalDate,"%Y-%m"))
-
-
-
-#
-# Patch Plots 
-#
-require(ggrepel)
-require(lubridate)
-require(plotly)
-p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
-  summarize(max_patch=max(size)/total_forest*100) %>%  
-  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c()  + 
-      ylab("Max Patch Size %") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
-ggplotly(p1)
-ggsave("figure/glf_Amazon_MaxSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
-
-
-p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
-  summarize(max_patch=n()/total_forest*100) %>%  
-  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c()  + 
-      ylab("Number of Patches %") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
-ggplotly(p1)
-ggsave("figure/glf_Amazon_NumberPatches_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
-
-p1 <- glf %>% mutate(date=ym(date)) %>% group_by(date) %>% 
-  summarize(max_patch=sum(size)/total_forest*100) %>%  
-  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c()  + 
-      ylab("Total Size%") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
-ggplotly(p1)
-ggsave("figure/glf_Amazon_TotSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
-
-p1 <- glf %>% mutate(date=year(FinalDate)) %>% group_by(date) %>%  
-  summarize(max_patch=sum(area)/total_area*100) %>%  
-  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c()  + 
-      ylab("GLF Total Size%") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + scale_x_continuous(breaks=2000:2020)
-ggplotly(p1)
-ggsave("figure/glf_Amazon_TotSize_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
-
-
-
-
-```
-
-# 
+# Read precipitation and temperature Data
 
 ```{r readFileswithPrecipitationTmaxPatch, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
 require(tidyverse)
