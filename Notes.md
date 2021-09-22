@@ -1,5 +1,14 @@
 # Notes
 
+From Hansen
+
+Forest Area (30%Cover) / Total Area, year 2000 = 0.010260215678575
+
+Deforestation rate 2000-2020 by year  = 3.84239690053276E-05
+ 
+by day = 1.05271147959802E-07
+
+
 ## Abstract
 
 Global tipping points in forest wildfires
@@ -10,7 +19,7 @@ Fire is one of the most important disturbances of the earth-system, shaping the 
 
 ----
 
-
+@NatureEcoEvo2020 Biodiversity in flames
 
 Fires burn and spread because of current weather conditions and because of the quantity, distribution and dryness of fuel, which are determined by interactions between climate and forest ecology. While limited fires can have positive consequences for biodiversity, the effect of those at the scale currently being experienced is catastrophic, both for species and for ecosystems. This season has seen record-breaking temperatures in eastern Australia, which provide the conditions for fire ignition and spread. There is no doubt that such conditions will become more frequent and that new records will soon be set, and that this is the result of anthropogenic climate change.
 
@@ -27,9 +36,9 @@ In Australia, it is difficult to disaggregate the influences of climate change f
 Moreover, tropical deforestation fires have remained relatively constant over the last 30 years after increasing during the 1980s in line with increased deforestation 99,100 , despite climate change. Instead, an important feature of tropical deforestation fires is the strong interannual variation in step with drought cycles, such as those caused by the El Niño–Southern Oscillation 101,102 (Fig. 3i,j) . 
 
 
+Landscape-wide conversions from slow-growing, infrequently burned forests to frequently burned grassland and shrublands are possible (Fig. 5) , which depletes soil carbon stores, as in regrowth forests in the conifer forests in the western USA 133 and in Indonesia 134 . This feedback process is most likely self-correcting because fire regimes will shift from being flammability-limited to fuel-limited with increasing reduced productivity 40,42,133
 
-Landscape-wide conversions from slow-growing, infrequently burned forests to frequently burned grassland and shrublands are possible (Fig. 5) , which depletes soil carbon stores, as in regrowth forests in the conifer forests in the western USA 133 and in Indonesia 134 . This feedback process is most likely self-correcting because fire regimes will shift from being flammability-limited to fuel-limited with increasing
-reduced productivity 40,42,133
+
 
 
 ------
@@ -110,18 +119,91 @@ The PMB paradigm is based on the assumption that the biotas of fire-prone biomes
 
 ----
 
+@Brando2019a
+
+Surface tropical fires are expected to kill mostly small‐ and medium‐
+sized trees, because the larger, thicker barked individuals can avoid
+heat‐related damage to cambium cells during fires (Brando et al.,
+2012). Although delayed postfire mortality of large trees has been
+observed across the tropics, the mechanisms driving this process
+remain unclear (Barlow et al., 2003). In our study, the persistent
+postfire mortality of large trees may have been associated with their
+increased vulnerability to windstorms. 
+
+Specifically, the fires weak‐ 
+ened trunks and increased crown exposure of large trees to strong 
+winds that impacted the experimental forest (Silvério et al., 2019). 
+This postfire disturbance caused greater losses in canopy cover and 
+biomass in areas impacted by our experimental fires. The observed 
+rapid growth of resprouts and saplings was expected to partially re‐ 
+store forest structure (Chazdon et al., 2007), but ABG reached its 
+lowest levels 7 years after the experimental fires had ended, particu‐ 
+larly along the forest edges. Our results suggest that fragmentation 
+of tropical forests—and the associated increase in forest edges— 
+could dramatically increase the negative impacts of fires and lead 
+to persistent losses of biomass (Silva et al., 2018). This is particularly 
+true where fires co‐occur with extreme droughts that can further 
+increase fire intensity and fire‐related tree mortality by triggering 
+accumulation and desiccation of fuels (Aragão et al., 2008). 
+A permanent transition to a new, derived‐savanna state in this 
+ecotone would require persistence of grass cover and a more open 
+canopy. While grasses could persist along the forest edges due to
+delayed postfire tree mortality (Higgins, Bond, & Trollope, 2000),
+we instead observed widespread postfire resprouting of woody
+vegetation—including in areas that had been previously covered by
+grasses. However, the total area occupied by grasses did not de‐
+crease, because grasses invaded new areas between 2012 and 2015.
+Furthermore, we found no major replacement of C4 by C3 species,
+a process expected to occur as light in the understory of the burned
+plots became scarce. Instead, light‐demanding African C4 grasses
+became more abundant, particularly where fires in previous years
+had been more intense and severe, and where the blowdown event
+had topkilled more trees (e.g., B3yr). The delayed tree mortality
+drove much of this process by increasing light and probably water
+availability as canopy cover decreased. Another likely driver was
+the greater capacity of African grasses to produce, germinate, and
+disperse seeds compared with the Cerrado native grasses (Higgins
+et al., 2000). These results raise the question of whether the edge of
+
+----
+@Schertzer2014
+
+
+Modeling work—based largely on simple models of tree populations interacting with mean-field approximations of critical behaviors in fire spread—suggests that the threshold response of fire spread to fuel-layer continuity could provide a plausible mechanism for maintaining the bistability of savanna and forest (Beckage and Ellingwood 2008; Beckage et al. 2009; Staver et al. 2011a; Staver and Levin 2012). Although empirically well supported (Archibald et al. 2009; Pueyo and Alen- castro Graa 2010), these modeling efforts have largely neglected to explicitly take into account the spatial dynamics of fire spread. This omission of the spatial dynamics of fire spread and of tree demography is problematic for two main reasons. Firstly, mean-field models cannot address the possibility, clearly recognized in the theoretical literature, that spatial dynamics may qualitatively change the stability characteristics of dynamical systems (Durrett and Levin 1994; Levin and Durrett 1996). Secondly, they can provide few insights into how local, spatial interactions mechanistically give rise to emergent patterns in fire spread (Archibald et al. 2009; Pueyo and Alencastro Graa 2010) and how these determine tree demographic responses to fire (Staver and Levin 2012). Percolation (Grimmett 1999) and, more generally, nearest-neighbor infection models (Archibald et al. 2012) make useful predictions about the threshold responses of fire regimes to fuel layer connectivity that emerge both locally and at the continental scale (Archibald et al. 2009; Pueyo and Alencastro Graa 2010; Staver et al. 2011a,b). However, although fire spread modeling in static landscapes can be fairly sophisticated (Sullivan 2009; Zinck and Grimm 2009), fully understanding the role of fire as an ecological process that emerges from and determines grass and tree cover in savanna remains an ongoing challenge.
+
+
+Previous analytical models have tended to assume that, if fire spreads in a landscape, it affects the entire landscape, when in fact fire only affects those areas where it can propagate. This may lead to significant spatial structure in landscapes (Hochberg et al. 1994)
+
+--------
+@Alencar2011
+
+Approximately 38% of the burned forest was subsequently deforested, which represents 19% of the total area deforested during the period of analysis (Table 3, Fig. 7B). Although this rate was higher for the forest areas that were burned twice (45%), it was similar to the areas that burned three or four times during this period (averages of 41% and 35%, respectively), while decreasing in the forest areas that burned more than ﬁve times (,20%; Table 2). These results suggest a weak relation-
+ship between ﬁre frequency and the likelihood of a forest being cleared in this region.
+
+----
+
+@Brando2014
+
+In 2010, the Amazon experienced another drought (36), with widespread understory forest fires that affected 5.4% of the Xingu region (Fig. S10). These extensive fires occurred even as deforestation declined (Table S2), suggesting that weather may have overwhelmed the expected inhibitory effect (on forest fires) of reducing the fire ignition sources that often accompany deforestation.
 
 
 ----
 
+@Masson-Delmotte2021
 
-Adams, M. A. et al. 2020. Causes and consequences of Eastern Australia’s 2019–20 season of mega-fires: A broader perspective. - Global Change Biology 26: 3756–3758.
+These feedbacks, as well as potential additional carbon losses due to climate-induced
+7 fire feedback are not routinely included in Earth System models. {Box 5.1, 5.4.3, 5.4.7, 5.4.8, Box TS.9}
+
+
+Additional ecosystem responses to warming not yet fully
+included in climate models, such as CO2 and CH4 fluxes from wetlands, permafrost thaw and wildfires,
+would further increase concentrations of these gases in the atmosphere (high confidence).
+{5.4, Box TS.5, TS.3.2}
+
+
 
 Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 356: 1356–1362.
 
-Nolan, R. H. et al. 2020. Causes and consequences of eastern Australia’s 2019–20 season of mega-fires. - Global Change Biology 26: 1039–1041.
-
-Boer, M. M. et al. 2020. Unprecedented burn area of Australian mega forest fires. - Nature Climate Change 10: 171–172.
 
 Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon. - Forest Ecology and Management 424: 312–322.
 
