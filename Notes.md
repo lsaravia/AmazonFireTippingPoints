@@ -9,6 +9,9 @@ Deforestation rate 2000-2020 by year  = 3.84239690053276E-05
 by day = 1.05271147959802E-07
 
 
+* Forest dispersal with power-law dispersal kernel @Clark2005 @Seri2012
+
+
 ## Abstract
 
 Global tipping points in forest wildfires

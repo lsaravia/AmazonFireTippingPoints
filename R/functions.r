@@ -525,7 +525,7 @@ netlogo_evaluate_patch_distr <- function(br) {
   pp <-  str_remove_all(br, "[\\[\\]]") %>% str_split(" ") %>% unlist() %>% as.numeric() 
   message(br)
   if( length(unique(pp))>2) {
-    evaluate_patch_distr( pp ) %>% mutate(max_patch=max(pp),tot_patch=sum(pp))
+    evaluate_patch_distr( pp ) %>% mutate(max_patch=max(pp),tot_patch=sum(pp),num_patch=length(pp))
   } else {
     tibble(date=NA,  type=NA, expo=NA,rate=NA,  xmin=NA,  AICc=NA, range=NA)
   }

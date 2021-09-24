@@ -45,15 +45,25 @@ In this work we develop a simple model with the minimal components to reproduce 
 
 ## methods 
 
-### Regions
 
-* Our region of study is the Amazonas Basin (from http://worldmap.harvard.edu/data/geonode:amapoly_ivb), one of the reasons to choose this regions is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point [@Lenton2013;@Staver2011]. 
+Our region of study is the Amazonas Basin (Figure 1), including Brasil, that represent 60% of the area, and 8 countries more (Bolivia, Colombia, Ecuador, Guyana, Peru, Suriname, Venezuela, and French Guiana). One of the reasons to choose this region is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point [@Lenton2013;@Staver2011]. 
+
+![Region of study: the Amazonas Basin](figure/AmazonasRegion.png)
 
 ### Fire data and parameters
 
-* We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 @Giglio2016, which has a 500 m pixel resolution. To download the data for each region we used Google Earth Engine restricted to each region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month.
+We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 @Giglio2016, which has a 500 m pixel resolution. To download the data we used Google Earth Engine restricted to the region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month. We calculate the probabilitiy of ignition as the number of clusters that growth from cero in that month, it means that if a fire started in the previous month we avoid to count it, the we divided it by the total number of pixels in the region.
 
-Then to estimate the distribution of fire sizes we used an annual period. We agregated the monthly images using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood to decide which distribution fited best to the data [@Clauset2009]. 
+To estimate the distribution of fire sizes we used an annual period. We agregated the monthly images using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood to decide which distribution fited best to the data [@Clauset2009]. 
+
+### Modelling the probability of ignition
+
+We fitted a series of GAM models to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables were frequently used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM) we will use later. We obtanied these monthly variables from the TerraClimate dataset [@Abatzoglou2018], and made an spatial average over the study region.
+
+We fitted models with single variables and a combination of two interacting variables, and also precipitation from the previous month  (Table S1), using to select the best model the Akaike criterion (AIC). To evaluate the predictive power of the models we break the data set in a training set (with Date < 2018) and testing set (with Date >= 2018) and we calculate the mean absolute percentage error (MAPE) for the three best models previously selected (Figure S2). 
+
+
+To obtain predictions of the ignition probabily up to 2060, we use the NASA Earth Exchange Global Daily Downscaled Climate Projections [@Thrasher2012] from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. We average over the 21 CMIP5 models and over the study area to obtain the monthly values of the variables (precipitation and maximum temperature). Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
 
 
 
@@ -69,5 +79,11 @@ We use a 2 dimensional lattice, each site in the lattice could be in three diffe
 4. Any site can catch fire spontaneously with probability $f$, this probability changes by month reflecting the fire season.
 
 
+
+* We fitted a series of GAM model to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables are used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM). We use an spatial average of these variables over the study region obtained from the TerraClimate dataset [@Abatzoglou2018]. The best model included the interaction between a seasonal term and maximal temperature. 
+
+* We obtained the monthly spatial averages of the previous variables from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
+
+<--! We predicted the ignition probability up to 2060 based in the Coupled Model Intercomparison Project Phase 5 (CMIP5, see @Taylor2012) and across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs, see @Meinshausen2011), RCP 4.5 and RCP 8.5. -->
 
 
