@@ -507,7 +507,7 @@ read_netlogo_simul <- function(fname,skip=6){
 #' @examples
 pred_err <- function(x,y) {
   da <- inner_join(x,y, by=c("Date" = "Date") )
-  da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
+  #da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
   data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(abs(da$burned_by_month - da$total_patch))/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
 }
 

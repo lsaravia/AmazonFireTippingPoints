@@ -63,20 +63,25 @@ We fitted a series of GAM models to relate the probability of ignition to monthl
 We fitted models with single variables and a combination of two interacting variables, and also precipitation from the previous month  (Table S1), using to select the best model the Akaike criterion (AIC). To evaluate the predictive power of the models we break the data set in a training set (with Date < 2018) and testing set (with Date >= 2018) and we calculate the mean absolute percentage error (MAPE) for the three best models previously selected (Figure S2). 
 
 
-To obtain predictions of the ignition probabily up to 2060, we use the NASA Earth Exchange Global Daily Downscaled Climate Projections [@Thrasher2012] from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. We average over the 21 CMIP5 models and over the study area to obtain the monthly values of the variables (precipitation and maximum temperature). Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
-
+To obtain predictions of the ignition probabily up to 2060, we use the NASA Earth Exchange Global Daily Downscaled Climate Projections [@Thrasher2012] obtained from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. We average over the 21 CMIP5 models and over the study area to obtain the monthly values of the variables (precipitation and maximum temperature). Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
 
 
 ### Model
 
-Conceptually the model represent to processes: forest burning and forest recovery,  we are assuming that the forest layer does not represent exactly forest cover but flamable forest, and after a site was burned it does not mean that all the vegetation is death but that all the fuel is consumed.  
+Conceptually the model represents two processes: forest burning and forest recovery,  we are assuming that the forest layer does not represent exactly forest cover but flammable forest, and after a site was burned it does not mean that all the vegetation is dead but that all the fuel is consumed.  
 
-We use a 2 dimensional lattice, each site in the lattice could be in three different states: an empty or burned site, a flamable forest, or burning forest or active fire. The lattice is updated in paralell, but in random order, according to following steps: 
+We use a 2 dimensional lattice, each site in the lattice could be in three different states: an empty or burned site, a flamable forest (called forest for short) and, a burning forest. The lattice is updated in paralell, but in random order, according to following steps: 
 
 1. A burning site becomes an empty site in the following step, the steps represent a day
-2. A forest site becomes a burning tree if one or more of its 8 nearest neighbor sites are burning
-3. An empty site becomes occupied by forest with probability $p$ at a distance dependent of a power-law dispersal kernel from another forest site. 
-4. Any site can catch fire spontaneously with probability $f$, this probability changes by month reflecting the fire season.
+2. A forest site becomes a burning forest if one or more of its 8 nearest neighbor sites are burning
+3. A forest site sents a propagule to an empty site with probability $p$ at a distance drawn from a power-law dispersal kernel with exponent %de%.  
+4. A random site can catch fire spontaneously with probability $f$, this probability could change by month reflecting the fire season.
+
+Absorving boundary conditions are assumed and the initial state is a random configuration of forest sites with density 0.6 (60% of the lattice with forest), this configuration assures that the forest percolates: most forest are connected then an initially the fire spreads over the whole lattice. The rule 3 basically represents that and emtpy site can recover more quicly when is nearby a forest site, but also that some sites can recover far from established forest sites in fact depending on the exponent it could be any site in lattice [@Marco2011]. This choice it is based on the assumption than forest can disperse with fat-tailed kernels [@Clark2005; @Seri2012].
+
+This model is very similar to the Drossel-Schwabl forest fire model [@Drossel1992; @Clar1994] that exhibits critical behavior when $p \to 0$ and $f/p \to 0$, and it must satisfy the condition that $f << p$.  If the ignition probability $f$ is too high fires are frequent, flamable forest sites are disconected 
+
+
 
 
 

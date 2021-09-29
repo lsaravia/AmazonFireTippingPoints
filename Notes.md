@@ -203,7 +203,26 @@ included in climate models, such as CO2 and CH4 fluxes from wetlands, permafrost
 would further increase concentrations of these gases in the atmosphere (high confidence).
 {5.4, Box TS.5, TS.3.2}
 
+----
+@Wuyts2017
 
+The reason for choosing this ﬁre model form is that ﬁre percolates through
+space such that ﬁres occurring on separate discretized spatial units cannot be
+considered as isolated from each other, and that several empirical studies have
+found that contagion of ﬁres from cultivated/cleared areas into the forest are major
+causes of extra forest loss next to direct deforestation/logging 26–29 .
+
+----
+
+@Hoffman2021
+
+Decades of warmer temperatures and
+greater instances of drought have lengthened wildfire seasons
+around the globe, and uncharacteristically severe wildfires have
+negatively impacted biodiversity in all of Earth’s biomes
+
+
+----
 
 Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 356: 1356–1362.
 
