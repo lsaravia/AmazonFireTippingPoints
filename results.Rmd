@@ -38,6 +38,37 @@ In this work we developed a simple model that reproduce the observed seasonal fi
 
 ## methods and results 
 
+### Model
+
+
+* Typical parameters Small p small f  and f << p   
+
+![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 dispersal to neighbours md=1.01  de=102](figure/Fire_f2-07_p5e-4_noseason_de102.png)
+
+   
+![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 long distance dispersal md=65.72 de=2.0155](figure/Fire_f2-07_p5e-4_noseason_de20155.png)
+
+* The role of seasonality, fire season 90 days 10 times more probability of ignition (average f = 6.5e-07)
+
+  ![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 dispersal to neighbours md=1.01  de=102](figure/Fire_f2-07_p5e-4_season_de102.png)
+
+  ![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 long distance dispersal md=65.72 de=2.0155](figure/Fire_f2-07_p5e-4_season_de20155.png)
+
+* Increase in fire season to 120 days
+
+  ![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 dispersal to neighbours md=1.01  de=102](figure/Fire_f2-07_p5e-4_season120_de102.png)
+  
+  ![Small p small f  and f << p,  f=2.0e-7 p=1/2000=5e-4 dispersal to neighbours md=1.01  de=102](figure/Fire_f2-07_p5e-4_season120_de20155.png)
+  
+
+* The role of long dispersal: with neighbours dispersal patches of forest coalesce bigger patches become bigger and they have more probability to burn, the number of forest patches decrease with time, driving the system to an extinction. 
+
+ ![Seasonality rapid recovery f=2.0e-7 p=1/500 dispersal to neighbours md=1.01  de=102](figure/Fire_f2-07_p2e-3_season_de102.png)
+
+ ![Seasonality rapid recovery f=2.0e-7 p=1/500 long distance dispersal md=65.72 de=2.0155](figure/Fire_f2-07_p2e-3_season_de20155.png)
+
+
+
 ### Regions
 
 * Our region of study is the Amazonas Basin (from http://worldmap.harvard.edu/data/geonode:amapoly_ivb), one of the reasons to choose this regions is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point. 

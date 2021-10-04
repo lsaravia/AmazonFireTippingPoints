@@ -90,134 +90,6 @@ nl <- nl(nlversion = "6.2",
 ["Initial-forest-density" 0.1]
 ["Periodicity" false]
 
-# Simulations 250x250 
-
-```{r gen_fit_lhs250, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
-
-# A new experiment with a bigger lattice to check size effects
-#
-nl@experiment <- experiment(expname="Amazon20years250",
-                            outpath=outpath,
-                            repetition=1,
-                            tickmetrics="true",
-                            idsetup="setup",
-                            idgo="go",
-                            idrunnum="nlrx-experiment",
-                            runtime=0,
-                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability" ),
-                            variables = list("forest-dispersal-distance" = list(min=1.5, max=3, qfun="qunif"),
-                                              "Forest-growth" = list(min=90, max=3650, qfun="qunif")),
-                            constants = list("world-width" = 249,
-                                             "world-height" = 249,
-                                               "fire-prob-filename"="\"Data/Estimated_bF.csv\"",
-                                               "Save-view" =  "false",
-                                               "video" = "false",
-                                               "use-fire-prob-se" = "false",
-                                               "end-simulation"= 14671,
-                                               "Initial-forest-density" = 0.6,
-                                               "Periodicity" = "false"
-                                             ))
-
-# Add idrunnum as global variable to transfer the current nlrx experiment name, random seed and runnumber (siminputrow) to NetLogo for use with self-written output In NetLogo.
-
-
-#
-# Run 10 times this do not set the run variable for output 
-#
-#nl@simdesign <- simdesign_simple(nl=nl,
-#                               nseeds=2)
-
-#
-# Set a latin hypercubic design 
-#
-nl@simdesign <- simdesign_lhs(nl=nl,
-                               samples=100,
-                               nseeds=10,
-                               precision=2)
-
-# run in Paralell 
-#
-plan(multisession)
-tic()
-results <- run_nl_all(nl,split = 4)
-toc()
-plan(sequential)
-names(results)
-
-#
-# Write the output 
-#
-setsim(nl, "simoutput") <- results 
-write_simoutput(nl)
-
-```
-
-
-# Simulations 350x350 
-
-```{r gen_fit_lhs349, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
-
-# A new experiment with a bigger lattice to check size effects
-#
-nl@experiment <- experiment(expname="Amazon20years350",
-                            outpath=outpath,
-                            repetition=1,
-                            tickmetrics="true",
-                            idsetup="setup",
-                            idgo="go",
-                            idrunnum="nlrx-experiment",
-                            runtime=0,
-                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability" ),
-                            variables = list("forest-dispersal-distance" = list(min=1.5, max=3, qfun="qunif"),
-                                              "Forest-growth" = list(min=90, max=3650, qfun="qunif")),
-                            constants = list("world-width" = 349,
-                                             "world-height" = 349,
-                                               "fire-prob-filename"="\"Data/Estimated_bF.csv\"",
-                                               "Save-view" =  "false",
-                                               "video" = "false",
-                                               "use-fire-prob-se" = "false",
-                                               "end-simulation"= 14671,
-                                               "Initial-forest-density" = 0.6,
-                                               "Periodicity" = "false"
-                                             ))
-
-# Add idrunnum as global variable to transfer the current nlrx experiment name, random seed and runnumber (siminputrow) to NetLogo for use with self-written output In NetLogo.
-
-
-#
-# Run 10 times this do not set the run variable for output 
-#
-#nl@simdesign <- simdesign_simple(nl=nl,
-#                               nseeds=2)
-
-#
-# Set a latin hypercubic design 
-#
-nl@simdesign <- simdesign_lhs(nl=nl,
-                               samples=100,
-                               nseeds=10,
-                               precision=2)
-
-# run in Paralell 
-#
-plan(multisession)
-tic()
-results <- run_nl_all(nl,split = 4)
-toc()
-plan(sequential)
-names(results)
-
-#
-# Write the output 
-#
-setsim(nl, "simoutput") <- results 
-write_simoutput(nl)
-
-```
-
-
-
-
 # simulations 450x450 
 
 ```{r gen_fit_lhs449, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -284,11 +156,11 @@ write_simoutput(nl)
 
 # simulations 450x450 Expanded set of simulations 
 
-```{r gen_fit_lhs449exp, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r gen_fit_lhs449exp2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 # A new experiment with a bigger lattice to check size effects
 #
-nl@experiment <- experiment(expname="Amazon20years450exp",
+nl@experiment <- experiment(expname="Amazon20years450exp02",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -339,8 +211,6 @@ write_simoutput(nl)
 * Amazon20years249_lhs  - 250x250 lattice size - 18590.67 sec - 5 hs
 * Amazon20years349_lhs  - 350x350 lattice size - 
 * Amazon20years449_lhs.csv - 450x450
-
-
 * Amazon20years350_lhs.csv - New simulations with corrected periodic ignition probability 
 * Amazon20years450_lhs.csv - 450x450 New simulations with corrected periodic ignition probability 
 
@@ -367,7 +237,7 @@ list.files(outpath,"Amazon20.*_lhs\\.csv")
 # sim <- read_netlogo_simul(file.path(outpath,"Amazon20years350_lhs.csv"),skip=0)
 # sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450_lhs.csv"),skip=0)
 
-sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp_lhs.csv"),skip=0)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp01_lhs.csv"),skip=0)
 
 names(sim)
 
@@ -400,7 +270,7 @@ mdat <- patch_size %>% mutate(Date=ymd(date)) %>% group_by(Date) %>%
 #
 pred_err(msim %>% filter(siminputrow==2,world_width==249),mdat )
 
-#best <- msim0 %>% group_by( type,world_width,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(rmse,n=10)
+#best <- msim0 %>% group_by( type,world_width,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err_max(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10)
 
 best <- msim %>% group_by( type,world_width,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10)
 
@@ -452,158 +322,6 @@ msim %>% inner_join(best %>% slice_min(mabe,n=1) %>% filter( type == "periodic")
 5 periodic         349                      2.11         1641.
 6 periodic         449                      2.19         1602.
 
-## Simulations with patch size output for wordl_width = 250 
-
-* Load 10 best simulations then make new simulations to estimate the patch size distributions
-* I repeated these simulations with type fixed and periodic for comparison but here only the periodic forced with data is included.
-
-
-```{r sim_distinct249cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
-
-best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
-
-
-disp_best <- best %>% filter( world_width==249, type=="periodic") %>% ungroup() %>% dplyr::select(forest_dispersal_distance) %>% deframe()
-grow_best <- best %>% filter( world_width==249, type=="periodic") %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
-names(disp_best) <- NULL
-names(grow_best) <- NULL
-
-# Calculate the number of steps for last day of the year to calculate patch size distributions
-#
-eval_times <- as.numeric(lapply(0:19, function(x){ymd("2000-12-31") + years(x) - ymd("1980-11-01") }))
-ymd("1980-11-01") + days(eval_times)
-
-
-nl@experiment <- experiment(expname="Amazon20years249sp",
-                            outpath=outpath,
-                            repetition=1,
-                            tickmetrics="true",
-                            idsetup="setup",
-                            idgo="go",
-                            #idrunnum="nlrx-experiment",
-                            runtime=0,
-                            evalticks=eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 0:19
-                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
-                            variables = list("forest-dispersal-distance" = list(values=disp_best),
-                                             "Forest-growth" = list(values=grow_best)),
-                            constants = list("world-width" = 249,
-                                             "world-height" = 249,
-                                               "fire-prob-filename"="\"Data/Estimated_bF.csv\"",
-                                               "Save-view" =  "false",
-                                               "video" = "false",
-                                               "end-simulation"= 14641,
-                                               "use-fire-prob-se" = "false",
-                                               "Initial-forest-density" = 0.6,
-                                               "Periodicity" = "false",
-                                               "Fire-probability" = 1E-6,
-                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\"")
-                                             ))
-
-# Add idrunnum as global variable to transfer the current nlrx experiment name, random seed and runnumber (siminputrow) to NetLogo for use with self-written output In NetLogo.
-
-#
-# Run 10 times this do not set the run variable for output 
-#
-# nl@simdesign <- simdesign_simple(nl=nl,
-#                                nseeds=1)
-
-nl@simdesign <- simdesign_distinct(nl=nl,
-                               nseeds=10)
-
-#
-# Set a latin hypercubic design 
-#
-# nl@simdesign <- simdesign_lhs(nl=nl,
-#                                samples=100,
-#                                nseeds=10,
-#                                precision=2)
-
-# run in Paralell 
-#
-plan(multisession)
-tic()
-results <- run_nl_all(nl,split=5)
-toc()
-plan(sequential)
-names(results)
-
-#
-# Write the output 
-#
-setsim(nl, "simoutput") <- results 
-write_simoutput(nl)
-#saveRDS(results, file.path(outpath, "Amazon20years249sp.rds"))
-
-```
-
-## Simulations with patch size output for wordl_width = 350 
-
-* Load 10 best simulations then make new simulations to estimate the patch size distributions
-
-```{r sim_distinct349cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
-
-best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
-
-
-disp_best <- best %>% filter( world_width==349) %>% select(forest_dispersal_distance) %>% deframe()
-grow_best <- best %>% filter( world_width==349) %>% select(Forest_growth) %>% deframe()
-names(disp_best) <- NULL
-names(grow_best) <- NULL
-
-nl@experiment <- experiment(expname="Amazon20years349sp",
-                            outpath=outpath,
-                            repetition=1,
-                            tickmetrics="true",
-                            idsetup="setup",
-                            idgo="go",
-                            #idrunnum="nlrx-experiment",
-                            runtime=0,
-                            evalticks= c(14671,14305,13940,13575,13210,12844,12479,12114,11749,11383),          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
-                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
-                            variables = list("forest-dispersal-distance" = list(values=disp_best),
-                                             "Forest-growth" = list(values=grow_best)),
-                            constants = list("world-width" = 349,
-                                             "world-height" = 349,
-                                               "fire-prob-filename"="\"Data/Estimated_bF.csv\"",
-                                               "Save-view" =  "false",
-                                               "video" = "false",
-                                               "end-simulation"= 14641,
-                                               "Initial-forest-density" = 0.6,
-                                               "Periodicity" = "false",
-                                               "Fire-probability" = 1E-6,
-#                                               "forest-dispersal-distance" = 2.38,
-#                                               "Forest-growth" = 2963,
-                                               "eval-burned-clusters"="\"[14671 14305 13940 13575 13210 12844 12479 12114 11749 11383]\""
-                                             ))
-
-
-#
-# Run 10 times this do not set the run variable for output 
-#
-# nl@simdesign <- simdesign_simple(nl=nl,
-#                                nseeds=1)
-
-nl@simdesign <- simdesign_distinct(nl=nl,
-                               nseeds=10)
-
-# run in Paralell 
-#
-plan(multisession)
-tic()
-results <- run_nl_all(nl,split=5)
-#results <- run_nl_all(nl,split = 4)
-toc()
-plan(sequential)
-names(results)
-
-#
-# Write the output 
-#
-setsim(nl, "simoutput") <- results 
-write_simoutput(nl)
-#saveRDS(results, file.path(outpath, "Amazon20years249sp.rds"))
-
-```
 
 ## Simulations with patch size output for wordl_width = 450 
 
@@ -685,7 +403,7 @@ write_simoutput(nl)
 * We selected the 10 best fitted parameters and estimate the anual fire patch distributions
 
 
-```{r comp_fit_lhs249cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r comp_fit_lhs449cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 # Read previously saved fitted exponents file
 #
@@ -693,8 +411,6 @@ pexp <- readRDS(file.path("Simulations", "fittedExponentsAmazon20years.rds"))
 pexp <- pexp %>% filter(!(world_width==449 & sim_type=="periodic") )   ## -----> recalculate to get the number of patches
 pexp %>% distinct(world_width,sim_type)
 
-#sim <- read_netlogo_simul(file.path(outpath,"Amazon20years249sp_distinct.csv"),skip=0)
-#sim <- read_netlogo_simul(file.path(outpath,"Amazon20years349sp_distinct.csv"),skip=0)
 #sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449sp_distinct.csv"),skip=0)
 sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449spNew_distinct.csv"),skip=0)
 
@@ -999,7 +715,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45.rds"))
 * RCP 8.5
 
 
-```{r sim_simple449clusterRCP85new, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449clusterRCP85new, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 
 eval_times <- as.numeric(lapply(0:38, function(x){ymd("2021-12-31") + years(x) - ymd("2010-01-01") }))
@@ -1064,7 +780,7 @@ write_simoutput(nl)
 
 # Calculate patch distributions from best fitted parameteres forced with RCP 8.5
 
-```{r calcPatchDistSimRCP85, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+```{r calcPatchDistSimRCP85, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 
 # Read previous simulations for RCP 4.5 and fitted parameters

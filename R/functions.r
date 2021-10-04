@@ -511,6 +511,27 @@ pred_err <- function(x,y) {
   data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(abs(da$burned_by_month - da$total_patch))/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
 }
 
+#
+# 
+#
+#' Calculate error from predicted values using the annual maxima 
+#' 
+#' It takes two datframes and assummes they have a column named Date
+#'
+#' @param x dataframe with simulations
+#' @param y dataframe with data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+pred_err_max <- function(x,y) {
+  da <- inner_join(x,y, by=c("Date" = "Date") )
+  da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
+  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(abs(da$burned_by_month - da$total_patch))/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+}
+
+
 
 
 #' Evaluate patch distribution from netlogo list of patch sizes output "[]"
