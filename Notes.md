@@ -41,7 +41,9 @@ Moreover, tropical deforestation fires have remained relatively constant over th
 
 Landscape-wide conversions from slow-growing, infrequently burned forests to frequently burned grassland and shrublands are possible (Fig. 5) , which depletes soil carbon stores, as in regrowth forests in the conifer forests in the western USA 133 and in Indonesia 134 . This feedback process is most likely self-correcting because fire regimes will shift from being flammability-limited to fuel-limited with increasing reduced productivity 40,42,133
 
+However, the relationship between vegetation fire and vegetation is likely to change in the future due to dynamic feedbacks, which is not accounted for using statistical associations 108,119,120 .
 
+Another key area of uncertainty in future fire-regime predictions is the range of variability and frequency of extreme fire events, and there is a lack of research projecting these events and linking them to cascading consequences, such as post-fire floods, large-scale erosion and debris flows that alter hydrology and topography, and development of pyrocumulonimbus 136 . The paucity of projections is partially due to the substantial challenges and uncertainties inherent in coupling interdisciplinary models, as well as the increased level of uncertainty and error at the extremes 90,137,138 .
 
 
 ------
@@ -224,6 +226,43 @@ negatively impacted biodiversity in all of Earth’s biomes
 
 ----
 
+@Pausas2021
+
+Climate change increases the frequency with which some of these thresholds are crossed, extending the duration of the fire season and increasing the frequency of dry years.
+
+----
+@Aragao2018 21st Century drought-related fires counteract the decline of Amazon deforestation carbon emissions
+
+Most Earth System Models (ESMs) predict increasing dry season intensity in Amazonia in the 21st century. This is directly related to radiative
+forcing 11 and declining Northern Hemisphere aerosol production 12, 13 , which tend to cause anomalous variation of sea surface temperatures (SST) and consequently drive large-scale swings in precipitation over Amazonia. If this new climatic conﬁguration is borne out, Amazonia is expected to become an ampliﬁed ﬁre-prone system 14, 15 , with emissions from drought-induced ﬁres unrelated to deforestation increasingly playing a much larger role than those from deforestation 15 .
+
+----
+
+
+@Pivello2021
+
+Humid tropical forests, dominant in the Amazon basin and in the Atlantic Forest, present no indication of evolutionary history inﬂuenced by ﬁre, and their species do not have adaptations that favor their resistance to and resilience after ﬁre events. Outside extreme climate events, rainforests are rarely affected by naturally lit ﬁre, as high humidity levels and lack of fuel prevent ﬁre from starting and propagating. The natural ﬁre return intervals in these forests are estimated to be of hundreds or even thousands of years (Kauffmann and Uhl, 1990). However, extreme droughts increase the probability of forest ﬁres.
+
+----
+@Sanderson2020
+
+The complex dynamics of fuel accumulation, vegetation dynamics and their interactions with climate under transient CO2 concentrations, as well as impacts of land management and human ignitions, are likely to result in fire behaviour patterns not represented in historical records. Thus, fire prediction over decadal to century timescales requires more mechanistic approaches, capable of capturing the numerous interacting system components that affect the evolution of fire risk 14 15.
+
+Precipitation projections for southeast Australia remain highly uncertain and model-dependent 10 , and assessing the changing probabilities of low-rainfall years like 2019 under climate change requires large ensembles that simulate many realizations of natural variability 20 .
+
+
+----
+@Palmieri2020
+
+
+
+We are of course just repeating the original hope of SOC research and suggesting that systems of entirely different nature may indeed exhibit similar emergent collective behavior, even if the dynamics does not operate in a critical state, but rather is found to inhabit a broad region of approximately scale-free nature. Crucial for our suggestion is the observation that the true asymptotic behavior of the FFM appears to happen for such enormous systems sizes that they hardly are of relevance to real macroscopic systems.
+
+
+----
+
+
+
 Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 356: 1356–1362.
 
 
@@ -231,8 +270,6 @@ Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon
 
 Brando, P. M. et al. 2014. Abrupt increases in Amazonian tree mortality due to drought–fire interactions. - PNAS 111: 6347–6352.
 
-Aragão, L. E. O. C. et al. 2018. 21st Century drought-related fires counteract the decline of Amazon deforestation carbon emissions. - Nature Communications 9: 536.
-Global tipping points in forest wildfires
 
 Amigo, I. 2020. When will the Amazon hit a tipping point? - Nature 578: 505–507. @Amigo2020
 
