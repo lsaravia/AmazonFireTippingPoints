@@ -48,9 +48,9 @@ Our region of study is the Amazonas Basin (Figure 1), including Brasil, that rep
 
 ### Fire data and parameters
 
-We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 @Giglio2016, which has a 500forced with the ignition probabilty  m pixel resolution. To download the data we used Google Earth Engine restricted to the region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month. We calculate the probability of ignition as the number of clusters that growth from zero in that month, it means that if a fire started in the previous month we avoid to count it, the we divided it by the total number of pixels in the region.
+We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 [@Giglio2016], which has a 500 m pixel resolution. To download the data we used Google Earth Engine restricted to the region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month. We calculate the probability of ignition as the number of clusters that growth from zero in that month, it means that if a fire started in the previous month we avoid to count it, the we divided it by the total number of pixels in the region.
 
-To estimate the distribution of fire sizes we used an annual period. We aggregated the monthly images using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood to decide which distribution fited best to the data [@Clauset2009]. 
+To estimate the distribution of fire sizes we used an annual period. We aggregated the monthly images using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood to decide which distribution fitted best to the data [@Clauset2009]. 
 
 ### Modelling the probability of ignition
 
@@ -82,7 +82,7 @@ We use a 2-dimensional lattice, each site in the lattice could be in three diffe
 
 We assumed absorbing boundary conditions and the initial state is a random configuration of forest with density 0.6 (60% of the lattice with forest), this configuration assures that the forest percolates: most forest sites are connected then initially the fire spreads over the whole lattice. Rule 3 represents that an empty site can recover more quickly when is nearby a forest site, but also that some sites can recover far from established forest sites in fact, depending on the kernel exponent, it could be any site in lattice [@Marco2011]. The choice of a power-law dispersal is justified because it was found that forest usually disperses with fat-tailed kernels [@Clark2005; @Seri2012].
 
-This model is very similar to the Drossel-Schwabl forest fire model [@Drossel1992] that exhibits critical behaviour when $\theta = p/f$ tends to $\infty$,   thus it must satisfy the condition that $f << p$, as is generally observed in natural systems. The model involves the separation between three time scales: the fast burning of forest clusters, the slow recover of forest, and the even slower rate of fire ignitions. Then in the critical regime there is a slow accumulation of forest that forms connected clusters, eventually as the ignition probability is very low these clusters connect the whole lattice---here is the link with percolation theory [@Stauffer1994]---and an ignition event produce big fires. After this the density of the forest is very low and the accumulation cycle begins again. This regime is characterized by wide fluctuations in the size of fires and the density of trees, and both of them follow approximately power-law size distributions.
+This model is very similar to the Drossel-Schwabl forest fire model [@Drossel1992] that exhibits critical behaviour when $\theta = p/f$ tends to $\infty$,   thus it must satisfy the condition that $f << p$, as is generally observed in natural systems. The model involves the separation between three time scales: the fast burning of forest clusters, the slow recover of forest, and the even slower rate of fire ignitions. Then in the critical regime there is a slow accumulation of forest that forms connected clusters, eventually as the ignition probability is very low these clusters connect the whole lattice---here is the link with percolation theory [@Stauffer1994]---and an ignition event produce big fires. After this, the density of the forest becomes very low and the accumulation cycle begins again. This regime is characterized by wide fluctuations in the size of fires and the density of trees, and both of them follow approximately power-law size distributions.
 
 If the ignition probability $f$ is too high fires are frequent, forest sites become disconnected and small fires, with a characteristic size, dominate the system. An example of this regime could be the case of indigenous fire stewardship in Australian landscapes, they maintained flammable forest in a disconnected state by producing frequent small scale fires [@NatureEcoEvo2020]. This regime was disrupted by fire suppression related to European colonization and land-use change [@Hoffman2021], pushing the system towards a critical regime [@Nicoletti2021].  
 
@@ -92,14 +92,33 @@ The second feature not present in the original forest fire model is seasonality,
 
 Increasing the length of the fire season as predicted in climate change scenarios [@Pausas2021]  will produce the model to spend more time at a lower $\theta$ decreasing the connectivity of the forest and the size of fires. Moreover, depending on the position of $\theta_{max} - \theta_{min}$ on the parameter space increasing the possibility of critical extinction.  
 
+We made a set of exploratory simulations with a range of parameters compatible with the Amazon region to characterize the previously described regimes (Table 1), the simulations run for 40 years with an initial forest density of 0.3, and we use the final 20 year to estimate the total annual fire size, the maximum individual fire size, the distribution of fire sizes, the fire return time, and the total number of fires. To determine the fire sizes we used the same methods described previously for the MODIS fire data.
 
-<!-- This extension in fire season would produce less large fires but as we approximate the critical extinction zone what happens is that the forest sites experience more frequent fires this could undermine the regeneration capacity of the forest pushing the model more towards the critical extinction, in nature this probably means that the system will be pushed to a drastic change in vegetation type as a transition from forest to savannah -->
 
-##
+
+| $de$                       | $f$               | $\theta$       |
+| -------------------------: | ----------------: | -------------: |
+| 102                        | 2e-07             | 2500           |
+| 2.0155                     | 2e-06             | 250            |
+|                            | 2e-05             | 25             |
+|                            |                   |                |
+
+Table: We ran an in-silico experiment using a factorial combination of dispersal exponent $de$ and $\theta$ and 10 repetitions of each parameter set. First we ran the experiment with $\theta$ fixed, keeping the ignition probability $f$ constant, then we repeated the experiment with seasonality: we simulate a fire season of 3 months each year multiplying $f$  by 10. The dispersal exponent $de=101$ is equivalent to a dispersal to the nearest neighbours, and $de=2.0155$ corresponds to a mean dispersal distance of 66 sites.
+
+
+## Results
+
+
+
+## Discussion
+
 
 The model only reproduces the fire conditions related to the actual deforestation state and predicts the modifications in fire regimes due to climate change scenarios. Thus climate change per se will produce an important intensifications of fires and if deforestation and land use change continues at actual rates, these factors will interact and probably produce the collapse of the Amazonian tropical forest towards a savannah with irreversible implications to biodiversity and global climate. 
 
-<--! Thus, predicting ‘black swan’ extreme fire events — which, by definition, have no historical precedent, such as the protracted, enormous and severe Australian 2019–2020 fires — seriously challenge the capacity of Earth-system-model projections. -->
+
+<!-- This extension in fire season would produce less large fires but as we approximate the critical extinction zone what happens is that the forest sites experience more frequent fires this could undermine the regeneration capacity of the forest pushing the model more towards the critical extinction, in nature this probably means that the system will be pushed to a drastic change in vegetation type as a transition from forest to savannah -->
+
+<!-- Thus, predicting ‘black swan’ extreme fire events — which, by definition, have no historical precedent, such as the protracted, enormous and severe Australian 2019–2020 fires — seriously challenge the capacity of Earth-system-model projections. -->
 
 
 

@@ -201,7 +201,7 @@ pd3 %>% group_by(periodo) %>% summarise(meanReturnTime = mean(deltaD), meanRT_ye
 require(mgcv)
 require(gratia)
 require(ggplot2)
-
+require(lubridate)
 
 ignition_prob <- readRDS("Data/ignition_prob.rds")
 pr <- read_csv("Data/TerraClimatePrAmazonas.csv") %>% inner_join(ignition_prob %>% mutate(date=ymd(date))) 
