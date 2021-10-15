@@ -201,20 +201,23 @@ evaluate_patch_distr <- function(br,returnEWS=TRUE,returnOBJ=FALSE,xmin=1){
   m_pexp <- discpowerexp.fit(patch_distr,est$xmin)
   pe <- data.frame(x=dd$x,y=ppowerexp(dd$x,est$xmin,m_pexp$exponent,m_pexp$rate,lower.tail=F))
   pe$y <- pe$y*  dd$y[which(dd$x==est$xmin)]
-  gp <- ggplot( dd, aes(x,y) ) + geom_point() + theme_bw() + scale_x_log10() + scale_y_log10() + 
-    geom_line(data=ll,aes(x,y, color="Pl.")) + 
-    geom_line(data=ee,aes(x,y, color="Exp.")) + ylab("Frequency (P>=x)") + xlab( "Patch size") +
-    geom_line(data=pe,aes(x,y, color="P.Exp.")) + 
-    geom_line(data=pp,aes(x,y, color="Ln.")) + coord_cartesian(ylim=range(dd$y)) + scale_color_viridis_d(name="")
 
-  if(returnOBJ)
+  if(returnOBJ) {
+    gp <- ggplot( dd, aes(x,y) ) + geom_point() + theme_bw() + scale_x_log10() + scale_y_log10() + 
+      geom_line(data=ll,aes(x,y, color="Pl.")) + 
+      geom_line(data=ee,aes(x,y, color="Exp.")) + ylab("Frequency (P>=x)") + xlab( "Patch size") +
+      geom_line(data=pe,aes(x,y, color="P.Exp.")) + 
+      geom_line(data=pp,aes(x,y, color="Ln.")) + coord_cartesian(ylim=range(dd$y)) + scale_color_viridis_d(name="")
+    
     patch_df <- gp
-  else {
+  } else {
     if( returnEWS ){
-      
-      df1 <-tibble(date=brName, type="pl", expo=m_pl$pars[1],rate=m_pl$pars[2],xmin=m_pl$xmin,AICc = calc_AICc(m_pl), range=max(patch_distr)-xmin )
-      df2 <-tibble(date=brName, type="exp", expo=m_exp$pars[1],rate=m_exp$pars[2],xmin=m_exp$xmin,AICc = calc_AICc(m_exp)) 
-      df3 <- tibble(date=brName, type="ln", expo=m_ln$pars[1],rate=m_ln$pars[2],xmin=m_ln$xmin,AICc = calc_AICc(m_ln))
+      ln_p <- compare_distributions(m_ln,m_pl)$p_two_sided 
+      exp_p <- compare_distributions(m_exp,m_pl)$p_two_sided
+      df1 <-tibble(date=brName, type="pl", expo=m_pl$pars[1],rate=m_pl$pars[2],xmin=m_pl$xmin,AICc = calc_AICc(m_pl), range=max(patch_distr)-xmin,
+                   ln_p_value=ln_p, exp_p_value=exp_p)
+      df2 <-tibble(date=brName, type="exp", expo=m_exp$pars[1],rate=m_exp$pars[2],xmin=m_exp$xmin,AICc = calc_AICc(m_exp),ln_p_value=ln_p, exp_p_value=exp_p) 
+      df3 <- tibble(date=brName, type="ln", expo=m_ln$pars[1],rate=m_ln$pars[2],xmin=m_ln$xmin,AICc = calc_AICc(m_ln),ln_p_value=ln_p, exp_p_value=exp_p)
       df4 <- tibble(date=brName, type="pexp", expo=m_pexp$exponent,rate=m_pexp$rate,xmin=est$xmin,AICc = calc_AICc(m_pexp))
       patch_df <- bind_rows(df1,df2,df3,df4)
       #patch_distr <- data.frame("patchdistr_sews(brTF)
@@ -508,7 +511,7 @@ read_netlogo_simul <- function(fname,skip=6){
 pred_err <- function(x,y) {
   da <- inner_join(x,y, by=c("Date" = "Date") )
   #da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
-  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(abs(da$burned_by_month - da$total_patch))/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
 }
 
 #
@@ -528,7 +531,7 @@ pred_err <- function(x,y) {
 pred_err_max <- function(x,y) {
   da <- inner_join(x,y, by=c("Date" = "Date") )
   da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
-  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(abs(da$burned_by_month - da$total_patch))/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
 }
 
 

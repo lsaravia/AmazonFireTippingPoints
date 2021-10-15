@@ -140,6 +140,20 @@ patch_size <- bind_rows(patch_size,do.call(rbind,p_df))
 toc()
 
 saveRDS(patch_size,patch_size_name)
+```
+
+
+# Plot Monthly Patch distribution
+
+```{r PlotPatchByMonthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+patch_size_name <- paste0("Data/patch_size_BurnedArea_",region_name, ".rds")
+
+if(file.exists(patch_size_name)) {
+  patch_size <- readRDS(patch_size_name) %>% mutate(date=ymd(date))%>% filter(date>="2001-01-01" & date<"2021-01-01" )
+} else {
+  stop(paste("No patch size file: ", patch_size_name))
+}
 
 #
 # Calculate total forest region area in pixels 
@@ -160,7 +174,7 @@ total_forest <- 31364191
 require(ggrepel)
 require(lubridate)
 require(plotly)
-p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+p1 <- patch_size %>% group_by(date) %>% 
   summarize(no_patch=n()/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
   filter( month(date) %in% c(4,5,6,7,8,9,10)) %>% 
@@ -200,7 +214,7 @@ p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>%
   summarize(no_patch=n()/total_forest*100,tot_patch=max(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
   filter( month(date) %in% c(4,5,6,7,8,9,10)) %>%
-  mutate( label =ifelse(date =="2010-08-01" | date=="2007-09-01" | date=="2010-09-01" | date=="2005-09-01" | date=="2004-08-01",as.character(date),"")) %>%
+  mutate( label =ifelse(date =="2010-08-01" | date=="2007-09-01" | date=="2010-09-01" | date=="2005-09-01" | date=="2004-09-01",as.character(date),"")) %>%
   ggplot(  aes(no_patch,tot_patch, label=label,color=year(date) ))+ geom_point() + theme_bw() +
       scale_color_viridis_c(guide=FALSE)  + 
       xlab("Number of Patches") +  
@@ -209,11 +223,11 @@ p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>%
 ggsave("figure/Amazon_MaxSizeVsNumber_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
 
 
-p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
+p1 <- patch_size %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100) %>%  
   ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
       scale_color_viridis_c()  + 
-      ylab("Max Patch Size %") +  
+      ylab("Max Patch Size %") +  xlab("") + 
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
 ggplotly(p1)
 ggsave("figure/Amazon_MaxSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
@@ -230,14 +244,25 @@ ggsave("figure/Amazon_NumberPatches_Month.jpg",plot=p1,width=8,height=6,units="i
 
 
 p1 <- patch_size %>% mutate(date=ymd(date)) %>% group_by(date) %>% 
-  summarize(max_patch=sum(size)/total_forest*100) %>%  
-  ggplot(  aes(date,max_patch ))+ geom_line() + theme_bw() +
+  summarize(sum_patch=sum(size)/total_forest*100,max_patch=max(size)/total_forest*100) %>%  
+  ggplot(  aes(date,sum_patch ))+ geom_line() + theme_bw() +
       scale_color_viridis_c()  + 
-      ylab("Total Patch Size %") +  
+      ylab("Total Fire Size %") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year")
 ggplotly(p1)
 ggsave("figure/Amazon_TotSize_Month.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
 
+
+p1 <- patch_size %>% mutate(date=year(date)) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+   ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Maximum fire size (%)") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel()
+ggplotly(p1)
+ggsave("figure/Amazon_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
 
 p1 <- patch_size %>% mutate(date=year(date)) %>% group_by(date) %>% 
   summarize(no_patch=n()/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
@@ -254,10 +279,10 @@ ggsave("figure/Amazon_TotSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",
 p1 <- patch_size %>% mutate(date=year(date)) %>% group_by(date) %>% 
   summarize(no_patch=n()/total_forest*100,tot_patch=max(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
-   ggplot(  aes(no_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+   ggplot(  aes(tot_patch,no_patch, label=label,color=date ))+ geom_point() + theme_bw() +
       scale_color_viridis_c()  + 
-      xlab("Number of Patches") +  
-      ylab("Max Size (%)") +  
+      ylab("Number of Patches") +  
+      xlab("Max Size (%)") +  
       theme(axis.text.x = element_text(angle = 90, hjust = 1)) + geom_text_repel()
 ggplotly(p1)
 ggsave("figure/Amazon_MaxSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
@@ -317,11 +342,15 @@ if(file.exists(patch_dfp_fname)) {
   patch_dfp <- tibble()
 }
 
+# patch_dfp <- patch_dfp %>% group_by(region,date,period) %>% slice_tail(n=4)
+
+patch_dfp <- patch_dfp %>% tidyr::fill(ln_p_value,exp_p_value)
+
 plan(multisession)
 p_df <- future_lapply( unique(patch_sparse$period), function(i){
   br <- patch_sparse[patch_sparse$period == i,]
   spm <- sparseMatrix(br$i,br$j) 
-  df <- evaluate_patch_distr(spm,TRUE) %>% mutate(period=i,region= region_name)  %>% select(region, date,period, everything())
+  df <- evaluate_patch_distr(spm,TRUE) %>% mutate(period=i,region= region_name)  %>% dplyr::select(region, date,period, everything())
   #g1 <- generic_sews(as.matrix(spm),subsize = 2) 
   #df <- bind_cols(df, data.frame(t(g1$value)))
 })
@@ -348,7 +377,7 @@ if(file.exists(patch_size_pfname)) {
 p_df <- future_lapply( unique(patch_sparse$period), function(i){
   br <- patch_sparse[patch_sparse$period == i,]
   spm <- sparseMatrix(br$i,br$j)
-  df <- evaluate_patch_distr(spm,FALSE) %>% mutate(period=i,region= region_name)  %>% select(region, date,period, everything())
+  df <- evaluate_patch_distr(spm,FALSE) %>% mutate(period=i,region= region_name)  %>% dplyr::select(region, date,period, everything())
 })
 patch_sizes_p <- bind_rows(patch_sizes_p,p_df) 
 patch_sizes_p <- patch_sizes_p %>% mutate(date = 2000+ period)
@@ -358,9 +387,9 @@ saveRDS(patch_sizes_p,patch_size_pfname)
 
 
 #
-# Which years have power law distribution
+# Which years have power law distribution - Criteria min AICc and different from exponential
 #
-knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)))
+knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)) %>% select(date,type:range,exp_p_value))
 #
 # Power exponent vs Relative range
 #
@@ -376,7 +405,7 @@ patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc),type=="pl") %>% ungrou
 #
 plots_fname <- paste0("Data/Plots_p_BurnedArea_", region_name, ".rds" )
 if(file.exists(plots_fname)) {
-  patch_sizes_p <- readRDS(plots_fname)
+  p_df <- readRDS(plots_fname)
 } else {
 
   p_df <- future_lapply( unique(patch_sparse$period), function(i){
@@ -451,6 +480,22 @@ legend_b <- get_legend(
 pg <- plot_grid(prow, legend_b, nrow = 2, rel_heights = c(1, .1))
 save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6,dpi=600)
 
+
+#
+# Plota annual max size vs tot size
+#
+
+p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+   ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Maximum fire size (%)") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel()
+ggplotly(p1)
+ggsave("figure/Amazon_Annual_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
 ```
 
 ## power Law range and median 
@@ -498,7 +543,7 @@ save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6
 
 # Read precipitation and temperature Data
 
-```{r readFileswithPrecipitationTmaxPatch, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+```{r readFileswithPrecipitationTmaxPatch, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 require(tidyverse)
 require(lubridate)
 require(plotly)
@@ -556,7 +601,7 @@ ggplotly(p1)
 
 # Using Empirical dynamic modelling (dataframe from previous chunk) with maxtemp y monthly precipitation
 
-```{r EDMPatchGrowth, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+```{r EDMPatchGrowth, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 require(rEDM)
 
 #

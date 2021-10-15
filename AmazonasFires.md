@@ -42,33 +42,34 @@ The objective of this work is to predict the fire regimes of the Amazonas region
 ## methods 
 
 
-Our region of study is the Amazonas Basin (Figure 1), including Brasil, that represent 60% of the area, and 8 countries more (Bolivia, Colombia, Ecuador, Guyana, Peru, Suriname, Venezuela, and French Guiana). One of the reasons to choose this region is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point [@Lenton2013;@Staver2011]. 
-
-![Region of study: the Amazonas Basin](figure/AmazonasRegion.png)
+Our region of study is the Amazonas Basin (Figure S1), including Brasil, that represent 60% of the area, and 8 countries more (Bolivia, Colombia, Ecuador, Guyana, Peru, Suriname, Venezuela, and French Guiana). One of the reasons to choose this region is that is marked as a tipping element of the Earth-system, this means that that is at least subcontinental in scale and can exhibit a tipping point [@Lenton2013;@Staver2011]. 
 
 ### Fire data and parameters
 
-We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 [@Giglio2016], which has a 500 m pixel resolution. To download the data we used Google Earth Engine restricted to the region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976], each cluster represent a fire event and this allows us to calculate the number and sizes of fire clusters by month. We calculate the probability of ignition as the number of clusters that growth from zero in that month, it means that if a fire started in the previous month we avoid to count it, the we divided it by the total number of pixels in the region.
+We estimate the monthly burned areas from 2001 to the end of 2020 using the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area Collection 6 product MCD64A1 [@Giglio2016], which has a 500 m pixel resolution. To download the data we used Google Earth Engine restricted to the region of interest. Each image represents the burned pixels as 1 and the non-burned as 0. Then we calculate the burned clusters using 4 nearest neighbours (Von Neumann neighbourhood) and the Hoshen–Kopelman algorithm [@Hoshen1976]. Each cluster contains contiguous pixels burned within a month and this represents a fire event. After this we can calculate the number and sizes of fire clusters by month. We estimate the probability of ignition $f$ as the number of clusters that growth from zero in that month, it means that if a fire started in the previous month we avoid to count it, then we divided it by the total number of pixels in the region to allow comparisons with the fire model.
 
-To estimate the distribution of fire sizes we used an annual period. We aggregated the monthly images using a simple superposition, so the anual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted several distributions to the fire sizes ( power-law, power-law with exponential cut-off, log-normal, and exponential ), we used maximum likelihood to decide which distribution fitted best to the data [@Clauset2009]. 
+We also estimate the distribution of fire sizes, but using an annual period to have a enough number of fire clusters to discriminate between different distributions. We aggregated the monthly images using a simple superposition, so the annual image has a 1 if it has one or more fires during the year, and 0 if it has none. After that we run again the the Hoshen–Kopelman algorithm and obtain the annual fire clusters, and we fitted the following distributions to the fire sizes: power-law, power-law with exponential cut-off, log-normal, and exponential. We used maximum likelihood to decide which distribution fitted best to the data using the Akaike Information Criteria ($AIC$) [@Clauset2009]. Additionally we computed a likelihood ratio test for non-nested models: the Voung's test [@Vuong1989], we only consider it a true power-law when the value of the $AIC$ is minimum and the comparison with the exponential distribution using the Vuong's test is significant with p<0.05, if p>=0.05 we assume that the two distributions cannot be differentiated. 
 
 ### Modelling the probability of ignition
 
-We used generalized addditive models [@Wood2017] to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables were frequently used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM) we will use later. We obtained these monthly variables from the TerraClimate dataset [@Abatzoglou2018], and made an spatial average over the study region.
 
-We fitted models with single variables and a combination of two interacting variables, and also precipitation from the previous month  (Table S1), using to select the best model the Akaike criterion (AIC). To evaluate the predictive power of the models we break the data set in a training set (with Date < 2018) and testing set (with Date >= 2018) and we calculate the mean absolute error (MAE) for the three best models previously selected (Figure S2). 
+We calculated the monthly ignition probability $f$ and then we related it to monthly precipitation ($ppt$), maximum temperature ($maxTemp$) and a seasonal term. We obtained the environmental data from the TerraClimate dataset [@Abatzoglou2018], doing an average over the region. We transform $f$ to logarithms and evaluated an increasingly complex series of generalized additive models (GAMs), assuming a Gaussian distribution family. We use thin plate regression splines as smooth terms, and for interactions between environmental variables we used tensor products, with the method restricted maximum likelihood (REML) to ﬁt to the data [@Pedersen2019]. All these procedures were available in the R package **mgcv** [@Wood2017] and all source code is available at the repository <https://github.com/lsaravia/GlobalFireTippingPoints>.
 
+We selected the best model using  $AIC$ [@Wood2017] and to evaluate the predictive power of the models we break the data set in a training set (with Date < 2018) and testing set (with Date >= 2018) and we calculate the mean absolute percentage error (MAPE) for the three best models selected with $AIC$ (Table S2). The formula of the MAPE is as follows:
 
-To obtain predictions of the ignition probability up to 2060, we use the NASA Earth Exchange Global Daily Downscaled Climate Projections [@Thrasher2012] obtained from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. We average over the 21 CMIP5 models and over the study area to obtain the monthly values of the variables (precipitation and maximum temperature). Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
-
-<!-- * We fitted a series of GAM model to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables are used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM). We use an spatial average of these variables over the study region obtained from the TerraClimate dataset [@Abatzoglou2018]. The best model included the interaction between a seasonal term and maximal temperature. 
-
-* We obtained the monthly spatial averages of the previous variables from General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
-
- We predicted the ignition probability up to 2060 based in the Coupled Model Intercomparison Project Phase 5 (CMIP5, see @Taylor2012) and across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs, see @Meinshausen2011), RCP 4.5 and RCP 8.5. -->
+$\textrm{MAPE} = \frac{100}{N_{tot}} \sum_{i=1}^{ N_{tot}} {\frac{|n_i^{obs} - n_i^{pred}|}{n_i^{obs}}}$ 
 
 
-### Model
+We used the previous GAM model to obtain predictions of the ignition probability up to 2060. We get the data from the NASA Earth Exchange Global Daily Downscaled Climate Projections [@Thrasher2012], which were estimated with General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 [@Taylor2012]. We averaged over the 21 CMIP5 models and over the study region to obtain the monthly values of the needed variables: precipitation and maximum temperature. Then we estimate the probability of ignition up to 2060 using the fitted GAM across two of the four greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5 [@Meinshausen2011]. 
+
+<!-- 
+
+We used generalized additive models [@Wood2017] to relate the probability of ignition to monthly precipitation, maximum temperature and a seasonal term. These environmental variables were frequently used in statistical models of fire prediction [@Turco2018], we also selected these variables because they are readily available on the General Circulation Models (GCM) we will use later. We obtained these monthly variables from the TerraClimate dataset [@Abatzoglou2018], and made an spatial average over the study region.
+
+-->
+
+
+### Fire Model
 
 Conceptually the model represents two processes: forest burning and forest recovery, we are assuming that the forest layer does not represent exactly forest cover but flammable forest, and after a site was burned it does not mean that all the vegetation is dead but that all the fuel is consumed.  
 
@@ -92,23 +93,38 @@ The second feature not present in the original forest fire model is seasonality,
 
 Increasing the length of the fire season as predicted in climate change scenarios [@Pausas2021]  will produce the model to spend more time at a lower $\theta$ decreasing the connectivity of the forest and the size of fires. Moreover, depending on the position of $\theta_{max} - \theta_{min}$ on the parameter space increasing the possibility of critical extinction.  
 
-We made a set of exploratory simulations with a range of parameters compatible with the Amazon region to characterize the previously described regimes (Table 1), the simulations run for 40 years with an initial forest density of 0.3, and we use the final 20 year to estimate the total annual fire size, the maximum individual fire size, the distribution of fire sizes, the fire return time, and the total number of fires. To determine the fire sizes we used the same methods described previously for the MODIS fire data.
+We made a set of exploratory simulations with a range of parameters compatible with what we found for the Amazon region, to characterize the previously described regimes (Table S3). We used a lattice size of 450x450 sites, the simulations run for 60 years with an initial forest density of 0.3 (different initial conditions give the similar results), and we use the final 40 years to estimate the total annual fire size, the maximum cluster fire size, the distribution of fire sizes, and the total number of fires. To determine the cluster fire sizes and distributions we used the same methods described previously for the MODIS fire data. We ran a factorial combination of dispersal exponent $de$ and $\theta$ and 10 repetitions of each parameter set. First we ran the experiment with $\theta$ fixed, keeping the ignition probability $f$ constant, then we repeated the experiment with seasonality: we simulate a fire season of 3 months each year multiplying $f$  by 10. The dispersal exponent $de=102$ is equivalent to a dispersal to the nearest neighbours, and $de=2.0155$ corresponds to a mean dispersal distance of 66 sites (Table S3).
 
+### Fire Model Fitting
 
-
-| $de$                       | $f$               | $\theta$       |
-| -------------------------: | ----------------: | -------------: |
-| 102                        | 2e-07             | 2500           |
-| 2.0155                     | 2e-06             | 250            |
-|                            | 2e-05             | 25             |
-|                            |                   |                |
-
-Table: We ran an in-silico experiment using a factorial combination of dispersal exponent $de$ and $\theta$ and 10 repetitions of each parameter set. First we ran the experiment with $\theta$ fixed, keeping the ignition probability $f$ constant, then we repeated the experiment with seasonality: we simulate a fire season of 3 months each year multiplying $f$  by 10. The dispersal exponent $de=101$ is equivalent to a dispersal to the nearest neighbours, and $de=2.0155$ corresponds to a mean dispersal distance of 66 sites.
+As we already estimated the $f$ parameter from the 20 years of MODIS data, we only need to estimate the dispersal exponent $de$ and the probability $p$ of forest regrowth, we express the parameter $p$ as $r=1/p$ representing the average number of days for forest to recover. For doing this we duplicated the extension of the estimated $f$ as if it started in 1980, so we allow 20 years to the model to dissipate transients and then we used the last 20 years to compare with monthly fire data. To explore the parameter space we used latin-hypercube sampling [@Fang2005] with the parameter ranges $(4, 2.0101)$ for $de$ and $(90 - 7300) days for $r$, we used 500 samples and 10 simulations of the model for each sample. Then we select the 10 best parameter sets using the ones with the minimum MAPE comparing the monthly data with the predictions. We observed that the peaks in the model are delayed by 2-3 months, the same happen in more realistic process based models [@Thonicke2010], and as we were not interested in predicting exactly the seasonal fire patterns, we fitted again the models with MAPE but using comparing the maximum of the year. 
+The second step of our fitting procedure was to take the 10 best fitted parameter sets and calculate the power-law fire distribution, 
 
 
 ## Results
 
+The monthly fires follow a strongly seasonal pattern with a maximum between September and October (Figure S2). We could characterize the annual fire regime using the total fire size (total burned area) and the maximum fire cluster (the biggest fire event $S_{max}$), the years with highest total fire size are also the years with higher maximum individual fire cluster (Figure 1). We can observe that the years 2007 and 2010 had the two highest $S_{max}$ and they also have a power-law distribution (Table S1). Power-law distributions have two parameters the $x_{min}$ which is the minimum value for which the power-law holds, and the exponent. Only 6 from 20 years exhibit power law distribution (Table S1), some of the years with power-law distribution have a range, which is the $x_{min} - S_{max}$, with the highest values compared with the years without power-laws, but there are years with power-law and small range. These two extremes represent a pattern that we will also observe in the fire model. 
 
+![Annual total fire size vs maximum fire size for the Amazon as a percent of the region area. Estimated with MODIS burned area product](figure/Amazon_Annual_TotSizeVsMaxSize.jpg)
+
+
+We fitted GAM models for the ignition probability $f$ with single variables, and combinations of two interacting variables, the best model with lower $AIC$ and lower MAPE was the interaction  $maxTemp * month$ (Table S2). For the GAM fitted to the complete dataset we observe that the model do not capture the most extreme years of $f$ (Figure S7), but the model fitted for the first years (< 2018) predict very well the rest of the data (Figure S8).
+
+
+With the best-fitted GAM and the $maxTemp$ from the NASA Earth Exchange Global Daily Downscaled Climate Projections, we predicted the monthly $f$ starting from 2010 for two greenhouse gas emissions scenarios: RCP4.5 and RCP8.5, in this case all the data except one point fall inside de standard error of the model (Figures S9 & S10)
+
+### Fire model exploration 
+
+We simulated the model with a range of the $\theta$ parameter (equal to $p/f$) and we expected that bigger values would produce critical behaviour that consist in large variability total fires between years and extremely large cluster fire sizes that follow a power-law distribution. As expected we obtained a bigger proportion of power-law distributions for the biggest size of $\theta$ (Table S5), and particularly high variability and extremely big fires (Figure 2). For simulations with seasonality we observed the expected effect of decrease the frequency of power-law distributions, and also less variability and less extreme fires, because in these cases $\theta$ decreases for the fire season. Seasonality have also the unexpected effect of increasing the frequency of power-law distribution for $\theta = 25$ with a bigger exponent than the ones for large $\theta$ (Table S5), this pattern was also observed in the MODIS data. (Due to the formation of a few large and many small sized forest clusters that burns.)
+
+
+In the simulations with lower $\theta$ 25 and 250 and with shorter dispersal distances, the forest density tends to decrease and eventually it reach 0 which marks the absorbing phase transition reported for this kind of models [@Nicoletti2021], thus in these cases the model was below the critical point $\theta_{ext}$ (Figure S11). Increasing the dispersal distance produce higher forest density and seasonality have the opposite effect, in the case of high dispersal and low $\theta$ we are again below $\theta_{ext}$. Forest density is the so called active component of the model and for our purposes did not represent actually the forest but the flammable forest. 
+
+![Total annual fire size vs. max fire cluster for the Fire model. **A** & **B** Are simulations with fixed $\theta$ and dispersal exponent $de=102$ (equivalent to nearest neighbours) and $de=2.0155$. **C** & **D** Are simulations with a fire season of 90 days where $\theta$ is divided by 10 (probability of ignition $f$ is multiplied by 10), and the same $de$ respectively. ](figure/FireNL_TotSizeVsMaxSize_dispersal_theta_season.png)
+
+
+
+### Fire Model Fitting
 
 ## Discussion
 
@@ -118,7 +134,7 @@ The model only reproduces the fire conditions related to the actual deforestatio
 
 <!-- This extension in fire season would produce less large fires but as we approximate the critical extinction zone what happens is that the forest sites experience more frequent fires this could undermine the regeneration capacity of the forest pushing the model more towards the critical extinction, in nature this probably means that the system will be pushed to a drastic change in vegetation type as a transition from forest to savannah -->
 
-<!-- Thus, predicting ‘black swan’ extreme fire events — which, by definition, have no historical precedent, such as the protracted, enormous and severe Australian 2019–2020 fires — seriously challenge the capacity of Earth-system-model projections. -->
+<!-- Thus, predicting ‘black swan’ extreme fire events — which, by definition, have no historical precedent, such as the protracted, enormous and severe Australian 2019–2020 fires — seriously challenge the capacity of Earth-seystem-model projections. -->
 
 
 

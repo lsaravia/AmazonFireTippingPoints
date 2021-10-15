@@ -156,11 +156,11 @@ write_simoutput(nl)
 
 # simulations 450x450 Expanded set of simulations 
 
-```{r gen_fit_lhs449exp2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r gen_fit_lhs449exp5, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 # A new experiment with a bigger lattice to check size effects
 #
-nl@experiment <- experiment(expname="Amazon20years450exp02",
+nl@experiment <- experiment(expname="Amazon20years450exp05",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -178,7 +178,7 @@ nl@experiment <- experiment(expname="Amazon20years450exp02",
                                                "video" = "false",
                                                "use-fire-prob-se" = "false",
                                                "end-simulation"= 14671,
-                                               "Initial-forest-density" = 0.6,
+                                               "Initial-forest-density" = 0.3,
                                                "Periodicity" = "false"
                                              ))
 
@@ -213,7 +213,11 @@ write_simoutput(nl)
 * Amazon20years449_lhs.csv - 450x450
 * Amazon20years350_lhs.csv - New simulations with corrected periodic ignition probability 
 * Amazon20years450_lhs.csv - 450x450 New simulations with corrected periodic ignition probability 
-
+* Amazon20years450exp01_lhs.csv - 450x450 forest_dispersal_distance= 1.5 -100  Forest-growth=90 -7300 dens_ini=0.6
+* Amazon20years450exp02_lhs.csv - 450x450 forest_dispersal_distance=1.5 -100  Forest-growth=90 -7300 dens_ini=0.6
+* Amazon20years450exp03_lhs.csv - 450x450 forest_dispersal_distance=1.5 -100  Forest-growth=90 -7300 dens_ini=0.3
+* Amazon20years450exp04_lhs.csv - 450x450 forest_dispersal_distance=1.5 -100  Forest-growth=90 -7300 dens_ini=0.3
+* Amazon20years450exp05_lhs.csv - 450x450 forest_dispersal_distance=1.5 -100  Forest-growth=90 -7300 dens_ini=0.3
 
 
 # Compare with data using total burned area by year and max by year
@@ -225,25 +229,24 @@ require(plotly)
 # Read previous simulations
 #
 msim <- readRDS("Simulations/Amazon20yearsTot_lhs.rds") 
-msim %>% count(world_width,type)
-
-
+msim %>% count(world_width,type,Initial_forest_density) 
 list.files(outpath,"Amazon20.*_lhs\\.csv")
 
 # Add a new file with simulations
 #
-# sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450_lhs.csv"),skip=0)
+# sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp01_lhs.csv"),skip=0) 
+# sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp02_lhs.csv"),skip=0)
+# sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp03_lhs.csv"),skip=0)
 
-sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp01_lhs.csv"),skip=0)
-
-names(sim)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450exp05_lhs.csv"),skip=0)
+sim %>% summarise(range(forest_dispersal_distance),range(Forest_growth),max(Initial_forest_density))
 
 msim0 <- sim %>% filter(Date> "2000-12-31") %>% filter( floor_date(Date, "month") == Date ) %>%
-  dplyr::select(world_width,siminputrow,random_seed,forest_dispersal_distance,Forest_growth, Date:fire_probability) %>% mutate(burned_by_month= burned_by_month*100, type="periodic")
+  dplyr::select(world_width,siminputrow,random_seed,Initial_forest_density,forest_dispersal_distance,Forest_growth, Date:fire_probability) %>% mutate(burned_by_month= burned_by_month*100, type="seasonal")
 pp <-msim0 %>% count(forest_dispersal_distance,Forest_growth)
 msim <- bind_rows(msim,msim0)
-msim %>% group_by(world_width,type) %>% summarise(range(forest_dispersal_distance),range(Forest_growth))
- 
+msim %>% group_by(world_width,type,Initial_forest_density) %>% summarise(range(forest_dispersal_distance),range(Forest_growth))
+pp <- msim %>% count(forest_dispersal_distance,Forest_growth) 
 saveRDS(msim,file.path("Simulations","Amazon20yearsTot_lhs.rds"))  # Simulations for sizes 250 - 350
 
 
@@ -257,6 +260,9 @@ patch_size_name <- paste0("Data/patch_size_BurnedArea_",region_name, ".rds")
 if(file.exists(patch_size_name)) {
   patch_size <- readRDS(patch_size_name)
 }
+
+total_forest <- 31364191 # total mumber of pixels with forest
+
 mdat <- patch_size %>% mutate(Date=ymd(date)) %>% group_by(Date) %>% 
   summarize(total_patch=sum(size)/total_forest*100) 
 
@@ -265,72 +271,75 @@ mdat <- patch_size %>% mutate(Date=ymd(date)) %>% group_by(Date) %>%
 #
 # Test - calculate error using max month of the year 
 #
+pred_err_max(msim %>% filter(siminputrow==2,world_width==449),mdat )
 pred_err(msim %>% filter(siminputrow==2,world_width==449),mdat )
 
-#best <- msim0 %>% group_by( type,world_width,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err_max(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10)
+best <- msim %>% group_by( type,world_width,Initial_forest_density,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err_max(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10) %>% mutate(fitted="maxyear")
 
-best <- msim %>% group_by( type,world_width,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10)
-
+best1 <- msim %>% group_by( type,world_width,Initial_forest_density,forest_dispersal_distance, Forest_growth, siminputrow) %>%  summarise( pred_err(cur_data(),mdat) ) %>% group_by(type,world_width)  %>% arrange(rmse) %>% slice_min(mabe,n=10) %>% mutate(fitted="monthly")
+best <- bind_rows(best,best1)
 saveRDS(best,file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
+
+knitr::kable(best)
 
 #
 # Mean of 10 best fitted parameters 
 #
-best %>% summarise(forest_dispersal_distance=mean(forest_dispersal_distance),Forest_growth=mean(Forest_growth),mabe=mean(mabe))
+best %>% group_by(Initial_forest_density,fitted) %>% summarise(forest_dispersal_distance=mean(forest_dispersal_distance),Forest_growth=mean(Forest_growth),rmse=mean(rmse),mabe=mean(mabe))
 
-best%>% filter(type=="periodic") %>% ggplot( aes(forest_dispersal_distance, Forest_growth, color=factor(world_width))) + geom_point() + facet_wrap( ~type)
+best%>% filter(type=="seasonal") %>% ggplot( aes(forest_dispersal_distance, Forest_growth, color=fitted)) + geom_point() + facet_wrap( ~Initial_forest_density) + scale_color_viridis_d()
 
-msim %>% inner_join(best %>% slice_min(mabe,n=1) %>% filter(type=="periodic"))%>% filter(world_width==449 ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>% ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
+msim %>% inner_join(best  %>% filter(fitted=="maxyear") %>% slice_min(mabe,n=1)) %>% filter(world_width==449 ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>% ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + geom_line( aes(Date,burned_by_month,color=random_seed)) +
+      ylab("Monthly Patch Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
+ggsave("figure/Amazon_maxyear_fitted_450.png",width=8,height=6,units="in",dpi=600)
+
+msim %>% inner_join(best  %>% filter(fitted=="monthly") %>% slice_min(mabe,n=1)) %>% filter(world_width==449 ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>% ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
       scale_color_viridis_c(guide=FALSE)  + geom_line( aes(Date,burned_by_month,color=random_seed)) +
       ylab("Monthly Patch Size %") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
 ggsave("figure/Amazon_monthly_fitted_450.png",width=8,height=6,units="in",dpi=600)
-
-msim %>% inner_join(best %>% slice_min(mabe,n=1) %>% filter(type=="periodic"))%>% filter(world_width==249 ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>% ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c(guide=FALSE)  + geom_line( aes(Date,burned_by_month,color=random_seed)) +
-      ylab("Monthly Patch Size %") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
-ggsave("figure/Amazon_monthly_fitted_250.png",width=8,height=6,units="in",dpi=600)
-
-
+require(plotly)
+ggplotly()
 
 #
 # Monthly comparison of predicted vs data
 #
-msim %>% inner_join(best %>% slice_min(mabe,n=1) %>% filter(type=="periodic")) %>% inner_join(mdat, by=c("Date" = "Date") ) %>%  ggplot(  aes(burned_by_month,total_patch, color=factor(world_width )))+ geom_point() + theme_bw() + 
+msim %>% inner_join(best %>% filter(fitted=="maxyear") %>% slice_min(mabe,n=1) ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>%  ggplot(  aes(burned_by_month,total_patch, color=factor(world_width )))+ geom_point() + theme_bw() + 
       scale_color_viridis_d(guide=FALSE)  + geom_abline(intercept = 0, slope =1,alpha=0.3) 
 
 
 #
 # Yearly comparison of predicted vs data (Max)
 #
-msim %>% inner_join(best %>% slice_min(mabe,n=1) %>% filter( type == "periodic")) %>% inner_join(mdat, by=c("Date" = "Date") ) %>%  mutate(year=year(Date)) %>% group_by(year,world_width) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch)) %>% ggplot(  aes(burned_by_month,total_patch, color=factor(world_width )))+ geom_point() + theme_bw() + xlab("Predicted") + ylab("Data") + 
-      scale_color_viridis_d(name="Size")  + geom_abline(intercept = 0, slope =1,alpha=0.3) + coord_cartesian(xlim=c(0,1.5))
+msim %>% inner_join(best %>% filter(fitted=="maxyear")  %>% slice_min(mabe,n=1) ) %>% inner_join(mdat, by=c("Date" = "Date") ) %>%  mutate(year=year(Date)) %>% group_by(year,world_width) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch)) %>% ggplot(  aes(burned_by_month,total_patch, color=factor(world_width )))+ geom_point() + theme_bw() + xlab("Predicted") + ylab("Data") + 
+      scale_color_viridis_d(guide=NULL)  + geom_abline(intercept = 0, slope =1,alpha=0.3) + coord_cartesian(xlim=c(0,1.5))
+ggsave("figure/Amazon_maxyear_dataVsPredicted_450.png",width=8,height=6,units="in",dpi=600)
 
 
 ```
 
- type     world_width forest_dispersal_distance Forest_growth
-  <chr>          <dbl>                     <dbl>         <dbl>
-1 fixed            249                      2.38         2963.
-2 fixed            349                      1.92         1869.
-3 fixed            449                      2.17         1516.
-4 periodic         249                      2.04         1924.
-5 periodic         349                      2.11         1641.
-6 periodic         449                      2.19         1602.
+  Initial_forest_density fitted  forest_dispersal_distance Forest_growth  rmse  mabe
+                   <dbl> <chr>                       <dbl>         <dbl> <dbl> <dbl>
+1                    0.3 maxyear                      44.8         6578. 0.425  46.2
+2                    0.6 monthly                      56.8         5093. 0.303  82.8
+
+* Two types of fitting 1) against monthly data, the predicted peaks have a delay, this tends to select the parameters with lower max fire sizes.
+  2) against year maximun, this results in better fits of the max fire sizes, in this case the best fitting parameters are all with initial density 0.3
 
 
 ## Simulations with patch size output for wordl_width = 450 
 
-* Load 10 best simulations then make new simulations to estimate the patch size distributions
+* Load 10 best simulations then make new simulations to estimate the patch size distributions, initial_density = 0.3
 
-```{r sim_distinct449cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r sim_distinct449cluster90, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
 
 
-disp_best <- best %>% filter( world_width==449, type=="periodic") %>% ungroup() %>% select(forest_dispersal_distance) %>% deframe()
-grow_best <- best %>% filter( world_width==449, type=="periodic") %>% ungroup() %>% select(Forest_growth) %>% deframe()
+disp_best <- best %>% filter( world_width==449, fitted=="maxyear") %>% ungroup() %>% dplyr::select(forest_dispersal_distance) %>% deframe()
+grow_best <- best %>% filter( world_width==449, fitted=="maxyear") %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
 names(disp_best) <- NULL
 names(grow_best) <- NULL
 
@@ -358,7 +367,7 @@ nl@experiment <- experiment(expname="Amazon20years449spNew",
                                                "video" = "false",
                                                "end-simulation"= 14641,
                                                "use-fire-prob-se" = "false",
-                                               "Initial-forest-density" = 0.6,
+                                               "Initial-forest-density" = 0.3,
                                                "Periodicity" = "false",
                                                "Fire-probability" = 1E-6,
                                                "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\"")
@@ -372,13 +381,13 @@ nl@experiment <- experiment(expname="Amazon20years449spNew",
 #                                nseeds=1)
 
 nl@simdesign <- simdesign_distinct(nl=nl,
-                               nseeds=10)
+                               nseeds=100)
 
 # run in Paralell 
 #
 plan(multisession)
 tic()
-results <- run_nl_all(nl,split=5)
+results <- run_nl_all(nl)
 #results <- run_nl_all(nl,split = 4)
 toc()
 plan(sequential)
@@ -400,13 +409,20 @@ write_simoutput(nl)
 * We selected the 10 best fitted parameters and estimate the anual fire patch distributions
 
 
-```{r comp_fit_lhs449cluster, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r comp_fit_lhs449cluster03, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 # Read previously saved fitted exponents file
 #
-pexp <- readRDS(file.path("Simulations", "fittedExponentsAmazon20years.rds")) 
-pexp <- pexp %>% filter(!(world_width==449 & sim_type=="periodic") )   ## -----> recalculate to get the number of patches
-pexp %>% distinct(world_width,sim_type)
+pexp_name <- file.path("Simulations", "fittedExponentsAmazon20years.rds")
+if(file.exists(pexp_name)) {
+  pexp <- readRDS(pexp_name)
+  pexp %>% distinct(world_width,sim_type)
+
+} else {
+  pexp <- tibble()
+}
+  
+
 
 #sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449sp_distinct.csv"),skip=0)
 sim <- read_netlogo_simul(file.path(outpath,"Amazon20years449spNew_distinct.csv"),skip=0)
@@ -415,16 +431,26 @@ plan(multisession)
 p_df <- future_lapply( 1:nrow(sim) , function(i){
   df <- netlogo_evaluate_patch_distr(sim$burned_clusters_365[i]) %>%
     mutate(world_width=sim$world_width[i], forest_dispersal_distance=sim$forest_dispersal_distance[i],Forest_growth=sim$Forest_growth[i],Date=sim$Date[i],random_seed=sim$random_seed[i]) %>%
-    dplyr::select(world_width,forest_dispersal_distance,Forest_growth,Date,random_seed, everything()) %>% mutate(sim_type="periodic")
+    dplyr::select(world_width,forest_dispersal_distance,Forest_growth,Date,random_seed, everything()) %>% mutate(sim_type="seasonal")
 })
 pexp <- bind_rows(pexp,p_df)
 plan(sequential)
 
 saveRDS(pexp, file.path("Simulations", "fittedExponentsAmazon20years.rds"))
 
+# 
+# Best distributions with AIC
+#
 best_pexp <- pexp %>% group_by(forest_dispersal_distance,Forest_growth,Date,random_seed) %>% filter(AICc == min(AICc))
+knitr::kable(best_pexp %>% group_by(world_width,sim_type,type) %>% summarise(n = n(),expo=median(expo)) %>%  mutate(freq = n / sum(n)), digits = 2)
 
-knitr::kable(best_pexp %>% group_by(world_width,sim_type,type) %>% summarise(n = n()) %>%  mutate(freq = n / sum(n)), digits = 2)
+# 
+# Best distributions with AIC and Vuong's test
+#
+best_pexp <- pexp %>% group_by(forest_dispersal_distance,Forest_growth,Date,random_seed) %>% filter(AICc == min(AICc), exp_p_value<0.05)
+knitr::kable(best_pexp %>% group_by(world_width,sim_type,type) %>% summarise(n = n(),expo=median(expo)) %>%  mutate(freq = n / sum(n)), digits = 2)
+
+
 
 pl_best_pexp <- best_pexp %>% filter(type == "pl") # %>% mutate(relative_range=range/(350*350))
 
@@ -433,91 +459,77 @@ pl_best_pexp %>% group_by(world_width,sim_type,forest_dispersal_distance,Forest_
     geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
                 color = "red", size=1)
 
-pl_best_pexp %>% filter(sim_type=="periodic") %>% group_by(world_width,sim_type,forest_dispersal_distance,Forest_growth) %>% summarize(iqr=IQR(expo),expo=median(expo)) %>% ggplot( aes(x=forest_dispersal_distance, y=expo, colour=world_width)) + 
+pl_best_pexp %>% filter(sim_type=="seasonal") %>% group_by(world_width,sim_type,forest_dispersal_distance,Forest_growth) %>% summarize(iqr=IQR(expo),expo=median(expo)) %>% ggplot( aes(x=forest_dispersal_distance, y=expo, colour=world_width)) + 
     geom_errorbar(aes(ymin=expo-iqr, ymax=expo+iqr), width=.1) +
     geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
                 color = "red", size=1)
 
 
-pl_best_pexp <- pl_best_pexp %>% group_by(world_width,sim_type,forest_dispersal_distance,Forest_growth) %>% summarize(range(expo),expo=median(expo)) %>% mutate(distance = abs(2.29 - expo)) %>%  arrange(distance)
+pl_best_pexp <- pl_best_pexp %>% group_by(world_width,sim_type,forest_dispersal_distance,Forest_growth) %>% summarize(min_expo=min(expo),max_expo=max(expo),expo=median(expo)) %>% mutate(distance = abs(2.29 - expo)) %>%  arrange(distance)
 
 saveRDS(pl_best_pexp, file.path("Simulations", "bestFittedExponentsAmazon20years.rds"))
 
 #
 # The 3 model parameters with mean exponent closer to 2.29
 #
-knitr::kable( pl_best_pexp %>% group_by(sim_type,world_width) %>%  slice(1:2))
+knitr::kable( pl_best_pexp %>% mutate(theta = 1/(Forest_growth * 0.0000473 / 30 )) %>%  arrange(distance))
 
+#      `2.5%`     `50%`  `97.5%`
+#       <dbl>     <dbl>    <dbl>
+# 1 0.0000106 0.0000473 0.000388
+
+#
+# Plots of Theta
+#
+ignition_prob <- readRDS("Data/ignition_prob.rds") 
+
+ignition_prob %>% mutate(Date=ymd(date),theta = 1/(7004 * bF / 30 ) ) %>% ggplot( aes(Date,theta ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  +
+      ylab("Theta") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
+ggsave("figure/Amazon_Theta_fitted_450.png",width=8,height=6,units="in",dpi=600)
+
+ignition_prob <- read_csv( "Data/EstimatedGam_bF.csv") 
+ignition_prob %>% filter(date >= "2000-01-01") %>% mutate(theta = 1/(7004 * fit / 30 ) ) %>% ggplot( aes(date,theta ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  +
+      ylab("Theta") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
 
 ```
 
 
-* Most distributions from the model are power law or power law with exp cutoff
+* Most distributions from the model are ln (only AIC)
 
 
-| world_width|sim_type |type |   n| freq|
-|-----------:|:--------|:----|---:|----:|
-|         249|fixed    |exp  |  50| 0.05|
-|         249|fixed    |ln   |   1| 0.00|
-|         249|fixed    |pexp |  71| 0.07|
-|         249|fixed    |pl   | 863| 0.88|
-|         249|periodic |exp  | 359| 0.18|
-|         249|periodic |ln   | 628| 0.31|
-|         249|periodic |pexp | 223| 0.11|
-|         249|periodic |pl   | 790| 0.40|
-|         349|fixed    |exp  | 156| 0.16|
-|         349|fixed    |ln   |  45| 0.05|
-|         349|fixed    |pexp | 179| 0.18|
-|         349|fixed    |pl   | 619| 0.62|
-|         349|periodic |exp  | 156| 0.16|
-|         349|periodic |ln   |  45| 0.05|
-|         349|periodic |pexp | 179| 0.18|
-|         349|periodic |pl   | 619| 0.62|
-|         449|fixed    |exp  | 324| 0.16|
-|         449|fixed    |ln   | 103| 0.05|
-|         449|fixed    |pexp | 786| 0.39|
-|         449|fixed    |pl   | 787| 0.39|
-|         449|periodic |exp  | 624| 0.31|
-|         449|periodic |ln   | 167| 0.08|
-|         449|periodic |pexp | 655| 0.33|
-|         449|periodic |pl   | 554| 0.28|
+| world_width|sim_type |type |    n|     expo| freq|
+|-----------:|:--------|:----|----:|--------:|----:|
+|         449|seasonal |exp  |    4|     0.10| 0.00|
+|         449|seasonal |ln   | 1314| -1177.08| 0.66|
+|         449|seasonal |pexp |  271|     1.53| 0.14|
+|         449|seasonal |pl   |  411|     2.14| 0.21|
+
+* AIC and Vuong's test
+
+| world_width|sim_type |type |    n|     expo| freq|
+|-----------:|:--------|:----|----:|--------:|----:|
+|         449|seasonal |ln   | 1312| -1177.56| 0.82|
+|         449|seasonal |pl   |  297|     2.12| 0.18|
 
 
-* Model fits for different world_with and periodic/fixed ignition probability
+* Best parameters 
 
-| world_width|sim_type | forest_dispersal_distance| Forest_growth| range(expo)|     expo|  distance|
-|-----------:|:--------|-------------------------:|-------------:|-----------:|--------:|---------:|
-|         249|fixed    |                      2.28|       3548.78|    1.356463| 1.663689| 0.6263112|
-|         249|fixed    |                      2.28|       3548.78|    3.365363| 1.663689| 0.6263112|
-|         349|fixed    |                      1.54|       1523.53|    1.324345| 1.719801| 0.5701985|
-|         349|fixed    |                      1.54|       1523.53|    3.891734| 1.719801| 0.5701985|
-|         449|fixed    |                      1.52|       1169.56|    1.305525| 2.185609| 0.1043912|
-|         449|fixed    |                      1.52|       1169.56|    5.408540| 2.185609| 0.1043912|
-|         249|periodic |                      1.61|       1772.22|    1.539314| 2.303358| 0.0133579|
-|         249|periodic |                      1.61|       1772.22|    8.862589| 2.303358| 0.0133579|
-|         349|periodic |                      1.54|       1523.53|    1.324345| 1.719801| 0.5701985|
-|         349|periodic |                      1.54|       1523.53|    3.891734| 1.719801| 0.5701985|
-|         449|periodic |                      2.81|       1755.82|    2.034118| 2.571225| 0.2812252|
-|         449|periodic |                      2.81|       1755.82|    5.365729| 2.571225| 0.2812252|
-
-
-| world_width|sim_type | forest_dispersal_distance| Forest_growth| range(expo)|     expo|  distance|
-|-----------:|:--------|-------------------------:|-------------:|-----------:|--------:|---------:|
-|         249|fixed    |                      2.28|       3548.78|    1.356463| 1.663689| 0.6263112|
-|         249|fixed    |                      2.28|       3548.78|    3.365363| 1.663689| 0.6263112|
-|         349|fixed    |                      1.54|       1523.53|    1.324345| 1.719801| 0.5701985|
-|         349|fixed    |                      1.54|       1523.53|    3.891734| 1.719801| 0.5701985|
-|         449|fixed    |                      1.52|       1169.56|    1.305525| 2.185609| 0.1043912|
-|         449|fixed    |                      1.52|       1169.56|    5.408540| 2.185609| 0.1043912|
-|         249|periodic |                      1.61|       1772.22|    1.539314| 2.303358| 0.0133579|
-|         249|periodic |                      1.61|       1772.22|    8.862589| 2.303358| 0.0133579|
-|         349|periodic |                      1.54|       1523.53|    1.324345| 1.719801| 0.5701985|
-|         349|periodic |                      1.54|       1523.53|    3.891734| 1.719801| 0.5701985|
-|         449|periodic |                     65.72|       3320.15|    1.795265| 2.235268| 0.0547322|
-|         449|periodic |                     65.72|       3320.15|    2.863394| 2.235268| 0.0547322|
- 
-
-## Simulations with best parameters and GAM fitted bF (ignition prob) 2000-2020
+| world_width|sim_type | forest_dispersal_distance| Forest_growth| min_expo| max_expo|     expo|  distance|     theta|
+|-----------:|:--------|-------------------------:|-------------:|--------:|--------:|--------:|---------:|---------:|
+|         449|seasonal |                     19.91|       7003.88| 1.697540| 2.640482| 2.212942| 0.0770582|  90.55687|
+|         449|seasonal |                     48.60|       6282.53| 1.892132| 2.448953| 2.177204| 0.1127965| 100.95447|
+|         449|seasonal |                     33.03|       6675.76| 1.782435| 2.627684| 2.155894| 0.1341062|  95.00783|
+|         449|seasonal |                     97.12|       6766.00| 1.787254| 2.533563| 2.152678| 0.1373216|  93.74068|
+|         449|seasonal |                     44.99|       7131.49| 1.815685| 2.452098| 2.123187| 0.1668132|  88.93646|
+|         449|seasonal |                     54.43|       5918.38| 1.765939| 2.630938| 2.122273| 0.1677268| 107.16606|
+|         449|seasonal |                     14.23|       6882.39| 1.745444| 2.477970| 2.097268| 0.1927322|  92.15541|
+|         449|seasonal |                     25.48|       7022.70| 1.765186| 2.732261| 2.084246| 0.2057544|  90.31419|
+|         449|seasonal |                     77.49|       4676.16| 1.759340| 2.270457| 2.004885| 0.2851150| 135.63468|
+|         449|seasonal |                     32.72|       6536.88| 1.732522| 2.701635| 1.984998| 0.3050017|  97.02633|
 
 ```{r sim_simple449fittedBF, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -614,7 +626,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonfittedBF.rds"))
 
 * wordl_width = 450 
 * RCP 4.5
-
+*  19.91|       7003.88
 
 ```{r sim_simple449clusterRCP45new, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -633,7 +645,7 @@ nl@experiment <- experiment(expname="Amazon39years449rcp45",
                             #idrunnum="nlrx-experiment",
                             runtime=0,
                             evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
-                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365" ),
+                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365","median-fire-interval" ),
                             # variables = list("forest-dispersal-distance" = list(values=c(1.61,1.97,1.74)),
                             #                  "Forest-growth" = list(values=c(1419,1778,1361))),
                             constants = list("world-width" = 449,
@@ -642,11 +654,11 @@ nl@experiment <- experiment(expname="Amazon39years449rcp45",
                                                "Save-view" =  "false",
                                                "video" = "false",
                                                "end-simulation"= 14641,
-                                               "Initial-forest-density" = 0.6,
+                                               "Initial-forest-density" = 0.3,
                                                "Periodicity" = "false",
                                                "Fire-probability" = 1E-6,
-                                               "forest-dispersal-distance" = 65.72,
-                                               "Forest-growth" = 3320.15,
+                                               "forest-dispersal-distance" = 19.91,
+                                               "Forest-growth" = 7003.88,
                                                "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
                                                "use-fire-prob-se" = "true"
                                              ))

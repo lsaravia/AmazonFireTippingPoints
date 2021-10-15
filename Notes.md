@@ -260,7 +260,11 @@ We are of course just repeating the original hope of SOC research and suggesting
 
 
 ----
+@Achard2014
 
+We estimate changes in forest cover (deforestation and forest regrowth) in the tropics for the two last decades (1990–2000 and 2000–2010) based on a sample of 4000 units of 10 ×10 km size. Forest cover is interpreted from satellite imagery at 30 × 30 m resolution. Forest cover changes are then combined with pan-tropical biomass maps to estimate carbon losses. We show that there was a gross loss of tropical forests of 8.0 million ha yr−1 in the 1990s and 7.6 million ha yr−1 in the 2000s (0.49% annual rate), with no statistically significant difference. Humid forests account for 64% of the total forest cover in 2010 and 54% of the net forest loss during second study decade
+
+----
 
 
 Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 356: 1356–1362.
