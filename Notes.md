@@ -266,6 +266,56 @@ We estimate changes in forest cover (deforestation and forest regrowth) in the t
 
 ----
 
+@Fonseca2019
+
+Considering all four RCPs and using the outputs of the Earth system model HadGEM2‐ES, Betts et al. (2015) found an increase in the meteorologically defined forest fire danger index (FFDI) in the Amazon during the 21st century, with greater increases at higher levels of global warming. The authors warned, however, that the FFDI provides an indication of the effects of simulated changes in weather conditions for the risk of fire, but should not be understood as the fire activity per se since the latter is largely dependent on the susceptibility of the landscape to fire and on the influence of humans on either ignition or fire suppression.
+
+In the Brazilian Amazon, fire is almost entirely human‐ignited, given that it usually occurs in the driest period of the year and that lightning in the region is usually accompanied by rain, reducing the chance of igniting a natural fire (Barbosa & Fearnside, 2005). Deforestation and subsequent agricultural activities have increased the anthropogenic ignition sources in the last 40 years, since fire is the main technique used to clear the land and to renew pasture areas (Aragão et al., 2014). Although annual deforestation has sharply decreased from 27,772 km 2 in 2004 to 4,571 km 2 in 2012, it has been fluctuating since then, showing annual variation from −15% up to +29% (INPE, 2017a). Large‐scale transportation and energy infrastructure projects, the continuous weakening of environmental and indigenous protection agencies, relaxation of environmental legislation, including reduction of requirements in the environmental licensing process of potentially harmful enterprises, are some of the current threats that raise serious concerns about the future deforestation rates (Aguiar et al., 2016; Fearnside, 2016; Tollefson, 2018). Additionally, secondary vegetation regrowth on previously cleared areas is highly fire‐prone given its low and open canopy (Ray, Nepstad, & Moutinho, 2005), mostly in its early regeneration stages and during dry years (Gutiérrez‐Velez et al., 2014). Repeated clearing and burning of vegetation regrowth is a widespread practice in the Brazilian Amazon (Neeff, Lucas, Santos, Brondizio, & Freitas, 2006; Zarin et al., 2005), increasing the ignition sources.
+
+---
+
+@Pueyo2010
+
+We depart from the model in Pueyo (2007), which is
+essentially equivalent to the original Ôforest fireÕ model by
+Drossel & Schwabl (1992), except that it contemplates
+environmental forcings. These models are very simple but
+the resulting fire dynamics often remain unaltered when
+adding more details (Zinck & Grimm 2009), a property
+known in physics as ÔuniversalityÕ (Binney et al. 1992; Solé
+et al. 1999).
+
+-----
+@Feng2021
+
+However, continued degradation and loss of forest cover and biodiver-
+sity therein could undermine ecosystem resilience and hasten an irre-
+versible tipping point 12 . Indeed, a loss of 20–25% of Amazonian forests
+could precipitate a rapid transition to savannah-like formations 13,14 .
+
+Since the 1960s, approximately 20% of Amazonian forest cover has
+been lost as a result of deforestation and fires 15 . Forest loss is predicted
+to reach 21–40% by 2050, and such habitat loss will have large impacts on Amazonian biodiversity 16,17 .
+
+In conjunction with ongoing habitat loss
+due to deforestation, increasing fires in the Amazon potentially pose
+another great threat to biodiversity 4 : because Amazonian species have
+largely evolved in the absence of fire, they generally lack adaptations to
+fire-related damage (ref. 18 and references therein). Fires associated with
+deforestation generally lead to a total loss of forest habitat 3 , and the burn-
+ing of felled vegetation impairs regeneration and facilitates the invasion
+of exotic grasses 19 . Forest fires also have largely negative impacts on the
+habitats and long-term fitness of species due to habitat degradation 20–22 .
+Repeated burning can result in considerable species loss and turnover 23,24 .
+Burning can also initiate a series of positive feedbacks, including increases
+in dry fuel loads and midday temperatures, desiccation of biomass and
+flammability of native forests at the edges of clearings 25
+
+
+-----
+
+
+
 
 Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 356: 1356–1362.
 
@@ -273,6 +323,7 @@ Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 
 Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon. - Forest Ecology and Management 424: 312–322.
 
 Brando, P. M. et al. 2014. Abrupt increases in Amazonian tree mortality due to drought–fire interactions. - PNAS 111: 6347–6352.
+ 
 
 
 Amigo, I. 2020. When will the Amazon hit a tipping point? - Nature 578: 505–507. @Amigo2020
