@@ -236,6 +236,38 @@ Climate change increases the frequency with which some of these thresholds are c
 Most Earth System Models (ESMs) predict increasing dry season intensity in Amazonia in the 21st century. This is directly related to radiative
 forcing 11 and declining Northern Hemisphere aerosol production 12, 13 , which tend to cause anomalous variation of sea surface temperatures (SST) and consequently drive large-scale swings in precipitation over Amazonia. If this new climatic conﬁguration is borne out, Amazonia is expected to become an ampliﬁed ﬁre-prone system 14, 15 , with emissions from drought-induced ﬁres unrelated to deforestation increasingly playing a much larger role than those from deforestation 15 .
 
+
+Our analysis of SSTA showed that the two strongest droughts in
+this century, occurring in 2005 and 2010, were strongly correlated
+with the anomalous warming of the Atlantic ocean captured by
+the Atlantic Multidecadal Oscillation (AMO) 19, 20 index
+(Fig. 1a–e). In contrast, the 2015 drought occurred following a
+simultaneous development of anomalous warming of the equa-
+torial and eastern tropical north Paciﬁc and tropical north
+Atlantic oceans, as measured by the Multivariate El Nino Index
+(MEI) 21 , the Paciﬁc Decadal Oscillation (PDO) 22 and the
+AMO 19, 20
+
+Currently, peaks in active ﬁre detection are more strongly
+related to extreme drought events than to deforestation, as used to
+be the case 5
+This is conﬁrmed by the progressive temporal
+decoupling between ﬁre occurrence and deforestation activities 31 .
+Deforestation is clearly losing its explanatory power over the
+variance of the absolute number of ﬁre detections, with this
+
+The observed disassociation between deforestation and active
+ﬁre incidence can be related to increased ﬁre incidence in either
+(i) already deforested land covered by pastures (with no net
+impact on the atmospheric C burden) or (ii) forested areas
+dominated by woody vegetation. Our analysis showing that the
+amount of CO emitted per ﬁre count is temporally stable indi-
+cates that it is unlikely that C emissions are primarily related to
+ﬁres in pastures. This is supported by the fact that a shift in
+dominance from deforestation ﬁres to pasture ﬁres, through time,
+would lead to a reduction in the CO concentration per ﬁre count.
+
+
 ----
 
 
@@ -313,7 +345,76 @@ flammability of native forests at the edges of clearings 25
 
 
 -----
+@Palmieri2020
 
+
+A link between the behavior observed in brain activity and
+rainfalls [6, 7] and the Forest Fire Model was already suggested
+in [10]. Inspired by these studies, we analyse in detail the
+residence time distribution (which corresponds to the tree
+density distribution in the FFM) and its relationship to the order
+parameters used in standard percolation [11] and the brain study
+[6], namely the average cluster size and the normalized size of
+the largest cluster. We find that there is indeed a critical-like
+region where the fluctuations peak up and where the system
+seems to spend most of the time, exactly like in the brain and rain
+observations.
+
+Even though the studies of precipitation [7] and brain activity
+[6] related their findings to critical behavior, both observed a
+remarkable broad onset of the order parameter, which is certainly
+not the behavior seen as one approaches the critical point of a
+second-order phase transition of an infinite system. The absence
+of a sharp onset of the order parameter is remarkable because,
+for system sizes like the earth atmosphere or the human brain,
+one would not expect any significant finite-size effect if the
+usual phenomenology of equilibrium phase transitions were
+any guidance.
+
+
+Although we had to restrict our simulations to values of θ <
+10 4 , we observe a very robust scaling for the largest cluster 3,
+which is not observed in the distribution of cluster sizes P(S) over
+the same range of θ [4]. Interestingly, we found that h3i ∼ θ 1.04 ,
+a super-linear growth which indicates that the correlations in
+the system increase rapidly with θ
+
+----
+
+@Juhasz2020
+
+The present paper focuses on the effect of fine-grained heterogeneity in the
+environment. In the RS model, we place small obstacles onto the slope, and ask the following
+questions.
+1) How does the abundance and penetrability of the obstacles influence the range
+edge?
+2) Are the scaling laws detected in snapshots also applicable in the long run, for
+the averages of occupancies?
+We show that the scaling laws are broadly applicable. Accordingly, we propose that the
+geographic distributions of species should be delineated at the hull in order to monitor range
+shifts reliably.
+
+
+----
+
+@Brando2019
+
+Tropical forest fires are ignited almost entirely via accidental ignition or by people clearing veg-
+etation, burning agricultural fields and pastureland, or committing arson. Active frontier zones
+and the transportation networks within them are a major hub of fire activity (Nepstad et al. 1999,
+Schroeder et al. 2009). Anthropogenic ignitions are increasingly prevalent in vast portions of trop-
+ical forests undergoing extensive land-use and land-cover change. Most human activities in the
+Amazon region started during the 1980s, when large tracts of forest were converted to agricul-
+tural fields. In general, instances of lightning-ignited wildfires in closed-canopy forests are much
+
+
+During the Amazon drought in 2010, for example, Gatti et al. (2014) estimated a net flux of 0.2 PgC from the basin, compared with non-drought years.
+
+----
+Bowman2020
+
+Currently, anthropogenic climate change is altering precipitation patterns and increasing temperatures, resulting in more
+frequent extreme vegetation-fire events 23–25 .
 
 
 
