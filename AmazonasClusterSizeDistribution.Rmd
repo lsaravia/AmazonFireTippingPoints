@@ -303,7 +303,10 @@ fire_bricks <- list.files(path=data_path,pattern=file_pattern)
 fire_bricks
 region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
 fname <- paste0("Data/patch_sparse_BurnedArea_", region_name, ".rds" )
-
+#
+# Total Area in pixels 31364191
+#
+total_forest <- 31364191
 
 if(file.exists(fname)) {
   patch_sparse <- readRDS(fname)
@@ -495,6 +498,25 @@ p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>%
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel()
 ggplotly(p1)
 ggsave("figure/Amazon_Annual_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+
+
+p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>%
+   ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
+    geom_segment(color="#69b3a2", 
+                  aes(
+                    xend=c(tail(max_patch, n=-1), NA), 
+                    yend=c(tail(tot_patch, n=-1), NA)
+                  ),
+                  arrow=arrow(length=unit(0.3,"cm"))
+      ) +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Maximum fire size (%)") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel()
+p1
+ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
 
 ```
 
