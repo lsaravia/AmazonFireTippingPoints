@@ -503,13 +503,13 @@ ggsave("figure/Amazon_Annual_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,unit
 p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
-   ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
-    geom_segment(color="#69b3a2", 
+   ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
+    geom_curve(curvature = -0.2 , 
                   aes(
                     xend=c(tail(max_patch, n=-1), NA), 
                     yend=c(tail(tot_patch, n=-1), NA)
                   ),
-                  arrow=arrow(length=unit(0.3,"cm"))
+                  arrow=arrow(length=unit(0.2,"cm"))
       ) +
       scale_color_viridis_c(guide=NULL)  + 
       xlab("Maximum fire size (%)") +  
