@@ -1,5 +1,17 @@
 # Notes
 
+
+Suggested referees:
+
+- Ricard Solé, ricard.sole@upf.edu
+- Guido Caldarelli, guido.caldarelli@unive.it
+- Paula Villa Martín, paula.villamartin@oist.jp
+- Carla Staver carla.staver@yale.edu
+- Miguel A. Muñoz, mamunoz@ugr.es
+- Barbara Drossel, barbara.drossel@tu-darmstadt.de
+- Salvador Pueyo, spueyo@riseup.net
+
+
 From Hansen
 
 Forest Area (30%Cover) / Total Area, year 2000 = 0.010260215678575
