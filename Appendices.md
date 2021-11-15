@@ -194,7 +194,7 @@ Table: Ten best fitting parameters using two initial forest densities and two me
 ![Total annual fires, predicted vs data using the best fitted parameters with the method "maxyear"](figure/Amazon_maxyear_dataVsPredicted_450.png)
 
 
-| Dispersal distance (Exponent) | Forest growth $1/p$ | minimum exponent | maximum exponent | median exponent | distance   | Average $\theta$ |
+| Dispersal distance ($\alpha_{dis}$) | Forest growth $1/p$ | minimum $\alpha$ | maximum $\alpha$ | median $\alpha$ | distance   | Average $\theta$ |
 | -------------------------:    | -------------:      | --------:        | --------:        | --------:       | ---------: | ---------:       |
 | 19.91 (2.0529)                | 7003.88             | 1.6384           | 3.5871           | 1.7863          | 0.5037     | 90.5569          |
 | 13.71 (2.0787)                | 5756.42             | 1.6631           | 2.4942           | 1.7852          | 0.5048     | 110.1812         |
@@ -207,7 +207,7 @@ Table: Ten best fitting parameters using two initial forest densities and two me
 | 99.32 (2.0102)                | 6930.36             | 1.6560           | 2.2340           | 1.7412          | 0.5488     | 91.5175          |
 | 76.08 (2.0133)                | 7156.03             | 1.6593           | 1.8955           | 1.7403          | 0.5497     | 88.6315          |
 
-Table: The ten best fitting parameters using an initial forest density of 0.3 and the "maxyear" method, which compares only the monthly maximum of the year against the model. We selected the model with the median power law exponent of the fire size distribution (column median exponent) closer to the median of the data (2.29), the  distance is $|exp_{data} - exp_{model} |$ . The best model with dispersal distance 19.91 have a power law exponent for dispersal of 2.0529.
+Table: The ten best fitting parameters using an initial forest density of 0.3 and the "maxyear" method, which compares only the monthly maximum of the year against the model. We selected the model with the median power law exponent $\alpha$ of the fire size distribution (column median exponent) closer to the median of the data (2.29), the  distance is $|\alpha_{data} - \alpha_{model} |$ . The best model with dispersal distance 19.91 have a power law exponent for dispersal $\alpha_{dis}$ of 2.0529.
 
 
 ![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM). The maximum fire size is relative to the total area.](figure/Amazon_Max_Size_ModelVsData.png)
