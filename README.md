@@ -1,8 +1,9 @@
 # Amazonas fire regimes under climate change scenarios
 
+[![DOI](https://zenodo.org/badge/384492461.svg)](https://zenodo.org/badge/latestdoi/384492461)
 
 
-* Data readed from MODIS files and simulations 
+* Code and Data for the paper
 
 ## R Markdown files description
 
