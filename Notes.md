@@ -1,5 +1,6 @@
 # Notes
 
+20% of amazon was lost 2020 and up to 40% to 2050 (@Feng2021 @Brando)
 
 Suggested referees:
 
@@ -341,6 +342,19 @@ Since the 1960s, approximately 20% of Amazonian forest cover has
 been lost as a result of deforestation and fires 15 . Forest loss is predicted
 to reach 21–40% by 2050, and such habitat loss will have large impacts on Amazonian biodiversity 16,17 .
 
+The MODIS
+burned area product detects the approximate date of burning by locat-
+ing the occurrence of rapid changes in daily surface reflectance time
+series data. We also obtained the monthly active fire location product
+(MCD14ML) from the University of Maryland (https://modis-fire.umd.
+edu/). The MODIS active fire product detects land surface thermal
+anomalies at the time of satellite overpass under relatively cloud-free
+conditions using a contextual algorithm. We used vegetation fire with
+high detection confidence (>80%) to avoid false or minor fire signals,
+and converted the fire locations into monthly 927-m (or 1-km) raster
+layers 54 .
+
+
 In conjunction with ongoing habitat loss
 due to deforestation, increasing fires in the Amazon potentially pose
 another great threat to biodiversity 4 : because Amazonian species have
@@ -435,9 +449,37 @@ Andela, N. et al. 2017. A human-driven decline in global burned area. - Science 
 
 Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon. - Forest Ecology and Management 424: 312–322.
 
-Brando, P. M. et al. 2014. Abrupt increases in Amazonian tree mortality due to drought–fire interactions. - PNAS 111: 6347–6352.
- 
-
 
 Amigo, I. 2020. When will the Amazon hit a tipping point? - Nature 578: 505–507. @Amigo2020
 
+----
+
+@Soares-filho2006. Modelling conservation in the Amazon basin
+
+By 2050, current trends in agricultural expansion will eliminate a total of 40% of Amazon forests
+
+We estimate that the closed-canopy forest formation of the Amazon will be reduced from its current area of 5.3 million km 2 (2003, 85% of the original area) to 3.2 million km 2 (53%) by 2050 if current trends continue unabated (BAU = ‘business-as-usual’)
+
+The model, which we call ‘SimAmazonia 1’ (from the Portuguese simulação da Amazônia) produces annual maps of simulated future deforestation under user- defined scenarios of highway paving, PA networks, PA effectiveness, deforestation rates and deforested land ceilings.
+
+----
+
+@Brando2019. Droughts, Wildfires, and Forest Carbon Cycling: A Pantropical Synthesis
+
+Tropical forest fires are ignited almost entirely via accidental ignition or by people clearing veg-
+etation, burning agricultural fields and pastureland, or committing arson. Active frontier zones
+and the transportation networks within them are a major hub of fire activity
+
+Even in areas with low deforestation rates, land management practices in previously cleared areas often involve fire,
+which can readily spread to nearby forests. This spread of wildfire into adjacent forest areas is well
+documented in the satellite record (Aragão & Shimabukuro 2010).
+Land-use and land-cover changes also fundamentally alter fuels and the microclimate at forest
+edges. After decades of widespread deforestation, nearly 20% of remaining tropical forests lie
+within 100 m of a forest edge (Brando et al. 2014, Brinck et al. 2017, Haddad et al. 2017). Forest
+edges allow for greater sunlight and wind penetration, higher air temperatures, increased VPD,
+and lower soil moisture and relative humidity (Laurance 2000)—resulting in very dry accumulated
+fuels. Native and non-native grasses, often introduced at forest edges, can provide even greater
+amounts of fine fuels that readily burn (Silverio et al. 2013, Nepstad et al. 2004). Overall, the
+land-use change effects—increased ignitions, greater fuels, and drier conditions—interact with
+drought conditions to increase the likelihood of fire occurrence in tropical forests (Aragão et al.
+2018, Chen et al. 2017).

@@ -21,9 +21,9 @@ require(lubridate)
 #
 if( Sys.info()['nodename'] =="ls-pro") {
   
-  data_path <- "~/Academicos/GitProjects/AustraliaTippingPoint/Data"
+  data_path <- "~/Academicos/GitProjects/AmazonTippingPoint/Data"
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
-  data_path <- "~/GitProjects/AustraliaTippingPoint/Data"
+  data_path <- "~/GitProjects/AmazonTippingPoint/Data"
 
 }
 
@@ -155,9 +155,13 @@ pd <- patch_sparse %>% arrange(i, j, date) %>%  group_by(i, j) %>%
 # Estimate the number of times that the sites are burned
 #
 pd %>% count(times)  %>% mutate( prop = n / total_forest) 
+pd %>% count(times)  %>% mutate( prop = n / sum(n)) 
+
+# Number of sites burned twice in a year = 1.29% total, 0.06% annually
+#
+pd %>% filter(times>1,year(fini)==year(fend)) %>% group_by(year(fend)) %>% summarise(prop=n()/nrow(pd)) %>% mutate(mean(prop))
 
 pd %>% ggplot(aes(deltaD))+ geom_histogram() + theme_bw()
-
 pd %>% group_by(times) %>% summarise(quantile(deltaD, probs=c(0.5)))
 
 descdist(pd$deltaD, boot = 1000)
@@ -194,7 +198,7 @@ pd3 %>% group_by(periodo) %>% summarise(meanReturnTime = mean(deltaD), meanRT_ye
 * Probably the same places get burned repeatedly
 
 
-# Ignition Rate from pp/tmax using GAM
+# Predict Ignition Rate from pp/tmax using GAM
 
 ```{r gamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
@@ -326,10 +330,20 @@ AIC(gam04,gam04a,gam04b)
 # Break Data in training 
 #
 pr_train <- subset(pr, year(date)<2018 )
+pr_test  <- subset(pr, year(date)>=2018 ) 
+
+pr_train <- subset(pr, year(date)<2015 | year(date)>2017 )
+pr_test  <- subset(pr, year(date)>=2015 & year(date)<=2017 ) 
+
+
+pr_train <- subset(pr, year(date)<2010 | year(date)>2012 )
+pr_test  <- subset(pr, year(date)>=2010 & year(date)<=2012 ) 
+
+#model_mape <- tibble()           ## data frame to store results of mape
+
 gam03bt <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr_train,method="REML",
              family = gaussian)
 
-pr_test  <- subset(pr, year(date)>=2018 ) 
 
 p1<- predict(gam03bt,newdata=pr_test, se.fit = TRUE)
 pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
@@ -338,7 +352,7 @@ pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_virid
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 ggsave("figure/Amazon_bF_prediction2018-2021.jpg",width=8,height=6,units="in",dpi=600)
 
-pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03bt"))
 
 
 # Second best
@@ -350,7 +364,7 @@ pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
-pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03at"))
 
 # 3rd best
 #
@@ -362,6 +376,7 @@ pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_virid
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
 pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03t"))
 
 
 gam04bt <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
@@ -373,13 +388,14 @@ pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
-pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam04bt"))
+knitr::kable(model_mape)
 
 #
 # MAPE Normal GAM 54.5
 #      Gamma  GAM 63.8
 #
-# with all data
+# with all 
 #
 p1<- predict(gam03b,newdata=pr, se.fit = TRUE)
 pr_all <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
@@ -402,7 +418,28 @@ pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
 # using the gaussian distributions seems to be sligthly better with lower MAPE 
 #
 
+```
 
+* Table with models leaving out 3 years, allways the best model has lower prediction error
+
+|     MAPE|model   |
+|--------:|:-------|
+| 54.47824|gam03bt | 
+| 56.77618|gam03at |
+| 56.95208|gam03t  |
+| 63.78738|gam04bt |
+| 28.52796|gam03bt |
+| 37.46660|gam03at |
+| 48.12553|gam03t  |
+| 30.95800|gam04bt |
+| 50.52010|gam03bt |
+| 70.47736|gam03at |
+| 75.13256|gam03t  |
+| 58.87268|gam04bt |
+
+## Export estimated bF from Data 2000- 2020 for NetLogo Simulations
+
+```{r exportGamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 #
 # Export estimated bF from Data 2000- 2020 for NetLogo Simulations
