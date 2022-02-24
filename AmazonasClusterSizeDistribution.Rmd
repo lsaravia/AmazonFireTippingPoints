@@ -11,7 +11,7 @@ editor_options:
 
 * Update files in server
 
-rsync -azP --exclude "*.zip" -e 'ssh -p 33100' /home/leonardo/Academicos/GitProjects/AustraliaTippingPoint/ leonardo@127.0.0.1:~/GitProjects/AustraliaTippingPoint
+rsync -azP --exclude "*.zip" -e 'ssh -p 33100' /home/leonardo/Academicos/GitProjects/AmazonTippingPoint/ leonardo@127.0.0.1:~/GitProjects/AmazonTippingPoint
 
 ```{r setup, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
 source("R/functions.r")
@@ -27,9 +27,9 @@ require(readr)
 #
 if( Sys.info()['nodename'] =="ls-pro") {
   
-  data_path <- "~/Academicos/GitProjects/AustraliaTippingPoint/Data"
+  data_path <- "~/Academicos/GitProjects/AmazonTippingPoint/Data"
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
-  data_path <- "~/GitProjects/AustraliaTippingPoint/Data"
+  data_path <- "~/GitProjects/AmazonTippingPoint/Data"
 
 }
 
@@ -131,7 +131,7 @@ plan(multisession)
 p_df <- lapply( seq_along(fire_bricks), function(i){
   br <- brick(paste0(data_path,"/",fire_bricks[i]))
   df <- future_lapply(seq_len(nbands(br)), function(x){evaluate_patch_distr(br[[x]], FALSE) }) # future_
-  df <- bind_rows(df) %>% mutate(region= region_name)  %>% select(region, date, everything())
+  df <- bind_rows(df) %>% mutate(region= region_name)  %>% dplyr::select(region, date, everything())
 
 })
 plan(sequential)
@@ -150,7 +150,7 @@ saveRDS(patch_size,patch_size_name)
 patch_size_name <- paste0("Data/patch_size_BurnedArea_",region_name, ".rds")
 
 if(file.exists(patch_size_name)) {
-  patch_size <- readRDS(patch_size_name) %>% mutate(date=ymd(date))%>% filter(date>="2001-01-01" & date<"2021-01-01" )
+  patch_size <- readRDS(patch_size_name) %>% mutate(date=ymd(date))%>% filter(date>="2001-01-01" & date<"2022-01-01" )
 } else {
   stop(paste("No patch size file: ", patch_size_name))
 }
@@ -376,7 +376,7 @@ if(file.exists(patch_size_pfname)) {
   patch_sizes_p <- tibble()
 }
 
-
+# p_df <- future_lapply( 21, function(i){
 p_df <- future_lapply( unique(patch_sparse$period), function(i){
   br <- patch_sparse[patch_sparse$period == i,]
   spm <- sparseMatrix(br$i,br$j)
@@ -392,7 +392,7 @@ saveRDS(patch_sizes_p,patch_size_pfname)
 #
 # Which years have power law distribution - Criteria min AICc and different from exponential
 #
-knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)) %>% select(date,type:range,exp_p_value))
+knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)) %>% dplyr::select(date,type:range,exp_p_value))
 #
 # Power exponent vs Relative range
 #
@@ -427,7 +427,7 @@ gp <- lapply(seq_len(length(p_df)), function(x){
   
   gg <- p_df[[x]] + ggtitle(1999+x) 
 })
-gp[[2]]
+gp[[22]]
 prow <- plot_grid(
   gp[[4]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))), 
   gp[[5]] + theme(legend.position="none") + scale_x_log10( labels = trans_format("log10", math_format(10^.x))),
@@ -487,8 +487,8 @@ save_plot("figure/Amazon_PatchDistr_2015-2020.png",pg,base_width=8,base_height=6
 #
 # Plota annual max size vs tot size
 #
-
-p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>% 
+require(ggrepel)
+p1 <- patch_sizes_p %>% filter(date>2000, date<2022) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
    ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point() + theme_bw() +
@@ -500,7 +500,7 @@ ggplotly(p1)
 ggsave("figure/Amazon_Annual_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
 
 
-p1 <- patch_sizes_p %>% filter(date>2000, date<2021) %>% group_by(date) %>% 
+p1 <- patch_sizes_p %>% filter(date>2000, date<2022) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
    ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
@@ -530,28 +530,29 @@ ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height
 
 # Change of regime
 
-|region | date| period|type |      expo|      rate| xmin|      AICc| range|
-|:------|----:|------:|:----|---------:|---------:|----:|---------:|-----:|
-|Amazon | 2001|      1|ln   | -1.236398| 2.1531997|   54|  6950.870|    NA|
-|Amazon | 2002|      2|pexp |  2.217215| 0.0002646|   90|  8629.256|    NA|
-|Amazon | 2003|      3|pexp |  2.169919| 0.0005622|   44| 14556.177|    NA|
-|Amazon | 2004|      4|pexp |  2.142637| 0.0001151|   66| 13023.416|    NA|
-|Amazon | 2005|      5|ln   | -9.180169| 3.5026064|   70| 13842.223|    NA|
-|Amazon | 2006|      6|pexp |  2.041499| 0.0002795|   29| 19285.119|    NA|
-|Amazon | 2007|      7|pl   |  2.176596|        NA|   54| 15042.315| 47132|
-|Amazon | 2008|      8|pexp |  2.139883| 0.0002042|   48| 10688.426|    NA|
-|Amazon | 2009|      9|pl   |  2.400407|        NA|   45|  8154.537|  3117|
-|Amazon | 2010|     10|pl   |  1.997016|        NA|   41| 19977.859| 75967|
-|Amazon | 2011|     11|pexp |  1.954160| 0.0001630|   27| 14112.897|    NA|
-|Amazon | 2012|     12|pexp |  1.981832| 0.0003285|   25| 17126.664|    NA|
-|Amazon | 2013|     13|pl   |  2.323158|        NA|   49|  6013.017|  5440|
-|Amazon | 2014|     14|ln   | -2.007573| 2.3653178|   30| 12775.172|    NA|
-|Amazon | 2015|     15|pexp |  2.262959| 0.0001455|   74|  7857.954|    NA|
-|Amazon | 2016|     16|pexp |  2.111907| 0.0001705|   59| 10315.595|    NA|
-|Amazon | 2017|     17|pexp |  2.035952| 0.0000956|   36| 17060.737|    NA|
-|Amazon | 2018|     18|pl   |  2.459423|        NA|   60|  5837.460|  3596|
-|Amazon | 2019|     19|pexp |  2.155401| 0.0000982|   56| 11285.548|    NA|
-|Amazon | 2020|     20|pl   |  2.251879|        NA|   86|  8554.237| 17718|
+| date  | type  | 1st par.   | 2nd par.   | xmin  | AICc       | range  | Vuong p-value |
+| ----: | :---- | ---------: | ---------: | ----: | ---------: | -----: | -----------:  |
+| 2001  | ln    | -1.236398  | 2.1531997  | 54    | 6950.870   | 4916   | 0.0029987     |
+| 2002  | pexp  | 2.217215   | 0.0002646  | 90    | 8629.256   | 7128   | 0.0000675     |
+| 2003  | pexp  | 2.169919   | 0.0005622  | 44    | 14556.177  | 4625   | 0.0000009     |
+| 2004  | pexp  | 2.142637   | 0.0001151  | 66    | 13023.416  | 11254  | 0.0000000     |
+| 2005  | ln    | -9.180169  | 3.5026064  | 70    | 13842.223  | 13234  | 0.0000000     |
+| 2006  | pexp  | 2.041499   | 0.0002795  | 29    | 19285.119  | 3826   | 0.0000000     |
+| 2007  | pl    | 2.176596   | NA         | 54    | 15042.315  | 47132  | 0.0002225     |
+| 2008  | pexp  | 2.139883   | 0.0002042  | 48    | 10688.426  | 6508   | 0.0000000     |
+| 2009  | pl    | 2.400407   | NA         | 45    | 8154.537   | 3117   | 0.0000001     |
+| 2010  | pl    | 1.997016   | NA         | 41    | 19977.859  | 75967  | 0.0011222     |
+| 2011  | pexp  | 1.954160   | 0.0001630  | 27    | 14112.897  | 10626  | 0.0000000     |
+| 2012  | pexp  | 1.981832   | 0.0003285  | 25    | 17126.664  | 3515   | 0.0000000     |
+| 2013  | pl    | 2.323158   | NA         | 49    | 6013.017   | 5440   | 0.0001411     |
+| 2014  | ln    | -2.007573  | 2.3653178  | 30    | 12775.172  | 7516   | 0.0000675     |
+| 2015  | pexp  | 2.262959   | 0.0001455  | 74    | 7857.954   | 5306   | 0.0000031     |
+| 2016  | pexp  | 2.111907   | 0.0001705  | 59    | 10315.595  | 5032   | 0.0000000     |
+| 2017  | pexp  | 2.035952   | 0.0000956  | 36    | 17060.737  | 10852  | 0.0000000     |
+| 2018  | pl    | 2.459423   | NA         | 60    | 5837.460   | 3596   | 0.0000069     |
+| 2019  | pexp  | 2.155401   | 0.0000982  | 56    | 11285.548  | 6798   | 0.0000000     |
+| 2020  | pl    | 2.251879   | NA         | 86    | 8554.237   | 17718  | 0.0000654     |
+| 2021  | pexp  | 2.179439   | 0.0001369  | 63    | 7183.948   | 7311   | 0.0000021     |
 
 1. The years 2009/2013/2018 are year with low total sizes, and 2007/2010/2020 have the high total size, both have power law patch distributions.
 
@@ -938,5 +939,54 @@ gdpp %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_v
 
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
 
+
+```
+
+
+# Load Deforestation Rates from Hansen 2013
+
+```{r HansendeforestationVsFireSize, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+#
+# Save patch distribution by period
+#
+patch_size_pfname <- paste0("Data/patch_sizes_p_BurnedArea_", region_name, ".rds" )
+if(file.exists(patch_size_pfname)) {
+  patch_sizes_p <- readRDS(patch_size_pfname)
+} else {
+  
+  stop("No patch file size by period")
+}
+
+hansen_def <- read_csv("Data/ForesLossbyYearAmazon.csv") %>% mutate(percent_deforested=loss/totalForestArea)
+
+p1 <- patch_sizes_p %>% filter(date>2000, date<2022) %>% group_by(date) %>% 
+  summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
+  mutate( label =as.character(date)) %>% inner_join(hansen_def, by=c("date"="year"))
+
+
+p1 %>% ggplot(  aes(percent_deforested,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Annual deforestation (%)") +  
+      ylab("Total fire Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel() 
+
+coeff <- 1/300
+p1 %>% ggplot(  aes(date,tot_patch, label=label ))+ geom_line(alpha=0.8,color="red") + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + geom_line(aes(date,percent_deforested/coeff),alpha=0.8) +
+      xlab("Annual deforestation (%)") +  
+      ylab("Total fire Size (%)") + 
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
+      scale_y_continuous(
+    
+      # Features of the first axis
+      name = "Annual Fire size",
+    
+      # Add a second axis and specify its features
+      sec.axis = sec_axis(~.*coeff, name="Deforestation")
+  )
+
+cor(p1[,c("percent_deforested","tot_patch")])
+cor.test(p1$percent_deforested,p1$tot_patch)
 
 ```

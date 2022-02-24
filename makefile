@@ -1,6 +1,6 @@
 OPTS= -H margins.sty --bibliography GlobalFireTippingPoints.bib --citeproc --csl=proceedings-of-the-royal-society-b.csl --pdf-engine=xelatex 
 
-all: AmazonasFires.pdf Appendices.pdf AmazonasFires_preprint.pdf
+all: AmazonasFires.pdf Appendices.pdf
 
 
 %.pdf:%.md

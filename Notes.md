@@ -139,49 +139,10 @@ The PMB paradigm is based on the assumption that the biotas of fire-prone biomes
 
 @Brando2019a
 
-Surface tropical fires are expected to kill mostly small‐ and medium‐
-sized trees, because the larger, thicker barked individuals can avoid
-heat‐related damage to cambium cells during fires (Brando et al.,
-2012). Although delayed postfire mortality of large trees has been
-observed across the tropics, the mechanisms driving this process
-remain unclear (Barlow et al., 2003). In our study, the persistent
-postfire mortality of large trees may have been associated with their
-increased vulnerability to windstorms. 
+Surface tropical fires are expected to kill mostly small‐ and medium‐ sized trees, because the larger, thicker barked individuals can avoid heat‐related damage to cambium cells during fires (Brando et al., 2012). Although delayed postfire mortality of large trees has been observed across the tropics, the mechanisms driving this process remain unclear (Barlow et al., 2003). In our study, the persistent postfire mortality of large trees may have been associated with their increased vulnerability to windstorms.
 
-Specifically, the fires weak‐ 
-ened trunks and increased crown exposure of large trees to strong 
-winds that impacted the experimental forest (Silvério et al., 2019). 
-This postfire disturbance caused greater losses in canopy cover and 
-biomass in areas impacted by our experimental fires. The observed 
-rapid growth of resprouts and saplings was expected to partially re‐ 
-store forest structure (Chazdon et al., 2007), but ABG reached its 
-lowest levels 7 years after the experimental fires had ended, particu‐ 
-larly along the forest edges. Our results suggest that fragmentation 
-of tropical forests—and the associated increase in forest edges— 
-could dramatically increase the negative impacts of fires and lead 
-to persistent losses of biomass (Silva et al., 2018). This is particularly 
-true where fires co‐occur with extreme droughts that can further 
-increase fire intensity and fire‐related tree mortality by triggering 
-accumulation and desiccation of fuels (Aragão et al., 2008). 
-A permanent transition to a new, derived‐savanna state in this 
-ecotone would require persistence of grass cover and a more open 
-canopy. While grasses could persist along the forest edges due to
-delayed postfire tree mortality (Higgins, Bond, & Trollope, 2000),
-we instead observed widespread postfire resprouting of woody
-vegetation—including in areas that had been previously covered by
-grasses. However, the total area occupied by grasses did not de‐
-crease, because grasses invaded new areas between 2012 and 2015.
-Furthermore, we found no major replacement of C4 by C3 species,
-a process expected to occur as light in the understory of the burned
-plots became scarce. Instead, light‐demanding African C4 grasses
-became more abundant, particularly where fires in previous years
-had been more intense and severe, and where the blowdown event
-had topkilled more trees (e.g., B3yr). The delayed tree mortality
-drove much of this process by increasing light and probably water
-availability as canopy cover decreased. Another likely driver was
-the greater capacity of African grasses to produce, germinate, and
-disperse seeds compared with the Cerrado native grasses (Higgins
-et al., 2000). These results raise the question of whether the edge of
+Specifically, the fires weakened trunks and increased crown exposure of large trees to strong winds that impacted the experimental forest (Silvério et al., 2019). This postfire disturbance caused greater losses in canopy cover and biomass in areas impacted by our experimental fires. The observed rapid growth of resprouts and saplings was expected to partially re‐store forest structure (Chazdon et al., 2007), but ABG reached its lowest levels 7 years after the experimental fires had ended, particu‐
+larly along the forest edges. Our results suggest that fragmentation of tropical forests—and the associated increase in forest edges— could dramatically increase the negative impacts of fires and lead to persistent losses of biomass (Silva et al., 2018). This is particularly true where fires co‐occur with extreme droughts that can further increase fire intensity and fire‐related tree mortality by triggering accumulation and desiccation of fuels (Aragão et al., 2008). A permanent transition to a new, derived‐savanna state in this ecotone would require persistence of grass cover and a more open canopy. While grasses could persist along the forest edges due to delayed postfire tree mortality (Higgins, Bond, & Trollope, 2000), we instead observed widespread postfire resprouting of woody vegetation—including in areas that had been previously covered by grasses. However, the total area occupied by grasses did not decrease, because grasses invaded new areas between 2012 and 2015. Furthermore, we found no major replacement of C4 by C3 species, a process expected to occur as light in the understory of the burned plots became scarce. Instead, light‐demanding African C4 grasses became more abundant, particularly where fires in previous years had been more intense and severe, and where the blowdown event had topkilled more trees (e.g., B3yr). The delayed tree mortality drove much of this process by increasing light and probably water availability as canopy cover decreased. Another likely driver was the greater capacity of African grasses to produce, germinate, and disperse seeds compared with the Cerrado native grasses (Higgins et al., 2000). These results raise the question of whether the edge of
 
 ----
 @Schertzer2014
@@ -453,7 +414,6 @@ Silva, S. S. da et al. 2018. Dynamics of forest fires in the southwestern Amazon
 Amigo, I. 2020. When will the Amazon hit a tipping point? - Nature 578: 505–507. @Amigo2020
 
 ----
-
 @Soares-filho2006. Modelling conservation in the Amazon basin
 
 By 2050, current trends in agricultural expansion will eliminate a total of 40% of Amazon forests
@@ -483,3 +443,30 @@ amounts of fine fuels that readily burn (Silverio et al. 2013, Nepstad et al. 20
 land-use change effects—increased ignitions, greater fuels, and drier conditions—interact with
 drought conditions to increase the likelihood of fire occurrence in tropical forests (Aragão et al.
 2018, Chen et al. 2017).
+
+-----
+@dosReis2021
+
+Projections of climate change in the
+future indicate that there will be an increase in precipitation in the rainy
+season and a decrease in the dry season. It is also predicted that the
+temperature will rise constantly during the dry seasons (Oo et al., 2019).
+The combined effect of higher temperature and dryer conditions exceeds
+the limits of tolerance of many Amazon trees, resulting in mortality
+(Phillips et al., 2009). The expected increase in severe droughts in the
+Amazon makes it urgent to understand their potential impacts on
+forests.
+
+A fire that occurs in a specific year is detected in the subsequent year
+because there can be a delay of up to one year for the burn scar to be
+detectable on satellite images. Thus, a burn scar mapped at time (t + 1)
+is attributed to the previous year (t) in order to represent the real year of
+the fire (Vasconcelos et al., 2013).
+
+
+----
+@Aragao2018
+
+Our results emphasize the fact that in a hotter and drier future, large swaths of the Amazon, distant from the main deforestation epicentres, may burn.
+
+Currently, peaks in active ﬁre detection are more strongly related to extreme drought events than to deforestation, as used to be the case 5 . This is conﬁrmed by the progressive temporal decoupling between ﬁre occurrence and deforestation activities 31 . Deforestation is clearly losing its explanatory power over the variance of the absolute number of ﬁre detections. 

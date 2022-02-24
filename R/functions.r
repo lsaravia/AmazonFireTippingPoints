@@ -511,8 +511,33 @@ read_netlogo_simul <- function(fname,skip=6){
 pred_err <- function(x,y) {
   da <- inner_join(x,y, by=c("Date" = "Date") )
   #da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
-  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  re <- data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  da <- x %>% filter(Date==max(Date)) 
+  bind_rows(re,data.frame(rmse=sqrt(sum(((da$median_fire_interval - 1194)/1194)^2)/nrow(da)),mabe=sum(100*abs(da$median_fire_interval - 1194)/1194)/nrow(da),corr=0)) %>% summarise_all(sum)
 }
+
+#
+# 
+#
+#' Calculate error from predicted values using the annual maxima + the difference of median_fire_interval
+#' 
+#' It takes two datframes and assummes they have a column named Date
+#'
+#' @param x dataframe with simulations
+#' @param y dataframe with data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+pred_err_max <- function(x,y) {
+  da <- inner_join(x,y, by=c("Date" = "Date") )
+  da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
+  re <- data.frame(rmse=sqrt(sum(((da$burned_by_month - da$total_patch)/da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  da <- x %>% filter(Date==max(Date)) 
+  bind_rows(re,data.frame(rmse=sqrt(sum(((da$median_fire_interval - 1194)/1194)^2)/nrow(da)),mabe=sum(100*abs(da$median_fire_interval - 1194)/1194)/nrow(da),corr=0)) %>% summarise_all(sum)
+}
+
 
 #
 # 
@@ -528,12 +553,14 @@ pred_err <- function(x,y) {
 #' @export
 #'
 #' @examples
-pred_err_max <- function(x,y) {
+pred_err_tot <- function(x,y) {
   da <- inner_join(x,y, by=c("Date" = "Date") )
-  da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=max(burned_by_month),total_patch=max(total_patch))
-  data.frame(rmse=sqrt(sum((da$burned_by_month - da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  da <- da %>% mutate(year=year(Date)) %>% group_by(year) %>% summarise(burned_by_month=sum(burned_by_month),total_patch=sum(total_patch))
+  re <- data.frame(rmse=sqrt(sum(((da$burned_by_month - da$total_patch)/da$total_patch)^2)/nrow(da)),mabe=sum(100*abs(da$burned_by_month - da$total_patch)/da$total_patch)/nrow(da),corr=cor(da$burned_by_month, da$total_patch))
+  da <- x %>% filter(Date==max(Date)) 
+  bind_rows(re,data.frame(rmse=sqrt(sum(((da$median_fire_interval - 1194)/1194)^2)/nrow(da)),mabe=sum(100*abs(da$median_fire_interval - 1194)/1194)/nrow(da),corr=0)) %>% summarise_all(sum)
+  
 }
-
 
 
 

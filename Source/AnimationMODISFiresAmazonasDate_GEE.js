@@ -1,3 +1,17 @@
+var SRTM = ee.Image("USGS/SRTMGL1_003"),
+    region = 
+    /* color: #d63000 */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Geometry.Polygon(
+        [[[-82.22979359894808, 12.872707342195604],
+          [-82.22979359894808, -21.149209197634182],
+          [-33.186824848948085, -21.149209197634182],
+          [-33.186824848948085, 12.872707342195604]]], null, false);
+
 var palettes = require('users/gena/packages:colorbrewer').Palettes;
 var utils = require('users/gena/packages:utils');
 var text = require('users/gena/packages:text');
@@ -6,7 +20,7 @@ print(text)
 
 // Define a collection
 var col = ee.ImageCollection('MODIS/006/MCD64A1')
-            .filterDate('2018-06-01', '2021-05-01')
+            .filterDate('2019-05-01', '2022-01-01')
              .select('BurnDate');
 
 //Define a mask to clip the data by.

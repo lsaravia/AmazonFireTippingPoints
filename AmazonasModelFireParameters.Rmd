@@ -41,12 +41,19 @@ region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
 ```{r calcPatchGrowthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 require(Matrix)
+fire_bricks <- fire_bricks[22]                                         ## Set this to add a new year 
 
 patch_df_name <- paste0("Data/patch_growth_",region_name, ".rds")
+if(!exists("patch_growth")) {
+  patch_growth <- readRDS(patch_df_name)
+}
+patch_growth <- patch_growth %>% filter(date < '2021-02-01') 
 
-plan(multicore,workers=parallel::detectCores() - 3 )
+plan(multicore )
 
-patch_growth <- patch_growth_from_GEE_files(fire_bricks,data_path,region_name)
+p_g <- patch_growth_from_GEE_files(fire_bricks,data_path,region_name)
+
+patch_growth <- bind_rows(patch_growth,p_g)
 
 saveRDS(patch_growth,patch_df_name)
 
@@ -58,6 +65,7 @@ plan(sequential)
 
 
 ```{r fireParamshAustralia, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
 
 
 if(!exists("patch_growth")) {
@@ -282,7 +290,8 @@ gam.check(gam03b)
 p1<- predict(gam03b,, se.fit = TRUE)
 pr_test <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
-pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+require(latex2exp)
+pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7),) +  geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 ggsave("figure/Amazon_bF_prediction.jpg",width=8,height=6,units="in",dpi=600)
 
@@ -331,15 +340,18 @@ AIC(gam04,gam04a,gam04b)
 #
 pr_train <- subset(pr, year(date)<2018 )
 pr_test  <- subset(pr, year(date)>=2018 ) 
+pr_period = "2018-2021"
 
 pr_train <- subset(pr, year(date)<2015 | year(date)>2017 )
 pr_test  <- subset(pr, year(date)>=2015 & year(date)<=2017 ) 
+pr_period = "2015-2018"
 
 
 pr_train <- subset(pr, year(date)<2010 | year(date)>2012 )
 pr_test  <- subset(pr, year(date)>=2010 & year(date)<=2012 ) 
+pr_period = "2010-2013"
 
-#model_mape <- tibble()           ## data frame to store results of mape
+model_mape <- tibble()           ## data frame to store results of mape
 
 gam03bt <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr_train,method="REML",
              family = gaussian)
@@ -348,11 +360,11 @@ gam03bt <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr
 p1<- predict(gam03bt,newdata=pr_test, se.fit = TRUE)
 pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
-pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 ggsave("figure/Amazon_bF_prediction2018-2021.jpg",width=8,height=6,units="in",dpi=600)
 
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03bt"))
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03bt",period=pr_period))
 
 
 # Second best
@@ -364,7 +376,7 @@ pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03at"))
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03at",period=pr_period))
 
 # 3rd best
 #
@@ -376,7 +388,7 @@ pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_virid
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
 pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03t"))
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03t",period=pr_period))
 
 
 gam04bt <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
@@ -388,7 +400,7 @@ pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
 
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam04bt"))
+model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam04bt",period=pr_period))
 knitr::kable(model_mape)
 
 #
@@ -422,20 +434,21 @@ pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
 
 * Table with models leaving out 3 years, allways the best model has lower prediction error
 
-|     MAPE|model   |
-|--------:|:-------|
-| 54.47824|gam03bt | 
-| 56.77618|gam03at |
-| 56.95208|gam03t  |
-| 63.78738|gam04bt |
-| 28.52796|gam03bt |
-| 37.46660|gam03at |
-| 48.12553|gam03t  |
-| 30.95800|gam04bt |
-| 50.52010|gam03bt |
-| 70.47736|gam03at |
-| 75.13256|gam03t  |
-| 58.87268|gam04bt |
+|     MAPE|model   |period    |
+|--------:|:-------|:---------|
+| 54.47824|gam03bt |2018-2021 |
+| 56.77618|gam03at |2018-2021 |
+| 56.95208|gam03t  |2018-2021 |
+| 63.78738|gam04bt |2018-2021 |
+| 28.52796|gam03bt |2015-2018 |
+| 37.46660|gam03at |2015-2018 |
+| 48.12553|gam03t  |2015-2018 |
+| 30.95800|gam04bt |2015-2018 |
+| 50.52010|gam03bt |2010-2013 |
+| 70.47736|gam03at |2010-2013 |
+| 75.13256|gam03t  |2010-2013 |
+| 58.87268|gam04bt |2010-2013 |
+
 
 ## Export estimated bF from Data 2000- 2020 for NetLogo Simulations
 
@@ -447,7 +460,13 @@ pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
 # Add an initial copy of the same data to give some time for transients 
 #
 pr$fecha <- pr$date - months(nrow(pr))
-pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% select(date,bF)
+pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% dplyr::select(date,bF)
+
+#
+# Add fire data not in Climaterra data for prediction
+#
+require(lubridate)
+pr_exp <- bind_rows(pr_exp, ignition_prob %>% filter(date > max(pr$date)) %>% mutate(date=ymd(date)) %>% dplyr::select(date,bF))
 
 # add one row repeat the last month  
 pr_exp <- pr_exp %>% add_row(date= pr_exp$date[nrow(pr_exp)] + months(1), bF= pr_exp$bF[nrow(pr_exp)])
@@ -485,7 +504,7 @@ gdpp <- read_csv("Data/GDPP_rcp45_Amazon.csv") %>% group_by(date) %>% summarise(
 gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
 
 pr %>% select(date,tmmx,pr) # %>% filter( year(date)==2019)
-gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
+gdpp <- left_join(gdpp, pr%>% dplyr::select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
 gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
@@ -496,9 +515,28 @@ gdpp %>% filter(date<"2035-01-01") %>% ggplot(aes(date,bF)) + geom_point() +them
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
 
 
-gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
 ggsave("figure/Amazon_bF_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+
+# Add gamma distribution to model extreme values
+#
+#    shape 
+# 1.421544 
+#    rate 
+# 13736.42 
+
+# Add only to the months 8,9,10
+#
+# gdpp <- gdpp %>% mutate(deltaGamma = ifelse(month %in% c(8,9,10), rgamma(nrow(pr_test),1.421544, rate=13736.42),0), newFit = fit + deltaGamma)
+# 
+# # New plots with extreme values 
+# #
+# gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= newFit )) +  
+#     geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+# ggsave("figure/Amazon_bF_RCP4.5PlusGamma.png",width=8,height=6,units="in",dpi=600)
+
+
 
 
 #
@@ -529,11 +567,11 @@ gdpp <- read_csv("Data/GDPP_rcp85_Amazon.csv") %>% group_by(date) %>% summarise(
 gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tmmx), pr=sum(pr)) %>% mutate(date=ym(date),pr1=lag(pr))
 
 pr %>% filter( year(date)==2010) %>% select(date,tmmx,pr) 
-gdpp <- left_join(gdpp, pr%>% select(date, bF) ) %>% mutate(month=month(date))
+gdpp <- left_join(gdpp, pr%>% dplyr::select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
 gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
 
-gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
+gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
 ggsave("figure/Amazon_bF_RCP8.5.png",width=8,height=6,units="in",dpi=600)
 
