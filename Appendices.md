@@ -224,7 +224,6 @@ Table: The ten best fitting parameters using an initial forest density of 0.3 an
 ![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM)](figure/Amazon_ForestPercent_SimulDataGam.png)
 
 
-
 \newpage
 
 ### Fire model predictions

@@ -519,26 +519,6 @@ gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
 ggsave("figure/Amazon_bF_RCP4.5.png",width=8,height=6,units="in",dpi=600)
 
-# Add gamma distribution to model extreme values
-#
-#    shape 
-# 1.421544 
-#    rate 
-# 13736.42 
-
-# Add only to the months 8,9,10
-#
-# gdpp <- gdpp %>% mutate(deltaGamma = ifelse(month %in% c(8,9,10), rgamma(nrow(pr_test),1.421544, rate=13736.42),0), newFit = fit + deltaGamma)
-# 
-# # New plots with extreme values 
-# #
-# gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= newFit )) +  
-#     geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
-# ggsave("figure/Amazon_bF_RCP4.5PlusGamma.png",width=8,height=6,units="in",dpi=600)
-
-
-
-
 #
 # Export Files for Netlogo Model
 #
