@@ -213,15 +213,7 @@ Table: Ten best fitting parameters per each initial forest density (0.3 and 0.6)
 Table: The ten best fitting parameters using an initial forest density of 0.3 and the "maxyear" method, which compares only the monthly maximum of the year against the model. We selected the model with the median power law exponent $\alpha$ of the fire size distribution (column median exponent) closer to the median of the data (2.29), the  distance is $|\alpha_{data} - \alpha_{model} |$ . The best model with dispersal distance 19.91 has a power law exponent for dispersal $\alpha_{dis}$ of 2.0529.
 
 
-![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM). The maximum fire size is relative to the total area.](figure/Amazon_Max_Size_ModelVsData.png)
-
-![Total annual fire extension predictions of the model compared with data. We used to simulate the model the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM). The annual fire extension is relative to the total area.](figure/Amazon_Tot_Size_ModelVsData.png)
-
-![Number of fires predictions of the model compared with data. We used to simulate the model the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM). The number of fires are relative to the total area.](figure/Amazon_Num_Fires_ModelVsData.png)
-
-![Power law exponent of the annual fire size distributions of the model compared with data. We used to simulate the model the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM). The maximum fire size is relative to the total area.](figure/Amazon_PatchExponent_ModelVsData.png)
-
-![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM)](figure/Amazon_ForestPercent_SimulDataGam.png)
+![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM) and two of the best fitted parameter sets with average $\theta = 90$ and $110$](figure/Amazon_ForestPercent_SimulDataGam.png)
 
 
 \newpage
@@ -229,18 +221,16 @@ Table: The ten best fitting parameters using an initial forest density of 0.3 an
 ### Fire model predictions
 
 
+![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Max_Size_theta90-110_RCP4.5-8.5.png)
+
+![Total annual fire extension predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_Tot_Size_theta90-110_RCP4.5-8.5.png)
+
+![Number of fires predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Num_Fires_theta90-110_RCP4.5-8.5.png)
+
+![Power law exponent of the annual fire size distributions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_PatchExponent_theta90-110_RCP4.5-8.5.png)
 
 
-![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. ](figure/Amazon_Max_Size_theta90-110_RCP4.5-8.5.png)
-
-![Total annual fire extension predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$.](figure/Amazon_Tot_Size_theta90-110_RCP4.5-8.5.png)
-
-![Number of fires predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. ](figure/Amazon_Num_Fires_theta90-110_RCP4.5-8.5.png)
-
-![Power law exponent of the annual fire size distributions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. ](figure/Amazon_PatchExponent_theta90-110_RCP4.5-8.5.png)
-
-
-![Predictions of the Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show tow of the best fitted fire models with the minimum and maximum $\theta$ parameter.](figure/Amazon_ForestPercent_theta90-110_RCP45-85.png)
+![Predictions of the Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show tow of the best fitted fire models with the minimum and maximum $\theta = 90$ and $110$.](figure/Amazon_ForestPercent_theta90-110_RCP45-85.png)
 
 
 
