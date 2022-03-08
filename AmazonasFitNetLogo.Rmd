@@ -1448,8 +1448,11 @@ pexp <- bind_rows(pexp,readRDS(file.path("Simulations", "simExponentsAmazonRCP85
 pexp %>% count(decade,theta)
 #
 # Read Simulations based on RCP 4.5
-# -----------------------> alternative set of simulations to check  simExponentsAmazonRCP45_59y.rds
-# 
+#   simExponentsAmazonRCP45.rds
+#   simExponentsAmazonRCP45theta110.rds
+# -----------------------> alternative set of simulations simExponentsAmazonRCP45_59y.rds
+#                                                         simExponentsAmazonRCP45theta110_59y.rds
+#
 pexp1 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45.rds")) %>% filter(world_width==449) %>% 
                      mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),,num_patch=num_patch/(450*450),
                     year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=90)
