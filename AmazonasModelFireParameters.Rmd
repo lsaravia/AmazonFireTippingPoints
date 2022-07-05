@@ -208,6 +208,8 @@ pd3 %>% group_by(periodo) %>% summarise(meanReturnTime = mean(deltaD), meanRT_ye
 
 # Predict Ignition Rate from pp/tmax using GAM
 
+* Plot data and 95% CI using method explained in https://fromthebottomoftheheap.net/2018/12/10/confidence-intervals-for-glms/
+
 ```{r gamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 require(mgcv)
@@ -219,9 +221,10 @@ ignition_prob <- readRDS("Data/ignition_prob.rds")
 pr <- read_csv("Data/TerraClimatePrAmazonas.csv") %>% inner_join(ignition_prob %>% mutate(date=ymd(date))) 
 
 pr  %>% ggplot( aes(pr,log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
-pr  %>% ggplot( aes(lag(pr,8),log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
+pr  %>% ggplot( aes(lag(pr),log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
 pr  %>% ggplot( aes(tmmx,log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
-
+pr  %>% ggplot( aes(lag(tmmx),log(bF),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
+pr  %>% ggplot( aes(date,tmmx,color=month(date))) + geom_line() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
 
 #
 # Linear Model
@@ -244,15 +247,15 @@ pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_virid
 # GAM Model 
 #
 
-gam01 <- gam(log(bF) ~ s(pr, bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
+gam01 <- gam(bF ~ s(pr, bs = "tp", k = 12), data=pr,method="REML",
+             family = Gamma)
 
 draw(gam01,residuals=T) 
 appraise(gam01) 
 summary(gam01)
 
-gam01a <- gam(log(bF) ~ s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
+gam01a <- gam(bF ~ s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
+             family = Gamma)
 
 draw(gam01a,residuals=T) 
 appraise(gam01a) 
@@ -260,195 +263,248 @@ summary(gam01a)
 
 AIC(gam01,gam01a)
 
-gam02 <- gam(log(bF) ~ s(tmmx, bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
+gam02 <- gam(bF ~ s(tmmx, bs = "tp", k = 12), data=pr,method="REML",
+             family = Gamma)
 gam.check(gam02)
 draw(gam02,residuals=T) 
 appraise(gam02) 
 summary(gam02)
 
-gam03 <- gam(log(bF) ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
+
+gam02a <- gam(bF ~ s(lag(tmmx), bs = "tp", k = 12), data=pr,method="REML",
+             family = Gamma)
+gam.check(gam02a)
+draw(gam02a,residuals=T) 
+appraise(gam02a) 
+summary(gam02a)
+
+gam02b <- gam(bF ~ s(tmmx, bs = "tp", k = 12)+s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
+             family = Gamma)
+gam.check(gam02b)
+draw(gam02b,residuals=T) 
+appraise(gam02b) 
+summary(gam02b)
+
+
+AIC(gam01,gam01a,gam02,gam02a,gam02b)
+
+# Interaction tmmx ppt 
+#
+gam03 <- gam(bF ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
 draw(gam03,residuals=T) 
 appraise(gam03) 
 summary(gam03)
 gam.check(gam03)
 
+
+# tmmx * lagged ppt
 #
-# Model with seasonal term and ciclic 
+pr$pr1 <- lag(pr$pr)
+
+gam03a <- gam(bF ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
+draw(gam03a,residuals=T) 
+appraise(gam03a) 
+summary(gam03a)
+gam.check(gam03a)
+
+rm(gam03b)
+#
+# Model tmmx * seasonal term and ciclic 
 #
 pr$month <- month(pr$date)
-gam03b <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
+gam03b <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
 draw(gam03b,residuals=T) 
 appraise(gam03b) 
 ggsave("figure/Amazon_bF_GAMcheck_tmmx_month.jpg",width=8,height=6,units="in",dpi=600)
 
 summary(gam03b)
 gam.check(gam03b)
-
+inv <- inv_link(gam03b)
 p1<- predict(gam03b,, se.fit = TRUE)
-pr_test <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_test <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), fit=inv(fit)  )
 
-require(latex2exp)
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7),) +  geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-ggsave("figure/Amazon_bF_prediction.jpg",width=8,height=6,units="in",dpi=600)
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + coord_cartesian(ylim=c(0,6e-04))
+ggsave("figure/Amazon_bF_prediction_gamma.jpg",width=8,height=6,units="in",dpi=600)
 
 
 
-# Add lagged pr
-pr$pr1 <- lag(pr$pr)
+# Add lagged tmmx and lagged ppt 
+pr$tmmx1 <- lag(pr$tmmx)
+gam03c <- gam(bF ~ te(tmmx1,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
+draw(gam03c,residuals=T) 
+appraise(gam03c) 
+summary(gam03c)
+gam.check(gam03c)
 
-gam03a <- gam(log(bF) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
-draw(gam03a,residuals=T) 
-appraise(gam03a) 
-summary(gam03a)
-gam.check(gam03a)
-taic <- tibble::rownames_to_column(AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b))  %>% mutate(deltaAIC=AIC - min(AIC)) %>% arrange(deltaAIC)
+
+# Add lagged tmmx,
+gam03d <- gam(bF ~ te(tmmx1,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
+draw(gam03d,residuals=T) 
+appraise(gam03d) 
+summary(gam03d)
+gam.check(gam03d)
+
+# Add lagged tmmx + month ciclic 
+rm(gam03e)
+gam03e <- gam(bF ~ te(tmmx1,month, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma)
+draw(gam03e,residuals=T) 
+appraise(gam03e) 
+summary(gam03e)
+gam.check(gam03e)
+
+#
+# Build the table
+#
+taic <- tibble::rownames_to_column(AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b,gam03c,gam03d,gam03e))  %>% mutate(deltaAIC=AIC - min(AIC)) %>% arrange(deltaAIC)
+
+#
+# Table with AIC
+#
 knitr::kable(taic)
+
+
+# Break Data in training and prediction (3 years) and repeat 10 times
+# with random start time
 #
-# Check gamma model
-#
-
-gam04 <- gam(bF ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = Gamma(link="log"))
-draw(gam04,residuals=T) 
-appraise(gam04) 
-summary(gam04)
-gam.check(gam04)
-
-gam04a <- gam(bF ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = Gamma(link="log"))
-draw(gam04a,residuals=T) 
-appraise(gam04a) 
-summary(gam04a)
-gam.check(gam04a)
-
-gam04b <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = Gamma(link="log"))
-draw(gam04b,residuals=T) 
-appraise(gam04b) 
-summary(gam04b)
-gam.check(gam04b)
-
-AIC(gam04,gam04a,gam04b)
-
-#
-# Break Data in training 
-#
-pr_train <- subset(pr, year(date)<2018 )
-pr_test  <- subset(pr, year(date)>=2018 ) 
-pr_period = "2018-2021"
-
-pr_train <- subset(pr, year(date)<2015 | year(date)>2017 )
-pr_test  <- subset(pr, year(date)>=2015 & year(date)<=2017 ) 
-pr_period = "2015-2018"
-
-
-pr_train <- subset(pr, year(date)<2010 | year(date)>2012 )
-pr_test  <- subset(pr, year(date)>=2010 & year(date)<=2012 ) 
-pr_period = "2010-2013"
 
 model_mape <- tibble()           ## data frame to store results of mape
+set.seed(1324)
+ini_years <- unique(year(pr$date))
+ini_years <- ini_years[ini_years<2020 & ini_years>2000]
+ini_years <- sample(ini_years, 10)
+ini_years + 3
 
-gam03bt <- gam(log(bF) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr_train,method="REML",
-             family = gaussian)
+t_mape <- lapply(ini_years, function(x){
+  xf <- x+2
+  pr_train <- subset(pr, year(date)<x | year(date)>xf )
+  pr_test  <- subset(pr, year(date)>=x & year(date)<=xf ) 
+  pr_period = paste0(x,"-",xf)
 
+    # t_max * month
+  #
+  gam03bt <- gam((bF) ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
+               family = Gamma)
+  
+  p1<- predict(gam03bt,newdata=pr_test, se.fit = TRUE)
+  pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), fit=inv(fit)  )
+  
+  model_mape <<- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03bt",period=pr_period))
+
+  # t_max-1 * month
+  #
+  gam03et <- gam((bF) ~ te(tmmx1,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
+             family = Gamma)
+
+  p1<- predict(gam03et,newdata=pr_test, se.fit = TRUE)
+  pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), fit=inv(fit)  )
+
+  model_mape <<- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF),na.rm=TRUE)*100) %>% mutate(model="gam03et",period=pr_period))
+
+  # 3rd best: t_max * ppt-1
+  #
+  gam03at <- gam((bF) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
+               family = Gamma)
+  p1<- predict(gam03at,newdata=pr_test, se.fit = TRUE)
+  pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), fit=inv(fit)  )
+
+  model_mape <<- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03at",period=pr_period))
+
+  
+})
+
+#
+# MAPE Table mean of the MAPE leaving out different portions of data
+#
+knitr::kable(model_mape)
+knitr::kable(model_mape %>% group_by(model) %>% summarize(mean_MAPE=mean(MAPE)) %>% arrange(mean_MAPE))
+
+
+
+# Only one period to plot 
+#
+pr_train <- subset(pr, year(date)<2018 | year(date)>2020 )
+pr_test  <- subset(pr, year(date)>=2018 & year(date)<=2020 ) 
+pr_period = "2018-2020"
+
+
+
+# t_max * month
+#
+gam03bt <- gam((bF) ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
+             family = Gamma)
 
 p1<- predict(gam03bt,newdata=pr_test, se.fit = TRUE)
-pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), fit=inv(fit)  )
 
 pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-ggsave("figure/Amazon_bF_prediction2018-2021.jpg",width=8,height=6,units="in",dpi=600)
-
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03bt",period=pr_period))
+ggsave("figure/Amazon_bF_prediction2018-2021_gamma.jpg",width=8,height=6,units="in",dpi=600)
 
 
-# Second best
+
+
 #
-gam03at <- gam(log(bF) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
-             family = gaussian)
-p1<- predict(gam03at,newdata=pr_test, se.fit = TRUE)
-pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03at",period=pr_period))
-
-# 3rd best
+# MAPE Table mean of the MAPE leaving out different portions of data
 #
-gam03t <- gam(log(bF) ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
-             family = gaussian)
-p1<- predict(gam03t,newdata=pr_test, se.fit = TRUE)
-pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-
-pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam03t",period=pr_period))
-
-
-gam04bt <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr_train,method="REML",
-             family = Gamma(link="log"))
-
-p1<- predict(gam04bt,newdata=pr_test, se.fit = TRUE)
-pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-
-pr_test %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-
-model_mape <- bind_rows(model_mape,pr_test %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100) %>% mutate(model="gam04bt",period=pr_period))
 knitr::kable(model_mape)
+knitr::kable(model_mape %>% group_by(model) %>% summarize(mean_MAPE=mean(MAPE)) %>% arrange(mean_MAPE))
 
-#
-# MAPE Normal GAM 54.5
-#      Gamma  GAM 63.8
-#
-# with all 
-#
-p1<- predict(gam03b,newdata=pr, se.fit = TRUE)
-pr_all <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-pr_all %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-ggsave("figure/Amazon_bF_fitted.png",width=8,height=6,units="in",dpi=600)
-
-pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
- 
-p1<- predict(gam04b,newdata=pr, se.fit = TRUE)
-pr_all <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-pr_all %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-
-pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
-
-# MAPE Normal GAM 41.5
-#      Gamma  GAM 47.8
-#
-# using the gaussian distributions seems to be sligthly better with lower MAPE 
-#
 
 ```
 
+* AIC
+
+|rowname |        df|      AIC|   deltaAIC|
+|:-------|---------:|--------:|----------:|
+|gam03b  | 17.901944| 379.5824|   0.000000|
+|gam03e  | 16.977377| 386.8289|   7.246554|
+|gam03a  |  9.609532| 440.4861|  60.903732|
+|gam03   | 12.498961| 475.3813|  95.798922|
+|gam01a  |  5.679627| 479.4975|  99.915145|
+|gam03c  | 11.651335| 483.5428| 103.960438|
+|gam02   |  7.733403| 486.5087| 106.926390|
+|gam03d  | 15.616824| 488.1406| 108.558294|
+|gam01   |  5.637581| 569.2847| 189.702381|
+
+* Gamma
+
+|rowname |        df|       AIC|  deltaAIC|
+|:-------|---------:|---------:|---------:|
+|gam03b  | 18.174422| -4602.520|   0.00000|
+|gam03e  | 17.951004| -4577.101|  25.41951|
+|gam03a  | 13.878660| -4498.440| 104.08041|
+|gam03   | 14.519860| -4488.773| 113.74726|
+|gam01a  |  6.068760| -4480.293| 122.22716|
+|gam02   |  8.156576| -4475.453| 127.06680|
+|gam03c  | 11.860525| -4475.310| 127.21071|
+|gam03d  | 17.189029| -4454.995| 147.52488|
+|gam01   |  6.007893| -4412.339| 190.18093|
+
+
+
+
 * Table with models leaving out 3 years, allways the best model has lower prediction error
 
-|     MAPE|model   |period    |
-|--------:|:-------|:---------|
-| 54.47824|gam03bt |2018-2021 |
-| 56.77618|gam03at |2018-2021 |
-| 56.95208|gam03t  |2018-2021 |
-| 63.78738|gam04bt |2018-2021 |
-| 28.52796|gam03bt |2015-2018 |
-| 37.46660|gam03at |2015-2018 |
-| 48.12553|gam03t  |2015-2018 |
-| 30.95800|gam04bt |2015-2018 |
-| 50.52010|gam03bt |2010-2013 |
-| 70.47736|gam03at |2010-2013 |
-| 75.13256|gam03t  |2010-2013 |
-| 58.87268|gam04bt |2010-2013 |
+|model   | mean_MAPE|
+|:-------|---------:|
+|gam03bt |  43.63060|
+|gam03et |  44.16456|
+|gam03at |  49.51700|
 
+* Gamma 
+
+|model   | mean_MAPE|
+|:-------|---------:|
+|gam03bt |  50.04765|
+|gam03et |  52.14347|
+|gam03at |  62.74181|
 
 ## Export estimated bF from Data 2000- 2020 for NetLogo Simulations
 
@@ -460,7 +516,7 @@ pr_all %>% summarise( MAPE=mean(abs((bF - fit)/bF))*100)
 # Add an initial copy of the same data to give some time for transients 
 #
 pr$fecha <- pr$date - months(nrow(pr))
-pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% dplyr::select(date,bF)
+pr_exp <- bind_rows(pr %>% mutate(date = fecha) ,pr) %>% dplyr::select(date,bF) %>% filter(date>="1980-11-01")
 
 #
 # Add fire data not in Climaterra data for prediction
@@ -481,16 +537,16 @@ write_csv( pr_exp, "Data/Estimated_bF.csv")
 #
 
 p1<- predict(gam03b,newdata=pr %>% mutate(month=month(date)), se.fit = TRUE)
-pr_exp <- pr %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+pr_exp <- pr %>% mutate(fit=as.numeric(p1$fit),se.fit =as.numeric(p1$se.fit), ucl=as.numeric(inv(fit + (1.96 * se.fit))), lcl = as.numeric(inv(fit - (1.96 * se.fit))), fit=inv(fit)  )
 pr_exp <- pr_exp %>% select(date,fit,se.fit,ucl,lcl)
 pr_exp$fecha <- pr_exp$date - months(nrow(pr_exp))
 
-pr_exp <- bind_rows(pr_exp %>% mutate(date = fecha) ,pr_exp) %>% select(date,,fit,se.fit,ucl,lcl)
+pr_exp <- bind_rows(pr_exp %>% mutate(date = fecha) ,pr_exp) %>% select(date,fit,se.fit,ucl,lcl)
 
 # add one row repeat the last month  
 pr_exp1 <- pr_exp %>% 
   bind_rows(pr_exp[rep(nrow(pr_exp), 1),] %>% 
-              mutate(date = date + months(1)))
+              mutate(date = date + months(1))) %>% filter(date>="1980-11-01")
 
 write_csv( pr_exp1, "Data/EstimatedGam_bF.csv")
 
@@ -506,7 +562,8 @@ gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summ
 pr %>% select(date,tmmx,pr) # %>% filter( year(date)==2019)
 gdpp <- left_join(gdpp, pr%>% dplyr::select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
-gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+inv <- inv_link( gam03b)
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), lcl=if_else(lcl<0,0,lcl), fit=inv(fit)  )
 
 gdpp %>% filter(date<"2035-01-01") %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
@@ -514,10 +571,12 @@ gdpp %>% filter(date<"2035-01-01") %>% ggplot(aes(date,bF)) + geom_point() +them
 
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
 
+gdpp  %>% ggplot(aes(log(fit),tmmx,color=year(date))) + geom_point() +theme_bw() + scale_colour_viridis_c() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
+
 
 gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
-ggsave("figure/Amazon_bF_RCP4.5.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_bF_RCP4.5_gamma.png",width=8,height=6,units="in",dpi=600)
 
 #
 # Export Files for Netlogo Model
@@ -549,12 +608,11 @@ gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summ
 pr %>% filter( year(date)==2010) %>% select(date,tmmx,pr) 
 gdpp <- left_join(gdpp, pr%>% dplyr::select(date, bF) ) %>% mutate(month=month(date))
 p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
-gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
+gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=inv(fit + (1.96 * se.fit)), lcl = inv(fit - (1.96 * se.fit)), lcl=if_else(lcl<0,0,lcl),fit=inv(fit)  )
 
 gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  ylab("𝑓") + 
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
-ggsave("figure/Amazon_bF_RCP8.5.png",width=8,height=6,units="in",dpi=600)
-
+ggsave("figure/Amazon_bF_RCP8.5_gamma.png",width=8,height=6,units="in",dpi=600)
 
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
 

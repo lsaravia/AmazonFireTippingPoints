@@ -47,25 +47,25 @@ Table: Best fitted fire size distribution according to the minimum AICc; where l
 
 | Model             | df         | AIC       | Delta AIC | MAPE  |
 | :------           | ---------: | --------: | --------: | ----: |
-| $T_{max} * m$     | 22.096028  | 373.8128  | 0.000     | 54.5  |
-| $T_{max} * ppt-1$ | 9.878829   | 424.2198  | 50.407    | 56.8  |
-| $T_{max} * ppt$   | 12.341762  | 460.4303  | 86.617    | 57.0  |
-| $ppt -1$          | 5.797506   | 461.9405  | 88.127    |       |
-| $T_{max}$         | 7.642891   | 468.5340  | 94.721    |       |
-| $ppt$             | 5.639345   | 550.8326  | 177.019   |       |
+| $T_{max} * m$     | 22.096028  | 373.8128  | 0.000     | 44.5  |
+| $T_{max} * ppt_{m-1}$ | 9.878829   | 424.2198  | 50.407    | 54.9  |
+| $T_{max} * ppt_{m}$   | 12.341762  | 460.4303  | 86.617    | 60.1  |
+| $ppt -1$          | 5.797506   | 461.9405  | 88.127    | 62.3  |
+| $T_{max}$         | 7.642891   | 468.5340  | 94.721    | 65.6  |
+| $ppt$             | 5.639345   | 550.8326  | 177.019   | 70.6  |
 
-Table: Generalized additive models (GAMs) terms and comparison using the Akaike criterion, and the mean absolute percentage error (MAPE) of predictions. Where we have the following monthly variables: $T_{max}$ is the maximum temperature, $ppt$ accumulated precipitation, $ppt-1$ same as ppt from the previous month, and $m$ is a seasonal term representing the actual month.
+Table: Generalized additive models (GAMs) terms and comparison using the Akaike criterion, and the mean absolute percentage error (MAPE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T_{max}$ is the maximum temperature, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month.
 
-![Model check for the best GAM model of ignition probability $bF \sim T_{max} + m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
+![Model check for the best GAM model of ignition probability $bF \sim T_{max} * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
 
 
-![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ (black line) with $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)
+![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ (black line), 95% confidence interval (grey band) and $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)
 
-![Predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ using as training data the years < 2018](figure/Amazon_bF_prediction2018-2021.jpg)
+![Predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
 
-![Predictions of the probability of ignition $f$ up to 2060 using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5.png)
+![Predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5.png)
 
-![Predictions of the probability of ignition $f$ up to 2060 using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5.png)
+![Predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5.png)
 
 <!-- Names of the CMIP5 models:  'ACCESS1-0', 'bcc-csm1-1', 'BNU-ESM', 'CanESM2', 'CCSM4', 'CESM1-BGC', 'CNRM-CM5', 'CSIRO-Mk3-6-0', 'GFDL-CM3', 'GFDL-ESM2G', 'GFDL-ESM2M', 'inmcm4', 'IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'MIROC-ESM', 'MIROC-ESM-CHEM', 'MIROC5', 'MPI-ESM-LR', 'MPI-ESM-MR', 'MRI-CGCM3', 'NorESM1-M'. -->
 
@@ -189,9 +189,9 @@ Table: Frequency of Fire cluster size distribution of the fire model with true p
 
 Table: Ten best fitting parameters per each initial forest density (0.3 and 0.6) and two methods 1) "monthly": compares the monthly burned data against the model, 2) "maxyear": compares only the maximum of the year against the maximum of the model. To select the best parameters we use the mean percent absolute error (MAPE).
 
-![Time series of best fitted parameters against data for the fire model, with method "maxyear", notice that this method select an initial forest density 0.3](figure/Amazon_maxyear_fitted_450.png)
+![Ten simulations of monthly fire time series using best fitted parameters against data for the fire model (See table S6), with method "maxyear", notice that this method depicts an initial forest density 0.3](figure/Amazon_maxyear_fitted_450.png)
 
-![Time series of best fitted parameters against data for the fire model, with method "monthly", notice that this method select an initial forest density 0.6](figure/Amazon_monthly_fitted_450.png)
+![Ten simulations of monthly fire time series using best fitted parameters against data for the fire model (See table S6), with method "monthly", notice that this method depicts an initial forest density 0.6](figure/Amazon_monthly_fitted_450.png)
 
 ![Total annual fires, predicted vs data using the best fitted parameters with the method "maxyear"](figure/Amazon_maxyear_dataVsPredicted_450.png)
 
@@ -213,7 +213,7 @@ Table: Ten best fitting parameters per each initial forest density (0.3 and 0.6)
 Table: The ten best fitting parameters using an initial forest density of 0.3 and the "maxyear" method, which compares only the monthly maximum of the year against the model. We selected the model with the median power law exponent $\alpha$ of the fire size distribution (column median exponent) closer to the median of the data (2.29), the  distance is $|\alpha_{data} - \alpha_{model} |$ . The best model with dispersal distance 19.91 has a power law exponent for dispersal $\alpha_{dis}$ of 2.0529.
 
 
-![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM) and two of the best fitted parameter sets with average $\theta = 90$ and $110$](figure/Amazon_ForestPercent_SimulDataGam.png)
+![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM) and two of the best fitted parameter sets with average $\theta = 90$ and $110$ (Table S7)](figure/Amazon_ForestPercent_SimulDataGam.png)
 
 
 \newpage

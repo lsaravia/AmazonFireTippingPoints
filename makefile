@@ -1,13 +1,13 @@
 OPTS= -H margins.sty --bibliography GlobalFireTippingPoints.bib --citeproc --csl=proceedings-of-the-royal-society-b.csl --pdf-engine=xelatex 
 
-all: AmazonasFires.pdf Appendices.pdf AmazonasFires.docx
+all: AmazonasFires.pdf Appendices.pdf AmazonasFires_preprint.pdf
  
 
 %.pdf:%.md
 	pandoc $< -o $@ 
 	evince $@		
 
-AmazonasFires.pdf: AmazonasFires.md margins.sty makefile
+AmazonasFires.pdf: AmazonasFires.md margins.sty 
 	pandoc $< -o $@ $(OPTS)
 		
 
