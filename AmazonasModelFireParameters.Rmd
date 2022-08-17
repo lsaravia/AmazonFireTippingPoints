@@ -594,7 +594,7 @@ gdpp_exp %>% slice_tail()
 # repeat the last date
 #
 gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
-write_csv(gdpp_exp , "Data/Predicted_bF_rcp45.csv")
+write_csv(gdpp_exp %>% mutate(across(fit:lcl, as.numeric)) , "Data/Predicted_bF_rcp45.csv")
 
 
 
@@ -632,7 +632,7 @@ gdpp_exp %>% slice_tail()
 # repeat the last date
 #
 gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
-write_csv(gdpp_exp, "Data/Predicted_bF_rcp85.csv")
+write_csv(gdpp_exp %>% mutate(across(fit:lcl, as.numeric)), "Data/Predicted_bF_rcp85.csv")
 
 
 
