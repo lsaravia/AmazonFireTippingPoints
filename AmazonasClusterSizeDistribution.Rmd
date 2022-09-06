@@ -387,6 +387,11 @@ patch_sizes_p <- patch_sizes_p %>% mutate(date = 2000+ period)
 
 saveRDS(patch_sizes_p,patch_size_pfname)
 
+#
+# Frequency of distributions with min AICc
+#
+best_patch_dfp <- patch_dfp %>% group_by(date) %>% filter(AICc==min(AICc)) 
+knitr::kable(best_patch_dfp %>% group_by(type) %>% summarise(n = n(),expo=median(expo),rate=median(rate)) %>%  mutate(freq = n / sum(n)), digits = 5)
 
 
 #
@@ -520,12 +525,14 @@ ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height
 
 ```
 
-## power Law range and median 
+## Proportion of distributions with min AICc 
 
-  `range(expo)` `median(expo)`
-          <dbl>          <dbl>
-1          2.00           2.29
-2          2.46           2.29
+|type |  n|     expo|    rate|    freq|
+|:----|--:|--------:|-------:|-------:|
+|ln   |  3| -2.00757| 2.36532| 0.13636|
+|pexp | 13|  2.13988| 0.00017| 0.59091|
+|pl   |  6|  2.28752|      NA| 0.27273|
+
 
 
 # Change of regime
