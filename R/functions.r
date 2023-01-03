@@ -295,7 +295,7 @@ convert_to_sparse_days <- function(fire_bricks,region_name,data_path){
   p_df <- lapply( seq_along(fire_bricks), function(ii){
     
     br <- brick(paste0(data_path,"/",fire_bricks[ii]))
-    df <- future_lapply(seq_len(nbands(br)), function(x){   # future_lapply
+    df <- lapply(seq_len(nbands(br)), function(x){   # future_lapply
       brName <- stringr::str_sub( stringr::str_replace_all(names(br[[x]]), "\\.", "-"), 2)
       mm <- as.matrix(br[[x]])
       message(paste(x,"-", brName ,"Suma de fuegos", sum(mm)))

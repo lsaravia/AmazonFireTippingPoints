@@ -113,7 +113,7 @@ saveRDS(patch_df,patch_df_name)
 
 # Save Patch distribution
 
-```{r SavePatchByMonthAmazon, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+```{r SavePatchByMonthAmazonNew, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 #
 # Save patch distribution
@@ -293,7 +293,7 @@ ggsave("figure/Amazon_MaxSizeVsNo_year.jpg",plot=p1,width=8,height=6,units="in",
 
 * For Amazon/Dry Chaco  the months of max fire are 08 09 10
 
-```{r AmazonSeasonalPatchDistr, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+```{r AmazonSeasonalPatchDistrNew, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
 require(lubridate)
 require(Matrix)
 require(ggplot2)
@@ -345,9 +345,7 @@ if(file.exists(patch_dfp_fname)) {
   patch_dfp <- tibble()
 }
 
-# patch_dfp <- patch_dfp %>% group_by(region,date,period) %>% slice_tail(n=4)
-
-patch_dfp <- patch_dfp %>% tidyr::fill(ln_p_value,exp_p_value)
+# patch_dfp <- patch_dfp %>% tidyr::fill(ln_p_value,exp_p_value)
 
 plan(multisession)
 p_df <- future_lapply( unique(patch_sparse$period), function(i){
@@ -386,6 +384,26 @@ patch_sizes_p <- bind_rows(patch_sizes_p,p_df)
 patch_sizes_p <- patch_sizes_p %>% mutate(date = 2000+ period)
 
 saveRDS(patch_sizes_p,patch_size_pfname)
+
+```
+
+## Plots and tables of fitted distributions  Centered on the month of max fire - Annual
+
+* For Amazon/Dry Chaco  the months of max fire are 08 09 10
+
+```{r PlotsAmazonSeasonalPatchDistr, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+
+# Load data
+#
+patch_size_pfname <- paste0("Data/patch_sizes_p_BurnedArea_", region_name, ".rds" )
+if(file.exists(patch_size_pfname)) {
+  patch_sizes_p <- readRDS(patch_size_pfname)
+}
+patch_dfp_fname <- paste0("Data/patch_dfp_BurnedArea_", region_name, ".rds" )
+
+if(file.exists(patch_dfp_fname)) {
+  patch_dfp <- readRDS(patch_dfp_fname)
+}
 
 #
 # Frequency of distributions with min AICc

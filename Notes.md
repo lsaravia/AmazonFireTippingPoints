@@ -470,3 +470,9 @@ the fire (Vasconcelos et al., 2013).
 Our results emphasize the fact that in a hotter and drier future, large swaths of the Amazon, distant from the main deforestation epicentres, may burn.
 
 Currently, peaks in active ﬁre detection are more strongly related to extreme drought events than to deforestation, as used to be the case 5 . This is conﬁrmed by the progressive temporal decoupling between ﬁre occurrence and deforestation activities 31 . Deforestation is clearly losing its explanatory power over the variance of the absolute number of ﬁre detections. 
+
+
+----
+@Staver2012
+
+Savannas with tree cover below ∼40% burn frequently, but fire is almost nonexistent in systems with tree cover above ∼40% (Hennenberg et al. 2006; Archibald et al. 2009; Pueyo et al. 2010; Staver et al. 2011b). This threshold appears to be universal, despite differences in the effects of forest versus savanna trees on the grass layer in their subcanopy. Thus, we assume athresholdresponseoffirefrequencytograssabundance: above a threshold in grass abundance (GT), fire spreads; below that threshold, it does not.
