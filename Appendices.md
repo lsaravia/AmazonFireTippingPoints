@@ -45,23 +45,29 @@ Table: Best fitted fire size distribution according to the minimum AICc; where l
 ## Generalized Additive Models of ignition probability 
 
 
-| Model             | df         | AIC       | Delta AIC | MAPE  |
-| :------           | ---------: | --------: | --------: | ----: |
-| $T_{max} * m$     | 22.096028  | 373.8128  | 0.000     | 44.5  |
-| $T_{max} * ppt_{m-1}$ | 9.878829   | 424.2198  | 50.407    | 54.9  |
-| $T_{max} * ppt_{m}$   | 12.341762  | 460.4303  | 86.617    | 60.1  |
-| $ppt -1$          | 5.797506   | 461.9405  | 88.127    | 62.3  |
-| $T_{max}$         | 7.642891   | 468.5340  | 94.721    | 65.6  |
-| $ppt$             | 5.639345   | 550.8326  | 177.019   | 70.6  |
+| Model    | df         | AIC       | deltaAIC    | Mean MAE  | Mean RMSE |
+| :------- | ---------: | --------: | ----------: | --------: | --------: |
+| Gaussian |            |           |             |           |           |
+|          |            |           |             |           |           |
+| nor03b   | 17.901944  | 379.5824  | 0.000000    | 3.14e-05  | 5.15e-05  |
+| nor03e   | 16.977377  | 386.8289  | 7.246554    | 3.20e-05  | 5.24e-05  |
+| nor03a   | 9.609532   | 440.4861  | 60.903732   | 3.62e-05  | 5.89e-05  |
+|          |            |           |             |           |           |
+| Gamma    |            |           |             |           |           |
+|          |            |           |             |           |           |
+| gam03b   | 18.174422  | -4602.520 | 0.00000     | 3.46e-05  | 5.61e-05  |
+| gam03e   | 17.951004  | -4577.101 | 25.41951    | 3.63e-05  | 5.84e-05  |
+| gam03a   | 13.878660  | -4498.440 | 104.08041   | 4.13e-05  | 6.58e-05  |
+|          |            |           |             |           |           |
 
-Table: Generalized additive models (GAMs) terms and comparison using the Akaike criterion, and the mean absolute percentage error (MAPE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T_{max}$ is the maximum temperature, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month.
+Table: Generalized additive models (GAMs) terms and comparison using the Akaike criterion, and the mean absolute error (MAE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T^{max}_{m}$ is the maximum temperature for the actual month, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month. Then the models ending in the letter 'a' are the interaction of $T^{max}_m * ppt_{m-1}$, models ending  in 'b' $T^{max}_m * m$ and models ending in 'e' are $T^{max}_{m-1} * m$. To see the rest of the models with higher AIC please check the source code 'AmazonasModelFireParameters.Rmd'
 
-![Model check for the best GAM model of ignition probability $bF \sim T_{max} * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
+![Model check for the best GAM model of ignition probability $bF \sim T^{max}_m * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
 
 
-![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ (black line), 95% confidence interval (grey band) and $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)
+![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ (black line), 95% confidence interval (grey band) and $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)
 
-![Predictions of the probability of ignition by the best GAM model $f \sim T_{max} * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
+![Predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
 
 ![Predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5.png)
 
@@ -162,55 +168,30 @@ Table: Frequency of Fire cluster size distribution of the fire model with true p
 ### Forest fire model fitting 
 
 
+| Name          | Initial forest density  | Dispersal distance         | Forest growth $(1/p)$  |
+| :------------ | ----------------------: | -------------------------: | -------------: |
+| 2.5 % Perc.   | 0.0763                  | 81.7156                    | 4807.227       |
+| Mean          | 0.2714                  | 121.0560                   | 5887.786       |
+| Median        | 0.2739                  | 122.5313                   | 5842.389       |
+| 97.5 % Perc.  | 0.4910                  | 151.4867                   | 6996.803       |
 
 
-| fit method | Initial forest density  | Dispersal distance         | Forest growth $1/p$ | MAPE      | correlation |
-| :-------   | ----------------------: | -------------------------: | -------------:      | --------: | ----------: |
-| maxyear    | 0.3                     | 32.72                      | 6536.88             | 44.27120  | 0.6031193   |
-| maxyear    | 0.3                     | 13.71                      | 5756.42             | 44.99850  | 0.5576882   |
-| maxyear    | 0.3                     | 48.60                      | 6282.53             | 45.06912  | 0.5139903   |
-| maxyear    | 0.3                     | 65.07                      | 6426.67             | 45.91759  | 0.5257451   |
-| maxyear    | 0.3                     | 19.91                      | 7003.88             | 46.24743  | 0.6396228   |
-| maxyear    | 0.3                     | 31.23                      | 5739.33             | 46.47136  | 0.5180568   |
-| maxyear    | 0.3                     | 36.89                      | 6967.00             | 47.07761  | 0.5938925   |
-| maxyear    | 0.3                     | 99.32                      | 6930.36             | 47.26686  | 0.5600610   |
-| maxyear    | 0.3                     | 24.26                      | 6977.69             | 47.32994  | 0.6063205   |
-| maxyear    | 0.3                     | 76.08                      | 7156.03             | 47.40817  | 0.6105106   |
-| monthly    | 0.6                     | 57.94                      | 4446.46             | 82.44552  | -0.0042925  |
-| monthly    | 0.6                     | 48.92                      | 5395.68             | 82.54614  | 0.0120322   |
-| monthly    | 0.6                     | 92.54                      | 5299.42             | 82.64424  | -0.0116897  |
-| monthly    | 0.6                     | 59.31                      | 4503.38             | 82.64629  | 0.0073827   |
-| monthly    | 0.6                     | 58.66                      | 4683.73             | 82.73700  | -0.0029672  |
-| monthly    | 0.6                     | 37.29                      | 4747.29             | 82.74801  | -0.0098299  |
-| monthly    | 0.6                     | 99.80                      | 4882.64             | 82.84778  | -0.0089749  |
-| monthly    | 0.6                     | 63.01                      | 5692.99             | 82.96181  | -0.0119154  |
-| monthly    | 0.6                     | 36.43                      | 5213.85             | 82.99431  | 0.0019312   |
-| monthly    | 0.6                     | 14.43                      | 6065.37             | 83.02749  | 0.0249054   |
+Table: Summary of the first ABC posterior parameter distribution. This uses the annual maximum monthly fire size to select the 0.05% of the best parameters.
 
-Table: Ten best fitting parameters per each initial forest density (0.3 and 0.6) and two methods 1) "monthly": compares the monthly burned data against the model, 2) "maxyear": compares only the maximum of the year against the maximum of the model. To select the best parameters we use the mean percent absolute error (MAPE).
+![Monthly total MODIS estimated fire size (black line) and 95% percentiles of simulations (shade) of monthly fire time series using the fitted parameters (See table S6)](figure/Amazon_maxyear_PI95_450.png)
 
-![Ten simulations of monthly fire time series using best fitted parameters against data for the fire model (See table S6), with method "maxyear", notice that this method depicts an initial forest density 0.3](figure/Amazon_maxyear_fitted_450.png)
+![Ten simulations of monthly fire time series using one set of the fitted parameters of the fire model (See table S6), the black line is the MODIS data. The parameters used are Initial forest density = 0.2, Dispersal distance = 83.41, Forest growth =  5004.71](figure/Amazon_maxyear_fitted_450.png)
 
-![Ten simulations of monthly fire time series using best fitted parameters against data for the fire model (See table S6), with method "monthly", notice that this method depicts an initial forest density 0.6](figure/Amazon_monthly_fitted_450.png)
+![Total annual fires, predicted vs data using the first ABC posterior parameters](figure/Amazon_maxyear_dataVsPredicted_450.png)
 
-![Total annual fires, predicted vs data using the best fitted parameters with the method "maxyear"](figure/Amazon_maxyear_dataVsPredicted_450.png)
+| Name          | Initial forest density  | Dispersal distance         | Forest_growth $(1/p)$ | Fire Size Power Law Exponent |
+| :------------ | ----------------------: | -------------------------: | -------------:        | ---------------------------: |
+| 2.5 % Perc.   | 0.0192                  | 76.0916                    | 4781.407              | 1.73                         |
+| Mean          | 0.2706                  | 119.5919                   | 5835.700              | 2.83                         |
+| Median        | 0.2759                  | 121.9571                   | 5809.553              | 2.73                         |
+| 97.5 % Perc.  | 0.5944                  | 149.8876                   | 6840.369              | 4.94                         |
 
-
-| Dispersal distance ($\alpha_{dis}$) | Forest growth $1/p$ | minimum $\alpha$ | maximum $\alpha$ | median $\alpha$ | distance | Average $\theta$ | MAPE      |
-| ----------------:                   | --------:           | -------:         | -------:         | -------:        | -------: | ---------:       | --------: |
-| 19.91 (2.0529)                      | 7003.88             | 1.6384           | 3.5871           | 1.7863          | 0.5037   | 90.5569          | 46.24743  |
-| 13.71 (2.0787)                      | 5756.42             | 1.6631           | 2.4942           | 1.7852          | 0.5048   | 110.1812         | 44.99850  |
-| 32.72 (2.0315)                      | 6536.88             | 1.6637           | 2.1172           | 1.7619          | 0.5281   | 97.0263          | 44.27120  |
-| 48.60 (2.0210)                      | 6282.53             | 1.6889           | 2.1173           | 1.7603          | 0.5297   | 100.9545         | 45.06912  |
-| 65.07 (2.0156)                      | 6426.67             | 1.6693           | 1.9915           | 1.7587          | 0.5313   | 98.6902          | 45.91759  |
-| 31.23 (2.0331)                      | 5739.33             | 1.6586           | 2.0872           | 1.7534          | 0.5366   | 110.5093         | 46.47136  |
-| 36.89 (2.0279)                      | 6967.00             | 1.6751           | 3.0893           | 1.7432          | 0.5468   | 91.0362          | 47.07761  |
-| 24.26 (2.0430)                      | 6977.69             | 1.7090           | 1.8901           | 1.7419          | 0.5481   | 90.8968          | 47.32994  |
-| 99.32 (2.0102)                      | 6930.36             | 1.6560           | 2.2340           | 1.7412          | 0.5488   | 91.5175          | 47.26686  |
-| 76.08 (2.0133)                      | 7156.03             | 1.6593           | 1.8955           | 1.7403          | 0.5497   | 88.6315          | 47.40817  |
-|                                     |                     |                  |                  |                 |          |                  |           |
-
-Table: The ten best fitting parameters using an initial forest density of 0.3 and the "maxyear" method, which compares only the monthly maximum of the year against the model. We selected the model with the median power law exponent $\alpha$ of the fire size distribution (column median exponent) closer to the median of the data (2.29), the  distance is $|\alpha_{data} - \alpha_{model} |$ . The best model with dispersal distance 19.91 has a power law exponent for dispersal $\alpha_{dis}$ of 2.0529.
+Table: Summary of the second ABC posterior parameter distribution. We selected the model parameters with the median power law exponent $\alpha$ of the fire size distribution  closer to the median of the data (2.29). The summary of the power law exponent of fire size patch distribution is showed in the last column.
 
 
 ![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM) and two of the best fitted parameter sets with average $\theta = 90$ and $110$ (Table S7)](figure/Amazon_ForestPercent_SimulDataGam.png)

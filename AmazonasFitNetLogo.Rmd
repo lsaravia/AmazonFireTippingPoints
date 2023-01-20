@@ -9,7 +9,8 @@ editor_options:
 
 ```{r setup, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
 needed_packages <- c(
-    "tidyverse"
+    "MASS"
+  ,"tidyverse"
   , "lubridate"
   , "nlrx"
   , "tictoc"
@@ -74,8 +75,6 @@ nl <- nl(nlversion = "6.2",
          nlpath = netlogopath,
          modelpath = modelpath,
          jvmmem = 2048)
-
-
 
 ```
 
@@ -453,6 +452,25 @@ summary(resgfit)
 # [1] 0.258
 
 
+#
+# Build Table
+#
+require(rethinking)
+tabS6 <- res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+  summarise(across(everything(), PI,prob=0.95)) %>% 
+  mutate(Name= c("2.5 % Perc.","97.5 % Perc.")) %>% select(Name, everything())
+
+tabS6 <- bind_rows(tabS6,
+  res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+    summarise(across(everything(), mean)) %>% 
+    mutate(Name= c("Mean")) %>% select(Name, everything()),
+  res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+    summarise(across(everything(), median)) %>% 
+    mutate(Name= c("Median")) %>% select(Name, everything())
+)
+
+tabS6 <- tabS6[c(1,3,4,2),]
+knitr::kable(tabS6, digits = 4)
 
 #
 # Add Posterior to data.frame
@@ -474,27 +492,19 @@ best <- best %>% mutate(powexp =  (1 - 2 * forest_dispersal_distance ) / (1 - fo
 saveRDS(best,file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
 # best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
 
-plt <- msim %>% inner_join(best  %>% filter(method=="rejection") %>% slice_sample(n=10))%>% inner_join(mdat, by=c("Date" = "Date") ) 
+set.seed(1325)
+plt <- msim %>% inner_join(best  %>% filter(method=="rejection") %>% slice_sample(n=1))%>% inner_join(mdat, by=c("Date" = "Date") ) 
+old <- options(pillar.sigfig = 7)
+plt %>% distinct(Initial_forest_density, forest_dispersal_distance, Forest_growth)
+options(old)
 
 plt %>% 
   ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
       scale_color_viridis_c(guide=FALSE)  + geom_line( aes(Date,burned_by_month,color=random_seed)) +
       ylab("Monthly Burned Size %") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") +  facet_wrap(~random_seed)
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") +
+      facet_wrap(~random_seed) 
 ggsave("figure/Amazon_maxyear_fitted_450.png",width=8,height=6,units="in",dpi=600)
-
-# Plot all simulations as dots, set  slice_sample(n=10)
-#
-require(viridis)
-colnet <- viridis(3)
-plt %>%  
-  ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c(guide=FALSE)  + geom_line( aes(Date,burned_by_month),alpha=0.4,color=colnet[1]) +
-      ylab("Monthly Burned Size %") +  
-      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
-
-
-
 
 plt %>%  
   ggplot( aes(Date,Percent_forest,color=random_seed) )+ geom_line() + theme_bw() +
@@ -510,6 +520,34 @@ plt %>%
 ggsave("figure/Amazon_forestDens_fitted_450.png",width=8,height=6,units="in",dpi=600)
 
 
+# Plot all simulations as dots, set  slice_sample(n=10)
+#
+require(rethinking)
+plt <- msim %>% inner_join(best  %>% filter(method=="rejection") )%>% inner_join(mdat, by=c("Date" = "Date") ) %>% group_by(Date) %>% summarise(min_burned_by_month=PI(burned_by_month,prob=0.95)[1],max_burned_by_month=PI(burned_by_month,prob=0.95)[2],total_patch=max(total_patch))
+
+
+require(viridis)
+colnet <- viridis(3)
+#
+# Shifted 3 months and the peaks coincide!!
+n <- 3
+plt %>%  
+  ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      geom_ribbon( aes(ymin=lead(min_burned_by_month,n),ymax=lead(max_burned_by_month,n)),alpha=0.4) +
+      ylab("Monthly Burned Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
+
+
+plt %>%  
+  ggplot( aes(Date,total_patch ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide=FALSE)  + 
+      geom_ribbon( aes(ymin=min_burned_by_month,ymax=max_burned_by_month),alpha=0.4) +
+      ylab("Monthly Burned Size %") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
+ggsave("figure/Amazon_maxyear_PI95_450.png",width=8,height=6,units="in",dpi=600)
+
+
 
 #
 # Yearly comparison of predicted vs data (Max)
@@ -519,10 +557,10 @@ plt <- msim %>% inner_join(best  %>% filter(method=="rejection") %>% distinct() 
 plt %>% ggplot(  aes(sum_burned,sum_patch ))+ geom_point(alpha=0.1) + theme_bw() + xlab("Predicted") + ylab("Data") + 
       #geom_errorbarh(aes(xmax=sum_burned+sd_burned,xmin=sum_burned-sd_burned)) + 
       scale_color_viridis_d(guide=NULL)  + geom_abline(intercept = 0, slope =1,alpha=0.3) #+ coord_cartesian(xlim=c(0,1.5)) 
-ggsave("figure/Amazon_maxyear_dataVsPredicted_new.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_maxyear_dataVsPredicted_450.png",width=8,height=6,units="in",dpi=600)
 
 plt %>% ggplot(  aes(year,sum_patch ))+ geom_point(alpha=0.1) + theme_bw() + xlab("Year") + ylab("Data") + 
-      geom_jitter(aes(year,sum_burned),alpha=0.1,color=cols[1]) + 
+      geom_jitter(aes(year,sum_burned),alpha=0.1,color=colnet[1]) + 
       scale_color_viridis_d(guide=NULL)  + geom_abline(intercept = 0, slope =1,alpha=0.3) #+ coord_cartesian(xlim=c(0,1.5)) 
 
 ggsave("figure/Amazon_maxyear_dataVsPredicted_jitter.png",width=8,height=6,units="in",dpi=600)
@@ -554,10 +592,10 @@ ggsave("figure/Amazon_maxyear_dataVsPredicted_jitter.png",width=8,height=6,units
 ## Simulations with patch size output for wordl_width = 450 
 
 * Sample 300 parameters from the posterior then make new simulations to estimate the patch size distributions
-* Have to run this in chunks of 50 because it was the only way of doing it, it seems that netlogo/java hangs
-* So I generated files with names Amazon20years450Post50, Amazon20years450Post100...
+* Have to run this in chunks of 50,100,100,50 because it was the only way of doing it, it seems that netlogo/java hangs
+* So I generated files with names Amazon20years450Post50, Amazon20years450Post150...
 
-```{r sim_distinct449Amazon20yearPost100, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_distinct449Amazon20yearPost300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","best_Amazon20yearsTot_lhs.rds"))
 
@@ -568,16 +606,17 @@ ini_best  <- best %>% filter( method=="loclinear", forest_dispersal_distance>0 )
 
 # Check
 round(median(ini_best),3) == 0.274
+length(disp_best)==300
 
 # first 100
-disp_best <- disp_best[1:100]
-grow_best <- grow_best[1:100]
-ini_best <- ini_best[1:100]
+disp_best <- disp_best[251:300]
+grow_best <- grow_best[251:300]
+ini_best <- ini_best[251:300]
 
 eval_times <- as.numeric(lapply(1:21, function(x){ymd("2000-12-31") + years(x) - ymd("1980-11-01") }))
 ymd("1980-11-01") + days(eval_times)
 
-nl@experiment <- experiment(expname="Amazon20years450Post100",
+nl@experiment <- experiment(expname="Amazon20years450Post300",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -636,7 +675,7 @@ write_simoutput(nl)
 * We  estimated the fire patch distributions for the posterior of 1st ABC 
 
 
-```{r calc_fit_lhs450cluster21-300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r calc_powlaw_450cluster21-300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 # Read previously saved fitted exponents file
 #
@@ -653,9 +692,7 @@ list.files(outpath,"Amazon20years450Post.*\\.csv")
 
 
 sim <- read_netlogo_simul(file.path(outpath,"Amazon20years450Post50_distinct.csv"),skip=0)
-sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon20years450Post100_distinct.csv"),skip=0))
 sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon20years450Post150_distinct.csv"),skip=0))
-sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon20years450Post200_distinct.csv"),skip=0))
 sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon20years450Post250_distinct.csv"),skip=0))
 sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon20years450Post300_distinct.csv"),skip=0))
 
@@ -677,17 +714,11 @@ saveRDS(pexp, file.path("Simulations", "fittedExponentsAmazon21post.rds"))
 
 * Use ABC to compare cluster size distribution from data 
 
-|type |  n|     expo|    rate|    freq|
-|:----|--:|--------:|-------:|-------:|
-|ln   |  3| -2.00757| 2.36532| 0.13636|
-|pexp | 13|  2.13988| 0.00017| 0.59091|
-|pl   |  6|  2.28752|      NA| 0.27273|
 
 ```{r comp_fit_lhs450cluster21-300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 # Read previously saved fitted exponents file
 pexp <- readRDS( file.path("Simulations", "fittedExponentsAmazon21post.rds"))
-
 
 best_pexp <- pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth,Date,random_seed) %>% fill(range) %>% mutate(delta = AICc - min(AICc), rel_lik=exp(-0.5 * delta),prob_model=round(rel_lik/sum(rel_lik),2)) %>% dplyr::select(-c(date)) %>% filter(delta==0)
 
@@ -699,23 +730,31 @@ knitr::kable(best_pexp %>% group_by(type) %>% summarise(n = n(),expo=median(expo
 
 pl_best_pexp <- best_pexp %>% filter(type == "pl") # %>% mutate(relative_range=range/(350*350))
 
-pl_best_pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth) %>% summarize(iqr=IQR(expo),expo=median(expo)) %>% ggplot( aes(x=forest_dispersal_distance, y=expo)) + 
-    geom_errorbar(aes(ymin=expo-iqr, ymax=expo+iqr), width=.1) +
+plt <- pl_best_pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth) %>% summarize(pimin=PI(expo,prob=0.95)[1],pimax=PI(expo,prob=0.95)[2],expo=median(expo)) 
+
+
+p1 <- plt %>% ggplot( aes(x=forest_dispersal_distance, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax)) +
     geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
                 color = "red", size=1)
 
-pl_best_pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth) %>% summarize(iqr=IQR(expo),expo=median(expo)) %>% ggplot( aes(x=Forest_growth, y=expo)) + 
-    geom_errorbar(aes(ymin=expo-iqr, ymax=expo+iqr), width=.1) +
+p2 <- plt %>% ggplot( aes(x=Forest_growth, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax), width=.1) +
     geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
                 color = "red", size=1)
 
-pl_best_pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth) %>% summarize(iqr=IQR(expo),expo=median(expo)) %>% ggplot( aes(x=Initial_forest_density, y=expo)) + 
-    geom_errorbar(aes(ymin=expo-iqr, ymax=expo+iqr), width=.1) +
+p3 <- plt %>% ggplot( aes(x=Initial_forest_density, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax)) +
     geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
                 color = "red", size=1)
+
+require(ggpubr)
+ggarrange(p1,p2 + theme(axis.text.y=element_blank(),axis.title.y=element_blank()),
+          p3, widths = c(1.1,1))
+ggsave("figure/Amazon_1stABC_post_params.png",width=8,height=6,units="in",dpi=600)
 
 #
-# Initial_forest_density
+# ABC for power law exponent
 #
 require(abc)
 cc <- 2.29
@@ -736,16 +775,31 @@ plot(res2, param=dplyr::select(comp, Initial_forest_density,forest_dispersal_dis
 resgfit <- gfit(target=cc, sumstat=dplyr::select(comp,expo),statistic = median, nb.replicate=1000)
 plot(resgfit)
 summary(resgfit)
+# $pvalue
+# [1] 0.964
+
+# Build Table S7
+#
+require(rethinking)
+tabS7 <- res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+  summarise(across(everything(), PI,prob=0.95)) %>% 
+  mutate(Name= c("2.5 % Perc.","97.5 % Perc.")) %>% select(Name, everything())
+
+tabS7 <- bind_rows(tabS7,
+  res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+    summarise(across(everything(), mean)) %>% 
+    mutate(Name= c("Mean")) %>% select(Name, everything()),
+  res2$adj.values %>% as_tibble() %>% filter(Initial_forest_density>0 & Initial_forest_density<=1 ) %>% 
+    summarise(across(everything(), median)) %>% 
+    mutate(Name= c("Median")) %>% select(Name, everything())
+)
 
 
+knitr::kable(tabS7[c(1,3,4,2),], digits = 4)
 
-best_parm <- res2$adj.values %>% as_tibble() %>% mutate(method="loclinear")
+best_parm <- res2$adj.values %>% as_tibble() %>% mutate(method="loclinear") %>% filter(Initial_forest_density>0)
 best_parm <- bind_rows(best_parm, resabc$unadj.values %>% as_tibble() %>% mutate(method="rejection"))
 best_parm <- best_parm %>% mutate(powexp =  (1 - 2 * forest_dispersal_distance ) / (1 - forest_dispersal_distance ))
-
-
-
-# pl_best_pexp <- pl_best_pexp %>% group_by(forest_dispersal_distance,Forest_growth) %>% summarize(min_expo=min(expo),max_expo=max(expo),expo=median(expo)) %>% mutate(distance = abs(2.29 - expo),theta = 1/(Forest_growth * 0.0000473 / 30 ),  powexp= (1 - 2 * forest_dispersal_distance ) / (1 - forest_dispersal_distance )) %>%  arrange(distance)
 
 saveRDS(best_parm, file.path("Simulations", "bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -760,30 +814,29 @@ meanBf <- round(mean(ignition_prob$bF),7)                 # test the mean value 
 
 rangeBf <- round(range(ignition_prob$bF),7)
 
-knitr::kable( best_parm %>% mutate(mean_theta = 1/(Forest_growth * meanBf / 30 ), max_theta=  1/(Forest_growth * rangeBf[1] / 30 )) %>% group_by(method) %>% summarise(across(where(is.numeric),mean)), digits = 4)
+knitr::kable( best_parm %>% mutate(mean_theta = 1/(Forest_growth * meanBf / 30 ), max_theta=  1/(Forest_growth * rangeBf[1] / 30 ), min_theta=  1/(Forest_growth * rangeBf[2] / 30 )) %>% group_by(method) %>% summarise(across(where(is.numeric),mean)), digits = 4)
 
 
 # |method    | Initial_forest_density| forest_dispersal_distance| Forest_growth| powexp| mean_theta| max_theta|
 # |:---------|----------------------:|-------------------------:|-------------:|------:|----------:|---------:|
-# |loclinear |                 0.6089|                  247.1520|      1775.981| 2.0044|   200.7250|  2968.618|
-# |rejection |                 0.6094|                  247.7523|      1775.618| 2.0044|   200.7001|  2968.249|
-  
-  
+# |loclinear |                 0.2706|                  119.5919|       5835.70| 2.0087|    61.5630|  910.4842|
+# |rejection |                 0.2641|                  119.6898|       5846.39| 2.0087|    61.4486|  908.7926|  
 
 #
 # Plots of Theta with the mean a posteriori Forest_growth = 1776
 #
 ignition_prob <- readRDS("Data/ignition_prob.rds") 
 
-range
-ignition_prob %>% mutate(Date=ymd(date),theta = 1/(1776 * bF / 30 ) ) %>% ggplot( aes(Date,theta ))+ geom_line() + theme_bw() +
-      scale_color_viridis_c(guide=FALSE)  +
+mean_Forest_growth <- best_parm %>% filter(method=="loclinear") %>% summarise(mean_Forest_growth=mean(Forest_growth)) %>% deframe()
+
+ignition_prob %>% mutate(Date=ymd(date),theta = 1/(mean_Forest_growth * bF / 30 ) ) %>% ggplot( aes(Date,theta ))+ geom_line() + theme_bw() +
+      scale_color_viridis_c(guide="none")  +
       ylab("Theta") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
 ggsave("figure/Amazon_Theta_fitted_450.png",width=8,height=6,units="in",dpi=600)
 
 ignition_prob <- read_csv( "Data/EstimatedGam_bF.csv") 
-ignition_prob %>% filter(date >= "2000-01-01") %>% mutate(theta = 1/(1776 * fit / 30 ) ) %>% ggplot( aes(date,theta ))+ geom_line() + theme_bw() +
+ignition_prob %>% filter(date >= "2000-01-01") %>% mutate(theta = 1/(mean_Forest_growth * fit / 30 ) ) %>% ggplot( aes(date,theta ))+ geom_line() + theme_bw() +
       scale_color_viridis_c(guide=FALSE)  +
       ylab("Theta") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) +  scale_x_date(date_breaks = "1 year") 
@@ -793,30 +846,39 @@ ignition_prob %>% filter(date >= "2000-01-01") %>% mutate(theta = 1/(1776 * fit 
 
 * Frequency of distributions with lower AICc 
 
+* Data
+|type |  n|     expo|    rate|    freq|
+|:----|--:|--------:|-------:|-------:|
+|ln   |  3| -2.00757| 2.36532| 0.13636|
+|pexp | 13|  2.13988| 0.00017| 0.59091|
+|pl   |  6|  2.28752|      NA| 0.27273|
+
+* Model
 |type |     n|    expo|  freq|
 |:----|-----:|-------:|-----:|
-|exp  |   419|   0.012| 0.007|
-|ln   |  1251| -68.539| 0.020|
-|pexp | 58558|   1.374| 0.929|
-|pl   |  2772|   2.560| 0.044|
-
+|exp  |  4670|   0.057| 0.074|
+|ln   | 15946| -68.175| 0.254|
+|pexp | 33862|   1.430| 0.540|
+|pl   |  8244|   2.728| 0.131|
 
 
 
 * Mean of a posteriori parameter distribution 
 
-
 |method    | Initial_forest_density| forest_dispersal_distance| Forest_growth| powexp| mean_theta| max_theta|
 |:---------|----------------------:|-------------------------:|-------------:|------:|----------:|---------:|
-|loclinear |                 0.6089|                  247.1520|      1775.981| 2.0044|   200.7250|  2968.618|
-|rejection |                 0.6094|                  247.7523|      1775.618| 2.0044|   200.7001|  2968.249|
+|loclinear |                 0.2706|                  119.5919|       5835.70| 2.0087|    61.5630|  910.4842|
+|rejection |                 0.2641|                  119.6898|       5846.39| 2.0087|    61.4486|  908.7926|  
 
-# Simulations with best parameters a posteriori mean theta 200 max 3000 
+
+
+
+# Simulations with best parameters a posteriori mean theta 61 max 909 
 
 
 * 100 parameters from posterior 
 
-```{r sim_distinct449clusterPostTheta300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r sim_distinct449clusterPostTheta61, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds")) %>% filter(method=="loclinear")
 
@@ -831,7 +893,7 @@ ini_best <- ini_best[1:100]
 eval_times <- as.numeric(lapply(1:21, function(x){ymd("2000-12-31") + years(x) - ymd("1980-11-01") }))
 ymd("1980-11-01") + days(eval_times)
 
-nl@experiment <- experiment(expname="Amazon21years449postTheta300",
+nl@experiment <- experiment(expname="Amazon21years449postTheta61",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -882,9 +944,9 @@ setsim(nl, "simoutput") <- results
 write_simoutput(nl)
 ```
 
-## Calc exponents best fitted with estimatee GAM ignition, wordl_width = 450 -  theta 300
+## Calc exponents best fitted with estimatee GAM ignition, wordl_width = 450 -  theta 61
 
-```{r calcPatchDist450_PostTheta300, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+```{r calcPatchDist450_PostTheta61, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
 list.files(outpath,"Amazon21years449post.*\\.csv")
 
@@ -892,7 +954,7 @@ list.files(outpath,"Amazon21years449post.*\\.csv")
 
 # Read previous simulations for RCP 4.5 and fitted parameters
 #
-sim <- read_netlogo_simul(file.path(outpath,"Amazon21years449postTheta300_distinct.csv"),skip=0)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon21years449postTheta61_distinct.csv"),skip=0)
 # Calculate power law exponents and max/total patch size by year 
 #
 pexp <- tibble()
@@ -907,14 +969,60 @@ p_df <- future_lapply( 1:nrow(sim) , function(i){
 pexp <- bind_rows(pexp,p_df)
 plan(sequential)
 
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostTheta300.rds"))
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostTheta61.rds"))
 ```
 
+## Plot 2nd ABC fitted parameters
 
-# Simulations with the fitted bF GAM for the data period - theta 300
+```{r plotParameters450_PostTheta61, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+require(rethinking)
+# Read previously saved fitted exponents file
+pexp <- readRDS( file.path("Simulations", "simExponentsAmazonPostfittedBF.rds"))
+
+best_pexp <- pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth,Date,random_seed) %>% fill(range) %>% mutate(delta = AICc - min(AICc), rel_lik=exp(-0.5 * delta),prob_model=round(rel_lik/sum(rel_lik),2)) %>% dplyr::select(-c(date)) %>% filter(delta==0)
 
 
-```{r sim_simple449Post_gamBF300, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+# 
+# Best distributions with AIC
+#
+knitr::kable(best_pexp %>% group_by(type) %>% summarise(n = n(),expo=median(expo)) %>%  mutate(freq = n / sum(n)), digits = 3)
+
+pl_best_pexp <- best_pexp %>% filter(type == "pl") # %>% mutate(relative_range=range/(350*350))
+
+plt <- pl_best_pexp %>% group_by(Initial_forest_density,forest_dispersal_distance,Forest_growth) %>% summarize(pimin=PI(expo,prob=0.95)[1],pimax=PI(expo,prob=0.95)[2],expo=median(expo)) 
+
+p1 <-plt %>% ggplot( aes(x=forest_dispersal_distance, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax)) +
+    geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
+                color = "red", size=1) + xlab("Dispersal Distance") + ylab("Fire size power law exponent")
+
+
+p2 <-plt %>% ggplot( aes(x=Forest_growth, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax)) +
+    geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
+                color = "red", size=1) + xlab("Forest growth") + ylab("Fire size power law exponent")
+
+p3 <- plt %>% ggplot( aes(x=Initial_forest_density, y=expo)) + 
+    geom_linerange(aes(ymin=pimin, ymax=pimax)) +
+    geom_point() + geom_hline(yintercept=2.29, linetype="dashed", 
+                color = "red", size=1) + xlab("Initial Density") + ylab("Fire size power law exponent")
+
+require(ggpubr)
+ggarrange(p1,p2 + theme(axis.text.y=element_blank(),axis.title.y=element_blank()),
+          p3, widths = c(1.1,1))
+ggsave("figure/Amazon_2ndABC_post_params.png",width=8,height=6,units="in",dpi=600)
+
+# To add to table 
+#
+pl_best_pexp %>% ungroup() %>% summarize(pimin=PI(expo,prob=0.95)[1],pimax=PI(expo,prob=0.95)[2],Median=median(expo),Mean=mean(expo)) 
+
+
+```
+
+# Simulations with the fitted bF GAM for the data period - theta 61
+
+
+```{r sim_simple449Post_gamBF61, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -1015,7 +1123,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostfittedBF.rds"))
 * wordl_width = 450 
 * RCP 4.5
 
-```{r sim_simple449postRCP45_amazon59, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r sim_simple449postRCP45_amazon59, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 

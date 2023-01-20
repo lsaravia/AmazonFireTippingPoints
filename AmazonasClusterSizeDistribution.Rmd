@@ -415,14 +415,7 @@ knitr::kable(best_patch_dfp %>% group_by(type) %>% summarise(n = n(),expo=median
 #
 # Which years have power law distribution - Criteria min AICc and different from exponential
 #
-knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)) %>% dplyr::select(date,type:range,exp_p_value))
-#
-# Power exponent vs Relative range
-#
-pl <-  patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc), type=="pl") %>% mutate(range=range/total_forest) %>% ggplot(  aes(range,expo, color=factor(date )))+ geom_point() + theme_bw() + xlab("Relative Range") + ylab("Exponent") + 
-      scale_color_viridis_d(guide=FALSE)  + geom_abline(intercept = 2, slope =0,alpha=0.3) 
-
-pl
+knitr::kable(patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc)) %>% dplyr::select(date,type:range,exp_p_value,ln_p_value))
 
 patch_dfp %>% group_by(date) %>% filter(AICc == min(AICc),type=="pl") %>% ungroup() %>% summarize(range(expo),median(expo)) 
 
@@ -589,7 +582,7 @@ ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height
 
 
 
-# Read precipitation and temperature Data
+# Read precipitation and temperature to screen Data
 
 ```{r readFileswithPrecipitationTmaxPatch, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 require(tidyverse)
@@ -647,7 +640,7 @@ ggplotly(p1)
 
 ```
 
-# Using Empirical dynamic modelling (dataframe from previous chunk) with maxtemp y monthly precipitation
+# Total fire size causality Using Empirical dynamic modelling (dataframe from previous chunk) with maxtemp y monthly precipitation (NOT USED IN THE PAPER)
 
 ```{r EDMPatchGrowth, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 require(rEDM)
@@ -826,152 +819,15 @@ for (i in 1:1000) {
 
 ```
 
-# GAM models
 
-```{r gamBFfromPPtmax, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+# Load Deforestation Rates from Hansen 2013 (NOT USED IN THE PAPER)
 
-require(mgcv)
-require(gratia)
-require(ggplot2)
-
-
-pr  %>% ggplot( aes(pr,log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
-pr  %>% ggplot( aes(lag(pr,8),log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide= FALSE)
-pr  %>% ggplot( aes(tmmx,log(max_patch),color=month(date))) + geom_point() + theme_bw() + scale_color_viridis_c(guide=FALSE) 
-
-
-#
-# Linear Model
-#
-lm01 <- lm( log(max_patch) ~ pr*tmmx, data=pr)
-summary(lm01)
-drop1(lm01,test = "F")
-plot(lm01,which=1,add.smooth = FALSE)
-E <- resid(lm01)
-hist(E, xlab = "Residuals", main = "")
-
-pr <- pr %>% mutate( modL = exp(predict(lm01, type="response")))
-p1 <- pr %>% mutate(year=year(date),date=str_sub(date,1,7)) %>% filter(year>2000) %>% ggplot(aes(date,max_patch, color="Data")) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_point(aes(date,modL, color="Prediction"))
-
-ggplotly(p1)
-
-#
-# GAM Model 
-#
-
-gam01 <- gam(log(max_patch) ~ s(pr, bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
-
-draw(gam01,residuals=T) 
-appraise(gam01) 
-summary(gam01)
-
-gam01a <- gam(log(max_patch) ~ s(lag(pr), bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
-
-draw(gam01a,residuals=T) 
-appraise(gam01a) 
-summary(gam01a)
-
-AIC(gam01,gam01a)
-
-gam02 <- gam(log(max_patch) ~ s(tmmx, bs = "tp", k = 12), data=pr,method="REML",
-             family = gaussian)
-gam.check(gam02)
-draw(gam02,residuals=T) 
-appraise(gam02) 
-summary(gam02)
-
-gam03 <- gam(log(max_patch) ~ te(tmmx,pr, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
-draw(gam03,residuals=T) 
-appraise(gam03) 
-summary(gam03)
-gam.check(gam03)
-
-pr$month <- month(pr$date)
-gam03b <- gam(log(max_patch) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
-draw(gam03b,residuals=T) 
-appraise(gam03b) 
-summary(gam03b)
-gam.check(gam03b)
-
-
-# Add lagged pr
-pr$pr1 <- lag(pr$pr)
-
-gam03a <- gam(log(max_patch) ~ te(tmmx,pr1, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
-draw(gam03a,residuals=T) 
-appraise(gam03a) 
-summary(gam03a)
-gam.check(gam03a)
-
-
-AIC(gam01,gam01a,gam02,gam03,gam03a,gam03b)
-
-#
-# Break Data in training 
-#
-pr_train <- subset(pr, year(date)<2019 )
-pr_test  <- subset(pr, year(date)>=2019 ) 
-gam02 <- gam(log(max_patch) ~ te(tmmx,month, bs =c("tp","cs"), k =c(12,12) ), data=pr,method="REML",
-             family = gaussian)
-
-
-
-p1<- predict(gam02,newdata=pr_test, se.fit = TRUE)
-pr_test <- pr_test %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-
-pr_test %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) 
-
-#
-# 
-#
-# kg m-2 s-1 = (kg m-3) x (m/s) So, to go from m/s to mm/day you multiply by 86400x1000 But to take out density (measured in kg m-3) you divide by 1000.
-
-
-gdpp <- read_csv("Data/GDPP_rcp45_Amazon.csv")
-gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=sum(pr) * 86400/24 ) %>% mutate(date=ym(date),pr1=lag(pr))
-
-pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
-gdpp <- left_join(gdpp, pr%>% select(date, max_patch) ) %>% mutate(month=month(date))
-p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
-gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-
-gdpp %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
-
-
-gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 4.5") 
-
-
-#
-# 
-#
-gdpp <- read_csv("Data/GDPP_rcp85_Amazon.csv")
-gdpp <- gdpp %>% mutate(date=strftime(date,"%Y-%m")) %>% group_by(date) %>% summarise(tmmx = mean(tasmax), pr=sum(pr) * 86400/24 ) %>% mutate(date=ym(date),pr1=lag(pr))
-
-pr %>% filter( year(date)==2019) %>% select(date,tmmx,pr) 
-gdpp <- left_join(gdpp, pr%>% select(date, max_patch) ) %>% mutate(month=month(date))
-p1<- predict(gam03b,newdata=gdpp, se.fit = TRUE)
-gdpp <- gdpp %>% mutate(fit=p1$fit,se.fit =p1$se.fit, ucl=exp(fit + (1.96 * se.fit)), lcl = exp(fit - (1.96 * se.fit)), fit=exp(fit)  )
-
-gdpp %>% ggplot(aes(date,max_patch)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) + geom_line(aes( x= date, y= fit )) +  
-  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
-
-gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
-
-
-```
-
-
-# Load Deforestation Rates from Hansen 2013
+* Plots of previoius year % deforestation vs total Fire size
 
 ```{r HansendeforestationVsFireSize, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
+require(ggplot2)
+require(ggrep)
 #
 # Save patch distribution by period
 #
@@ -985,9 +841,9 @@ if(file.exists(patch_size_pfname)) {
 
 hansen_def <- read_csv("Data/ForesLossbyYearAmazon.csv") %>% mutate(percent_deforested=loss/totalForestArea)
 
-p1 <- patch_sizes_p %>% filter(date>2000, date<2022) %>% group_by(date) %>% 
+p1 <- patch_sizes_p %>% filter(date>2000, date<2023) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
-  mutate( label =as.character(date)) %>% inner_join(hansen_def, by=c("date"="year"))
+  mutate( label =as.character(date)) %>% inner_join(hansen_def, by=c("date"="year")) %>% mutate( deforested_prevyear = lag(percent_deforested))
 
 
 p1 %>% ggplot(  aes(percent_deforested,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
@@ -995,6 +851,13 @@ p1 %>% ggplot(  aes(percent_deforested,tot_patch, label=label,color=date ))+ geo
       xlab("Annual deforestation (%)") +  
       ylab("Total fire Size (%)") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel() 
+
+p1 %>% ggplot(  aes(deforested_prevyear,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Previous year annual deforestation (%)") +  
+      ylab("Total fire Size (%)") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel() 
+
 
 coeff <- 1/300
 p1 %>% ggplot(  aes(date,tot_patch, label=label ))+ geom_line(alpha=0.8,color="red") + theme_bw() +
@@ -1011,7 +874,7 @@ p1 %>% ggplot(  aes(date,tot_patch, label=label ))+ geom_line(alpha=0.8,color="r
       sec.axis = sec_axis(~.*coeff, name="Deforestation")
   )
 
-cor(p1[,c("percent_deforested","tot_patch")])
 cor.test(p1$percent_deforested,p1$tot_patch)
+cor.test(p1$deforested_prevyear,p1$tot_patch)
 
 ```

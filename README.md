@@ -5,6 +5,10 @@
 
 * Code and Data for the paper
 
+Saravia, L., Bond-Lamberty, B., & Suweis, S. (2021). Amazon fire regimes under climate change scenarios. EcoEvoRxiv. https://doi.org/10.32942/osf.io/nr23w
+
+
+
 ## R Markdown files description
 
 
@@ -25,13 +29,17 @@
 
 	Exploratory simulations of the DynamicFireForest.nlogo model 
 
+* R/test_ABC.R  
+
+  Validation of the use of  max_total_patch (Anual maximum of monthly fire size) for parameter estimation with ABC
+  
 ## Folders
 
 	| 
 	+--- R: R code by L. Saravia
-    |
-    +--- Source: Google Earth Engine Code to download the MODIS, Climaterra and NEX-GDDP CMIP5 proyections.
-    |
-    +--- Data: Saved R data with simulations, Fire, and Climate. (Attached in Release)
+  |
+  +--- Source: Google Earth Engine Code to download the MODIS, Climaterra and NEX-GDDP CMIP5 proyections.
+  |
+  +--- Data: Saved R data with simulations, Fire, and Climate. (Attached in Release)
 
 
