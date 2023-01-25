@@ -194,7 +194,7 @@ Table: Summary of the first ABC posterior parameter distribution. This uses the 
 Table: Summary of the second ABC posterior parameter distribution. We selected the model parameters with the median power law exponent $\alpha$ of the fire size distribution  closer to the median of the data (2.29). The summary of the power law exponent of fire size patch distribution is showed in the last column.
 
 
-![Predictions of the Forest state of the model vs time using the ignition probability calculated from MODIS burned area product (Simul Data) and the ignition probability from the estimated GAM models (Simul GAM) and two of the best fitted parameter sets with average $\theta = 90$ and $110$ (Table S7)](figure/Amazon_ForestPercent_SimulDataGam.png)
+![Power-law exponents versus parameters after the second ABC compared with the median power-law exponent from MODIS burned area product (red dashed line)](figure/Amazon_2ndABC_post_params.png)
 
 
 \newpage
