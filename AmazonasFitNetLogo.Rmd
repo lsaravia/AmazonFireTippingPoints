@@ -1129,7 +1129,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostfittedBF.rds"))
 * RCP 4.5
 * Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
 
-```{r sim_simple449postRCP45_amazon59_60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_amazon59_60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -1202,6 +1202,7 @@ write_simoutput(nl)
 # Calculate patch distributions from best fitted parameteres forced with RCP 4.5
 
 * Simulations/Amazon59years449PostRcp45_distinct.csv
+* Simulations/Amazon59years449PostRcp45_60_distinct.csv
 
 ```{r calcPatchDistSimRCP45_amazon59, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
 
@@ -1210,8 +1211,8 @@ write_simoutput(nl)
 #
 list.files(outpath,"Amazon59years449PostRcp45.*\\.csv")
 
-list.files(outpath)
-sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449rcp45_distinct.csv"),skip=0)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_distinct.csv"),skip=0)
+sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_60_distinct.csv"),skip=0))
 
 # Calculate power law exponents and max/total patch size by year 
 #
@@ -1227,7 +1228,7 @@ p_df <- future_lapply( 1:nrow(sim) , function(i){
 pexp <- bind_rows(p_df)
 plan(sequential)
 
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59y.rds"))
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59post.rds"))
 ```
 
 
@@ -1235,20 +1236,26 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59y.rds"))
 
 * wordl_width = 450 
 * RCP 8.5
-*  19.91|       7003.88
 
 
-```{r sim_simple449clusterRCP85_59y, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r sim_simple449clusterRCP85_59post60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
+
+best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
+
+disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
+grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
+ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
+disp_best <- disp_best[41:100]
+grow_best <- grow_best[41:100]
+ini_best <- ini_best[41:100]
 
 #  from 2001 to 2060
 # 
 eval_times <- as.numeric(lapply(0:58, function(x){ymd("2001-12-31") + years(x) - ymd("1980-11-01") }))
 ymd("1980-11-01") + days(eval_times)
 
-# eval_times <- as.numeric(lapply(0:39, function(x){ymd("2020-12-31") + years(x) - ymd("1980-11-01") }))
-# ymd("1980-11-01") + days(eval_times)
 
-nl@experiment <- experiment(expname="Amazon39years449rcp85_59y",
+nl@experiment <- experiment(expname="Amazon59years449PostRcp85_60",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -1258,39 +1265,38 @@ nl@experiment <- experiment(expname="Amazon39years449rcp85_59y",
                             runtime=0,
                             evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
                             metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365","median-fire-interval" ),
-                            # variables = list("forest-dispersal-distance" = list(values=c(1.61,1.97,1.74)),
-                            #                  "Forest-growth" = list(values=c(1419,1778,1361))),
+                            variables = list("forest-dispersal-distance" = list(values=disp_best),
+                                             "Forest-growth" = list(values=grow_best),
+                                             "Initial-forest-density" = list(values=ini_best)
+                                            ),
                             constants = list("world-width" = 449,
                                              "world-height" = 449,
                                                "fire-prob-filename"="\"Data/Predicted_bF_rcp85.csv\"",
                                                "Save-view" =  "false",
                                                "video" = "false",
-                                               "end-simulation"= 14641,
-                                               "Initial-forest-density" = 0.3,
+                                               "end-simulation"= 28918,
                                                "Periodicity" = "false",
                                                "Fire-probability" = 1E-6,
-                                               "forest-dispersal-distance" = 19.91,
-                                               "Forest-growth" = 7003.88,
                                                "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
-                                               "use-fire-prob-se" = "true"
+                                               "use-fire-prob-se" = "false"
                                              ))
 
 
 #
 # Run 10 times this do not set the run variable for output 
 #
-nl@simdesign <- simdesign_simple(nl=nl,
-                               nseeds=100)
-# 
-# nl@simdesign <- simdesign_distinct(nl=nl,
-#                                nseeds=50)
+nl@simdesign <- simdesign_distinct(nl=nl,
+                               nseeds=10)
 
 # run in Paralell 
 #
+# Total number of jobs = nseeds * split = 10*4 
+# Each job runs parameter input matrix / split
+nrow(nl@simdesign@siminput) / 4 
+
 plan(multisession)
 tic()
-results <- run_nl_all(nl)
-#results <- run_nl_all(nl,split = 4)
+results <- run_nl_all(nl,4)
 toc()
 plan(sequential)
 names(results)
@@ -1307,13 +1313,16 @@ write_simoutput(nl)
 
 # Calculate patch distributions from best fitted parameteres forced with RCP 8.5
 
-```{r calcPatchDistSimRCP85nose, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=FALSE}
+```{r calcPatchDistSimRCP85post, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
 
 
-# Read previous simulations for RCP 4.5 and fitted parameters
+# Read previous simulations for RCP 8.5 and fitted parameters
 #
-list.files(outpath)
-sim <- read_netlogo_simul(file.path(outpath,"Amazon39years449rcp85_59y_simple.csv"),skip=0)
+list.files(outpath,"Amazon59years449PostRcp85.*\\.csv")
+
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp85_distinct.csv"),skip=0)
+sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp85_60_distinct.csv"),skip=0))
+
 # Calculate power law exponents and max/total patch size by year 
 #
 pexp <- tibble()
@@ -1328,7 +1337,7 @@ p_df <- future_lapply( 1:nrow(sim) , function(i){
 pexp <- bind_rows(p_df)
 plan(sequential)
 
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59y.rds"))
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59post.rds"))
 ```
 
 # Compare with data with simulations period 2000-2020
@@ -1385,18 +1394,18 @@ require(latex2exp)
 require(viridis)
 cols =viridis_pal()(3)
 
-p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM")) %>% ggplot(aes(decade,max_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2) + scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
-#   scale_x_discrete(labels=c("Data", TeX("Simul Data $\\theta=110$"),TeX("Simul Data $\\theta=90$"), TeX("Simul GAM $\\theta=110$"),TeX("Simul GAM $\\theta=90$")))
+p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,max_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2) + scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
+#   scale_x_discrete(labels=c("Data", TeX("Simul Data $\\theta=110$"),TeX("Simul Data $\\theta=90$"), TeX("Simul GAM $\\theta=110$"),TeX"Simul GAM $\\theta=90$")))
 p1 
 #ggsave("figure/Amazon_Max_Size_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% ggplot(aes(decade,tot_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Total Fire Size %")  +  stat_summary(fun.y=median, geom="point", size=2) +
+p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",year>2000) %>% ggplot(aes(decade,tot_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Total Fire Size %")  +  stat_summary(fun.y=median, geom="point", size=2) +
   scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM","rejection"))
 
 p2
 #ggsave("figure/Amazon_Tot_Size_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM")) %>% ggplot(aes(decade,num_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Number of Fires %")  +  stat_summary(fun.y=median, geom="point", size=2) +
+p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,num_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Number of Fires %")  +  stat_summary(fun.y=median, geom="point", size=2) +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 #   scale_x_discrete(labels=c("Data", "Simul Data", TeX("Simul GAM $\\theta=90$"),TeX("Simul GAM $\\theta=110$")))
@@ -1404,7 +1413,7 @@ p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c
 p3
 #ggsave("figure/Amazon_Num_Fires_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM")) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data 90","Simul GAM 90"))) %>%  ggplot( aes(decade,expo,fill=decade)) + geom_violin() + scale_fill_manual(values=cols,guide=FALSE) +   ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2) + xlab("") +
+p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data 90","Simul GAM 90"))) %>%  ggplot( aes(decade,expo,fill=decade)) + geom_violin() + scale_fill_manual(values=cols,guide=FALSE) +   ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2) + xlab("") +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 p4
@@ -1426,30 +1435,44 @@ save_plot("figure/Amazon_ModelVsData_SimulGAM.png",prow,base_width=8,base_height
 #
 # Jitter plots ----> You have an idea of the number of points we are using
 #
-p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM")) %>% ggplot(aes(decade,max_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
+p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,max_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d(guide="none") +  ylab("Max Fire Size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
   scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 #   scale_x_discrete(labels=c("Data", TeX("Simul Data $\\theta=110$"),TeX("Simul Data $\\theta=90$"), TeX("Simul GAM $\\theta=110$"),TeX("Simul GAM $\\theta=90$")))
-
-p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",year>2000 ) %>% ggplot(aes(year,tot_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("") 
 p1
 
-p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM")) %>% ggplot(aes(decade,tot_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d(guide=FALSE) + xlab("") + ylab("Total Fire Size %")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
+# p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",year>2000 ) %>% ggplot(aes(decade,tot_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("") 
+# p1
+
+p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,tot_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d(guide="none") + xlab("") + ylab("Total Fire Size %")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
   scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 p2
 
-p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM")) %>% ggplot(aes(decade,num_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d(guide=FALSE) + xlab("") + ylab("Number of Fires %")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
+p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,num_patch,color=decade)) + geom_jitter(alpha=0.5) + scale_fill_viridis_d(guide="none") +    scale_color_viridis_d(guide="none") + xlab("") + ylab("Number of Fires %")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 #   scale_x_discrete(labels=c("Data", "Simul Data", TeX("Simul GAM $\\theta=90$"),TeX("Simul GAM $\\theta=110$")))
 
 p3
 
-cols =viridis_pal()(3)
+#cols =viridis_pal()(3)
 
-p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM")) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data","Simul GAM"))) %>%  ggplot( aes(decade,expo,color=decade)) + geom_jitter(alpha=0.5) + scale_color_manual(values=cols,guide=FALSE) +   ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") + xlab("") +
+p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data","Simul GAM"))) %>%  ggplot( aes(decade,expo,color=decade)) + geom_jitter(alpha=0.5) + scale_color_manual(values=cols,guide="none") +   ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2,color="black") + xlab("") +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 p4
+
+require(cowplot)
+prow <- plot_grid(
+  p2+ theme(axis.text.x=element_blank(),axis.title.x=element_blank()),
+  p1 + theme(axis.text.x=element_blank(),axis.title.x=element_blank()) , 
+  p3 ,
+  p4 ,
+  align = 'vh',
+  nrow= 2
+  )
+prow
+
+save_plot("figure/Amazon_ModelVsData_SimulGAM_jitter.png",prow,base_width=8,base_height=6,dpi=600)
 
 
 #
@@ -1725,21 +1748,16 @@ patch_sizes_p <- patch_sizes_p %>% group_by(date) %>% summarise(max_patch=max(si
 #
 # Read simulations based on GAM
 #
-pexp <- readRDS(file.path("Simulations", "simExponentsAmazonfittedBF.rds")) %>%   filter(world_width==449) %>% mutate(decade="2001-2020",tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450), year= year(Date),theta=90,RCP="4.5")
+pexp <- readRDS(file.path("Simulations", "simExponentsAmazonfittedBF.rds")) %>%   filter(world_width==449) %>% mutate(decade="2001-2020",tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450), year= year(Date),theta=61,RCP="4.5")
 
-pexp <- pexp %>% bind_rows(readRDS(file.path("Simulations", "simExponentsAmazonfittedBFtheta110.rds")) %>%   filter(world_width==449) %>% mutate(decade="2001-2020",tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450), year= year(Date),theta=110,RCP="4.5"))
+# pexp <- pexp %>% bind_rows(readRDS(file.path("Simulations", "simExponentsAmazonfittedBFtheta110.rds")) %>%   filter(world_width==449) %>% mutate(decade="2001-2020",tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450), year= year(Date),theta=110,RCP="4.5"))
 
 #
 # Read Simulations based on RCP 8.5
 # 
-pexp <- bind_rows(pexp,readRDS(file.path("Simulations", "simExponentsAmazonRCP85.rds")) %>% filter(world_width==449) %>% 
+pexp <- bind_rows(pexp,readRDS(file.path("Simulations", "simExponentsAmazonRCP85_59post.rds")) %>% filter(world_width==449) %>% 
                     mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),,num_patch=num_patch/(450*450),
-                    year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=90,RCP="8.5"))
-
-pexp <- bind_rows(pexp,readRDS(file.path("Simulations", "simExponentsAmazonRCP85theta110.rds"))  %>%  filter(world_width==449) %>%
-                    mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450),
-                    year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=110,RCP="8.5"))
-
+                    year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=61,RCP="8.5"))
 
 pexp %>% count(decade,theta)
 #
@@ -1749,13 +1767,9 @@ pexp %>% count(decade,theta)
 # -----------------------> alternative set of simulations simExponentsAmazonRCP45_59y.rds
 #                                                         simExponentsAmazonRCP45theta110_59y.rds
 #
-pexp1 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45.rds")) %>% filter(world_width==449) %>% 
+pexp1 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59post.rds")) %>% filter(world_width==449) %>% 
                      mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),,num_patch=num_patch/(450*450),
-                    year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=90)
-
-pexp1 <- bind_rows(pexp1,readRDS(file.path("Simulations", "simExponentsAmazonRCP45theta110.rds"))  %>%  filter(world_width==449) %>%
-  mutate(tot_patch= tot_patch/(450*450),max_patch=max_patch/(450*450),num_patch=num_patch/(450*450),year=year(Date),
-         decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=110))
+                    year=year(Date),decade=trunc((year - 2000 )/10)*10+2000,decade=paste0(decade , "-", decade+9),decade=factor(decade),theta=61)
 
 pexp1 %>% count(decade,theta)
 
@@ -1768,7 +1782,7 @@ pexp %>% count(decade,theta,RCP)
 
 # Add Data
 #
-pexp <- pexp %>% bind_rows(patch_sizes_p %>% mutate(theta=90,RCP="4.5")) %>%  mutate(tot_patch= 100 * tot_patch, max_patch= max_patch*100, num_patch=100* num_patch)## Make %
+pexp <- pexp %>% bind_rows(patch_sizes_p %>% mutate(theta=61,RCP="4.5")) %>%  mutate(tot_patch= 100 * tot_patch, max_patch= max_patch*100, num_patch=100* num_patch)## Make %
 pexp %>% count(decade,theta)
 
 #
@@ -1785,7 +1799,7 @@ pexp %>% mutate(theta=factor(theta)) %>% group_by(random_seed,Date) %>% filter( 
 ggsave("figure/Amazon_ForestPercent_theta90-110_RCP45-85.png",width=8,height=6,units="in",dpi=600)
 
 #
-# Predictions from 2020 -------------------------> Make simulations again sampling from 2021!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Predictions from 2020 
 #
 pdata <- patch_sizes_p %>% mutate(theta=90,RCP="4.5") %>%  mutate(tot_patch= 100 * tot_patch, max_patch= max_patch*100, num_patch=100* num_patch)
 pdata <- pdata %>% bind_rows(patch_sizes_p %>% mutate(theta=90,RCP="8.5") %>%  mutate(tot_patch= 100 * tot_patch, max_patch= max_patch*100, num_patch=100* num_patch))
@@ -1801,7 +1815,7 @@ p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("D
       xlab("Max Fire size (%)") +  
       ylab("Total Size (%)") +  
       theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_grid( RCP ~ decade) +  theme(legend.justification=c(1,0), legend.position=c(.1,0.03))
-ggsave("figure/Amazon_TotSizeVsMax_year_theta90-110_RCP45-85.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45-85.png",width=8,height=6,units="in",dpi=600)
 
 #
 # Power Law exponent
