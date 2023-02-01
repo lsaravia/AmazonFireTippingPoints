@@ -777,6 +777,9 @@ gdpp_exp %>% slice_tail()
 gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
 write_csv(gdpp_exp %>% mutate(across(fit:lcl, as.numeric)) , "Data/Predicted_bF_rcp45.csv")
 
+gdpp_exp %>% ggplot(aes(date,fit)) + geom_line() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) +   ylab("𝑓") + 
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 4.5") 
+ggsave("figure/Amazon_bF_RCP4.5_Complete.png",width=8,height=6,units="in",dpi=600)
 
 
 
@@ -815,6 +818,9 @@ gdpp_exp %>% slice_tail()
 gdpp_exp <- gdpp_exp %>% add_row(date= gdpp_exp$date[nrow(gdpp_exp)] + months(1), fit= gdpp_exp$fit[nrow(gdpp_exp)],se.fit= gdpp_exp$se.fit[nrow(gdpp_exp)])
 write_csv(gdpp_exp %>% mutate(across(fit:lcl, as.numeric)), "Data/Predicted_bF_rcp85.csv")
 
+gdpp_exp %>% ggplot(aes(date,fit)) + geom_line() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) +   ylab("𝑓") + 
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
+ggsave("figure/Amazon_bF_RCP8.5_Complete.png",width=8,height=6,units="in",dpi=600)
 
 
 ```

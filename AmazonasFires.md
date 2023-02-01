@@ -129,7 +129,6 @@ When observing the predictions without temporal structure (Figure 3), the model 
 
 ![Predictions of the fire model compared with observed data for the years 2001-2020. We used best-fit parameters, the ignition probability from MODIS, and the ignition probability from the estimated GAM models (Simul GAM), and run 100 simulations of the model. To make them comparable we divided all the outputs (except power law exponent) by the total number of pixels in the region/model; black points are the medians.](figure/Amazon_ModelVsData_SimulGAM.png)
 
-![Time series of predictions of the fire model compared with observed ata for the years 2001-2020. We used best-fit parameters, the ignition probability from MODIS (Simul Data), and the ignition probability from the estimated GAM models (Simul GAM), and run 100 simulations of the model. The lines are the actual data or medians of simulations with 95% confidence interval bands. All the outputs are relative to the total area.](figure/Amazon_ModelVsData_SimulGAM_year.png)
 
 <!-- ADDED FIGURE 4 -->
 
@@ -137,7 +136,10 @@ When observing the predictions without temporal structure (Figure 3), the model 
 
 We observed that the $\theta$ for the best fitted parameter was in the lowest range if we consider the set of ten best fitted parameters (Table S7), so we decided to add simulations with other parameters from the set, but with the highest values of $\theta$. Then we performed the simulations with the first row ($\theta \sim 90$) and the sixth row ($\theta \sim 110$) of the parameters in table S7. The simulations by decade gave results that are similar between the two RCPs (Figure 5). The simulations with $\theta \sim 110$ resulted in higher values of total fire and maximum fire, a difference that was more accentuated after the 2040s. The range of the predictions was, in all cases, lower than the range of the observed data.
 
-![Total annual size of fires vs maximum fire size % relative to the area of the region. The data column was estimated using the MODIS burned area product. The predictions by decade were estimated with a fitted model using a monthly ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. For the years 2001-2020 the ignition probability was estimated from actual data. We show two of the best fitted fire models with the minimum and maximum $\theta$ parameter.](figure/Amazon_TotSizeVsMax_year_theta90-110_RCP45-85.png)
+![Time series of predictions of the fire model compared with observed data for the years 2001-2060. We used best-fit parameters distribution, the ignition probability from the estimated GAM models based on actual data up to 2021 and based on RCP 4.5, 8.5 afterwards. The points are the actual data, the line the median of simulations with 95% confidence interval bands. All the outputs are relative to the total area.](figure/Amazon_TotSize_year_theta61_RCP45-85.png)
+
+
+![Total annual size of fires vs maximum fire size % relative to the area of the region. The data column was estimated using the MODIS burned area product. The predictions by decade were estimated with a fitted model using a monthly ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. For the years 2001-2020 the ignition probability was estimated from actual data. We show two of the best fitted fire models with the minimum and maximum $\theta$ parameter.](figure/Amazon_TotSizeVsMax_year_theta61_RCP45-85.png)
 
 
 ## Discussion 
