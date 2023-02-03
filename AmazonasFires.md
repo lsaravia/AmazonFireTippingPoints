@@ -189,7 +189,7 @@ Several studies have suggested that a deforestation of 20% to 40% of the Amazon 
 
 ## Acknowledgements
 
-We are grateful to the National University of General Sarmiento for financial support (Project 30/1139).  
+We are grateful to the National University of General Sarmiento for financial support (Project 30/1139) and to the Agencia Nacional de Promoción Científica y Tecnológica (PICT 2020-SERIEA-02628).  
 
 ## Authors’ contributions
 
