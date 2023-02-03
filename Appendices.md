@@ -10,27 +10,27 @@
 
 | date  | type  | 1st par.   | 2nd par.   | $x_{min}$ | AICc       | range  | Vuong p-value |
 | ----: | :---- | ---------: | ---------: | ----:     | ---------: | -----: | -----------:  |
-| 2001  | ln    | -1.236398  | 2.1531997  | 54        | 6950.870   | 4916   | 0.0029987     |
-| 2002  | pexp  | 2.217215   | 0.0002646  | 90        | 8629.256   | 7128   | 0.0000675     |
-| 2003  | pexp  | 2.169919   | 0.0005622  | 44        | 14556.177  | 4625   | 0.0000009     |
-| 2004  | pexp  | 2.142637   | 0.0001151  | 66        | 13023.416  | 11254  | 0.0000000     |
-| 2005  | ln    | -9.180169  | 3.5026064  | 70        | 13842.223  | 13234  | 0.0000000     |
-| 2006  | pexp  | 2.041499   | 0.0002795  | 29        | 19285.119  | 3826   | 0.0000000     |
+| 2001  | ln    | -1.236398  | 2.1531997  | 54        | 6950.870   | 4916   | NA            |
+| 2002  | pexp  | 2.217215   | 0.0002646  | 90        | 8629.256   | 7128   | NA            |
+| 2003  | pexp  | 2.169919   | 0.0005622  | 44        | 14556.177  | 4625   | NA            |
+| 2004  | pexp  | 2.142637   | 0.0001151  | 66        | 13023.416  | 11254  | NA            |
+| 2005  | ln    | -9.180169  | 3.5026064  | 70        | 13842.223  | 13234  | NA            |
+| 2006  | pexp  | 2.041499   | 0.0002795  | 29        | 19285.119  | 3826   | NA            |
 | 2007  | pl    | 2.176596   | NA         | 54        | 15042.315  | 47132  | 0.0002225     |
-| 2008  | pexp  | 2.139883   | 0.0002042  | 48        | 10688.426  | 6508   | 0.0000000     |
+| 2008  | pexp  | 2.139883   | 0.0002042  | 48        | 10688.426  | 6508   | NA            |
 | 2009  | pl    | 2.400407   | NA         | 45        | 8154.537   | 3117   | 0.0000001     |
 | 2010  | pl    | 1.997016   | NA         | 41        | 19977.859  | 75967  | 0.0011222     |
-| 2011  | pexp  | 1.954160   | 0.0001630  | 27        | 14112.897  | 10626  | 0.0000000     |
-| 2012  | pexp  | 1.981832   | 0.0003285  | 25        | 17126.664  | 3515   | 0.0000000     |
+| 2011  | pexp  | 1.954160   | 0.0001630  | 27        | 14112.897  | 10626  | NA            |
+| 2012  | pexp  | 1.981832   | 0.0003285  | 25        | 17126.664  | 3515   | NA            |
 | 2013  | pl    | 2.323158   | NA         | 49        | 6013.017   | 5440   | 0.0001411     |
-| 2014  | ln    | -2.007573  | 2.3653178  | 30        | 12775.172  | 7516   | 0.0000675     |
-| 2015  | pexp  | 2.262959   | 0.0001455  | 74        | 7857.954   | 5306   | 0.0000031     |
-| 2016  | pexp  | 2.111907   | 0.0001705  | 59        | 10315.595  | 5032   | 0.0000000     |
-| 2017  | pexp  | 2.035952   | 0.0000956  | 36        | 17060.737  | 10852  | 0.0000000     |
+| 2014  | ln    | -2.007573  | 2.3653178  | 30        | 12775.172  | 7516   | NA            |
+| 2015  | pexp  | 2.262959   | 0.0001455  | 74        | 7857.954   | 5306   | NA            |
+| 2016  | pexp  | 2.111907   | 0.0001705  | 59        | 10315.595  | 5032   | NA            |
+| 2017  | pexp  | 2.035952   | 0.0000956  | 36        | 17060.737  | 10852  | NA            |
 | 2018  | pl    | 2.459423   | NA         | 60        | 5837.460   | 3596   | 0.0000069     |
-| 2019  | pexp  | 2.155401   | 0.0000982  | 56        | 11285.548  | 6798   | 0.0000000     |
+| 2019  | pexp  | 2.155401   | 0.0000982  | 56        | 11285.548  | 6798   | NA            |
 | 2020  | pl    | 2.251879   | NA         | 86        | 8554.237   | 17718  | 0.0000654     |
-| 2021  | pexp  | 2.179439   | 0.0001369  | 63        | 7183.948   | 7311   | 0.0000021     |
+| 2021  | pexp  | 2.179439   | 0.0001369  | 63        | 7183.948   | 7311   | NA            |
 
 Table: Best fitted fire size distribution according to the minimum AICc; where ln=lognormal, pexp=power law with exponential cut-off, pl=power-law, and exp=exponential; 1st par is the first parameter of the distribution (the exponent for power-law) and 2nd par the second parameter; $x_{min}$ is the minimum cluster size estimated for the power-law distribution (in number of pixels); range is the max cluster size minus $x_{min}$. The power-law distributions are also compared with the exponential distribution using the Vuong's test. 	
 
@@ -45,22 +45,22 @@ Table: Best fitted fire size distribution according to the minimum AICc; where l
 ## Generalized Additive Models of ignition probability 
 
 
-| Model    | df         | AIC       | deltaAIC    | Mean MAE  | Mean RMSE |
-| :------- | ---------: | --------: | ----------: | --------: | --------: |
-| Gaussian |            |           |             |           |           |
-|          |            |           |             |           |           |
-| nor03b   | 17.901944  | 379.5824  | 0.000000    | 3.14e-05  | 5.15e-05  |
-| nor03e   | 16.977377  | 386.8289  | 7.246554    | 3.20e-05  | 5.24e-05  |
-| nor03a   | 9.609532   | 440.4861  | 60.903732   | 3.62e-05  | 5.89e-05  |
-|          |            |           |             |           |           |
-| Gamma    |            |           |             |           |           |
-|          |            |           |             |           |           |
-| gam03b   | 18.174422  | -4602.520 | 0.00000     | 3.46e-05  | 5.61e-05  |
-| gam03e   | 17.951004  | -4577.101 | 25.41951    | 3.63e-05  | 5.84e-05  |
-| gam03a   | 13.878660  | -4498.440 | 104.08041   | 4.13e-05  | 6.58e-05  |
-|          |            |           |             |           |           |
+| Model                   | df         | AIC       | deltaAIC    | Mean MAE  | Mean RMSE |
+| :-------                | ---------: | --------: | ----------: | --------: | --------: |
+| Gaussian                |            |           |             |           |           |
+|                         |            |           |             |           |           |
+| $T^{max}_m * m$         | 17.901944  | 379.5824  | 0.000000    | 3.14e-05  | 5.15e-05  |
+| $T^{max}_{m-1} * m$     | 16.977377  | 386.8289  | 7.246554    | 3.20e-05  | 5.24e-05  |
+| $T^{max}_m * ppt_{m-1}$ | 9.609532   | 440.4861  | 60.903732   | 3.62e-05  | 5.89e-05  |
+|                         |            |           |             |           |           |
+| Gamma                   |            |           |             |           |           |
+|                         |            |           |             |           |           |
+| $T^{max}_m * m$         | 18.174422  | -4602.520 | 0.00000     | 3.46e-05  | 5.61e-05  |
+| $T^{max}_{m-1} * m$     | 17.951004  | -4577.101 | 25.41951    | 3.63e-05  | 5.84e-05  |
+| $T^{max}_m * ppt_{m-1}$ | 13.878660  | -4498.440 | 104.08041   | 4.13e-05  | 6.58e-05  |
+|                         |            |           |             |           |           |
 
-Table: Generalized additive models (GAMs) terms and comparison using the Akaike criterion, and the mean absolute error (MAE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T^{max}_{m}$ is the maximum temperature for the actual month, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month. Then the models ending in the letter 'a' are the interaction of $T^{max}_m * ppt_{m-1}$, models ending  in 'b' $T^{max}_m * m$ and models ending in 'e' are $T^{max}_{m-1} * m$. To see the rest of the models with higher AIC please check the source code 'AmazonasModelFireParameters.Rmd'
+Table: Generalized additive models (GAMs) using a Gaussian and Gamma distributions. Terms and comparisons using the Akaike criterion, and the mean absolute error (MAE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T^{max}_{m}$ is the maximum temperature for the actual month, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month. To see the complete set of tried models please check the source code 'AmazonasModelFireParameters.Rmd'
 
 ![Model check for the best GAM model of ignition probability $bF \sim T^{max}_m * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
 
@@ -69,9 +69,9 @@ Table: Generalized additive models (GAMs) terms and comparison using the Akaike 
 
 ![Predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
 
-![Predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5.png)
+![Complete time series predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Complete.png)
 
-![Predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5.png)
+![Complete time series predictions  of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Complete.png)
 
 <!-- Names of the CMIP5 models:  'ACCESS1-0', 'bcc-csm1-1', 'BNU-ESM', 'CanESM2', 'CCSM4', 'CESM1-BGC', 'CNRM-CM5', 'CSIRO-Mk3-6-0', 'GFDL-CM3', 'GFDL-ESM2G', 'GFDL-ESM2M', 'inmcm4', 'IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'MIROC-ESM', 'MIROC-ESM-CHEM', 'MIROC5', 'MPI-ESM-LR', 'MPI-ESM-MR', 'MRI-CGCM3', 'NorESM1-M'. -->
 
@@ -138,6 +138,7 @@ Table: We ran an in-silico experiment using a factorial combination of dispersal
 
 Table: Fire cluster size distributions of the fire model with different parameters, and with or without seasonality.  The best fitted fire size distribution was selecting according to the minimum AICc; where ln=lognormal, pexp=power-law with exponential cut-off, pl=power-law, and exp=exponential; *n* is the number of cases and *freq* is the frequency of a particular distribution for the combination of parameters ; *range* is the max cluster size minus $x_{min}$ (in number of pixels).
 
+\newpage
 
 | Dispersal distance         | Seasonality | $\theta$ | n    | iqr   | range    | exponent | freq  |
 | -------------------------: | :--------   | -----:   | ---: | ----: | -------: | ----:    | ----: |
@@ -202,16 +203,16 @@ Table: Summary of the second ABC posterior parameter distribution. We selected t
 ### Fire model predictions
 
 
-![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Max_Size_theta90-110_RCP4.5-8.5.png)
+![Maximum annual fire size predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and the best fitted parameter set. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Max_Size_theta61_RCP45-85.png)
 
-![Total annual fire extension predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_Tot_Size_theta90-110_RCP4.5-8.5.png)
+![Total annual fire extension predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and the best fitted parameter set. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_Tot_Size_theta61_RCP45-85.png)
 
-![Number of fires predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Num_Fires_theta90-110_RCP4.5-8.5.png)
+![Number of fires predictions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and the best fitted parameter set. For the years 2001-2020 the ignition probability was estimated from actual data. ](figure/Amazon_Num_Fires_theta61_RCP45-85.png)
 
-![Power law exponent of the annual fire size distributions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and two of the best fitted parameter sets with average $\theta = 90$ and $110$. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_PatchExponent_theta90-110_RCP4.5-8.5.png)
+![Power law exponent of the annual fire size distributions of the model compared with data. We used to simulate the model the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5, and the best fitted parameter set. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_PatchExponent_theta61_RCP45-85.png)
 
 
-![Predictions of the Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show tow of the best fitted fire models with the minimum and maximum $\theta = 90$ and $110$.](figure/Amazon_ForestPercent_theta90-110_RCP45-85.png)
+![Flammable Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show the median and the 95% percentile based on the fitted parameter distribution.](figure/Amazon_ForestPercent_theta61_RCP45-85.png)
 
 
 
