@@ -2,7 +2,7 @@
 
 Leonardo A. Saravia ^1^ ^4^, Ben Bond-Lamberty ^2^, Samir Suweis ^3^
 
-1. Instituto de Ciencias, Universidad Nacional de General Sarmiento, J.M. Gutierrez 1159 (1613), Los Polvorines, Buenos Aires, Argentina.
+1. Centro Austral de Investigaciones Científicas (CADIC-CONICET), Ushuaia, Argentina.
 
 2. Pacific Northwest National Laboratory, Joint Global Change Research Institute, 5825 University Research Court #3500, College Park, MD 20740, USA 
 
@@ -36,7 +36,7 @@ The objective of this work is to model and predict the changes in fire regimes o
 
 ## Methods 
 
-Our region of study is the Amazon Basin (Figure S1). This includes Brasil, which represents 60% of the area, as well as eight other countries (Bolivia, Colombia, Ecuador, Guyana, Peru, Suriname, Venezuela, and French Guiana). We chose this region because a significant amount of fires extend to tropical moist forest outside Brasil [@Cardil2020], and the whole area is thought to be a crucial tipping element of the Earth-system [@Lenton2013;@Staver2011]. 
+Our region of study is the Amazon Basin (Figure S1). This includes Brazil, which represents 60% of the area, as well as eight other countries (Bolivia, Colombia, Ecuador, Guyana, Peru, Suriname, Venezuela, and French Guiana). We chose this region because a significant amount of fires extend to tropical moist forest outside Brazil [@Cardil2020], and the whole area is thought to be a crucial tipping element of the Earth-system [@Lenton2013;@Staver2011]. 
 
 ### Fire data and parameters
 
@@ -187,7 +187,7 @@ Several studies have suggested that a deforestation of 20% to 40% of the Amazon 
 
 ## Acknowledgements
 
-We are grateful to the National University of General Sarmiento for financial support (Project 30/1139) and to the Agencia Nacional de Promoción Científica y Tecnológica (PICT 2020-SERIEA-02628).  
+LAS is grateful to the Universidad Nacional de General Sarmiento for financial support (Project 30/1139), to the Agencia Nacional de Promoción Científica y Tecnológica (PICT 2020-SERIEA-02628) and Santiago R. Doyle for getting the computational resources used in this work.  
 
 ## Authors’ contributions
 
@@ -195,7 +195,7 @@ LAS, BBL, and SS conceived the ideas and designed methodology; LAS collected the
 
 ## Data Availability Statement
 
-The source code and data is available at zenodo <https://doi.org/10.5281/zenodo.5703638> and Github <https://github.com/lsaravia/AmazonFireTippingPoints>.  Remote sensing MODIS data and climate data are available directly from NASA and Google Earth Engine. 
+The source code and data are available at zenodo <https://doi.org/10.5281/zenodo.5703638> and Github <https://github.com/lsaravia/AmazonFireTippingPoints>.  Remote sensing MODIS data and climate data are available directly from NASA and Google Earth Engine. 
 
 
 ## References

@@ -13,6 +13,26 @@ Suggested referees:
 - Salvador Pueyo, spueyo@riseup.net
 
 
+--- 
+Last Suggested reviewers 
+
+Reason: Expert in ecological modeling worked with the original developer of the forest-fire model.
+Korina Allhoff
+Korinna.Allhoff@uni-tuebingen.de
+University of Hohenheim
+
+Reason: Works on Forest transitions and Amazonas
+Marina Hirota
+marinahirota@gmail.com
+Federal University of Santa Catarina
+
+Reason: He works in Theoretical Ecology Spatial models and Complex Systems.
+Javier Gamarra
+jgg@aber.ac.uk
+
+
+---
+
 From Hansen
 
 Forest Area (30%Cover) / Total Area, year 2000 = 0.010260215678575
@@ -31,7 +51,14 @@ Global tipping points in forest wildfires
 
 Saravia L. A.,  Ben Bond-Lamberty, Samir Suweis, Solé R. 
 
-Fire is one of the most important disturbances of the earth-system, shaping the biodiversity of ecosystems and particularly forests. Anthropogenic drivers such as climatic change and other human activities could produce potentially abrupt changes in fire regimes, potentially triggering more profound transformations like the transition from forests to savannah, grasslands or desert ecosystems. Large biodiversity loss could be produced if these transitions occur. Two of the more important factors influencing fires are temperature and precipitation, and climatic change could cause conditions that enhance fire ignition and spread, which in turn will produce more extensive, intense, and frequent fires. Here we analyze the changes in fire regimes at subcontinental scales, including in regions defined as tipping elements of the earth system. We propose a unified fire model that includes the most basic characteristics needed to reproduce the observed fire dynamics in these regions. Considering IPCC climate projections for the 21st century, we evaluate the possible changes in these fire regimes and the expected changes in global forests. 
+## Cover
+
+This study uses a simple forest-fire model and remote sensing data to examine the possible changes in the Amazon region's fire regime that depend on climate change-related variables. The findings of this research suggest that there are two possible regime changes: a critical regime that implies high variability in fire extension and mega-fires, and an absorbing phase transition that could lead to the extinction of the forest and a transition to a different vegetation state. The study predicts a consistent increase in fire extension in the Amazon region, but not a change in the fire-regime. The significance of this study lies in the fact that it provides important insights into the potential impacts of climate change on the Amazon forest, one of the most biodiverse and ecologically important regions on the planet. These findings are crucial for policymakers and environmental scientists working towards sustainable forest management and conservation in the face of ongoing climate change and human activities.
+
+## Significance statement
+
+I believe that Oikos is a Journal that publishes interdisciplinary research that is difficult to publish in more traditional-minded ecological journals. This manuscript is based on a simple forest-fire model applied to different systems, from brain dynamics to precipitation, and natural forest fires. We added modifications to the model that allow us to make predictions based on environmental variables estimated with General Circulation Models (GCM) of global change.  This model is potentially applicable to different ecosystems and of broad interest to the ecological sciences.
+
 
 ----
 
