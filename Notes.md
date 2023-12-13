@@ -1,5 +1,7 @@
 # Notes
 
+Install Latex pkg --> sudo tlmgr install enumitem
+
 20% of amazon was lost 2020 and up to 40% to 2050 (@Feng2021 @Brando)
 
 Suggested referees:
@@ -503,3 +505,34 @@ Currently, peaks in active ﬁre detection are more strongly related to extreme 
 @Staver2012
 
 Savannas with tree cover below ∼40% burn frequently, but fire is almost nonexistent in systems with tree cover above ∼40% (Hennenberg et al. 2006; Archibald et al. 2009; Pueyo et al. 2010; Staver et al. 2011b). This threshold appears to be universal, despite differences in the effects of forest versus savanna trees on the grass layer in their subcanopy. Thus, we assume athresholdresponseoffirefrequencytograssabundance: above a threshold in grass abundance (GT), fire spreads; below that threshold, it does not.
+
+
+----
+@Lenton2008
+
+Amazon Rainforest. A large fraction of precipitation in the Amazon basin is recycled, and, therefore, simulations of Amazon deforestation typically generate 20–30% reductions in precipitation (78), lengthening of the dry season, and increases in summer temperatures (79) that would make it difficult for the forest to reestablish, and suggest the system may exhibit bistability. Dieback of the Amazon rainforest has been predicted (2, 80) to occur under 3–4°C global warming because of a more persistent El Nin ̃o state that leads to drying over much of the Amazon basin (81). Different vegetation models driven with similar climate projections also show Amazon dieback (82), but other global climate models (83) project smaller reductions (or increases) of precipitation and, therefore, do not produce dieback (84). A regional climate model (85) predicts Amazon dieback due to widespread reductions in precipitation and lengthening of the dry season. Changes in fire frequency probably contribute to bistability and will be amplified by forest fragmentation due to human activity. Indeed land-use change alone could potentially bring forest cover to a critical threshold. Thus, the fate of the Amazon may be determined by a complex interplay between direct land-use change and the response of regional precipitation and ENSO to global forcing
+
+
+---                               SIMPLE MODELS!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@vandeLeemput2016
+
+Rather than aiming to be complete, ‘minimal models’ such as the one we present may help to understand how non-linear mechanisms may interact to drive complex systems.
+
+---
+@Koch2023
+
+Simpler models based on equilibrium concepts, on the other hand, have long been assumed to be unsuitable to capture tree–grass interactions and have therefore traditionally received little attention (Jeltsch et al. 2000). In line with related models based on dynamical systems theory (Anderies et al. 2002, Van Langevelde et al. 2003, Accatino et al. 2010, Staver et al. 2011, Holdo et al. 2013, Touboul et al. 2018) we challenge this view by demonstrating that simple models can indeed contribute to an improved understanding of the forces that push savanna systems towards encroachment. We consider our model a proof of concept. It demonstrates that interaction networks and provide a powerful tool-set because they allow us to study the relative importance of the underlying feedback loops.
+
+---
+@Pais2023
+
+---> Velocity of fires in different regions characterizing fire regimes!!!
+
+
+
+---
+** ADD pyrodiversity to discussion
+
+consisting of large variability of fires between years and extremely large cluster fire sizes that follow a power-law distribution. <!--  This is against reduction of pyrodiversity you mention in the introduction -->
+
+

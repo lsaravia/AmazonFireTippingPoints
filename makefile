@@ -5,14 +5,14 @@ all: AmazonasFires.pdf Appendices.pdf AmazonasFires_preprint.pdf AmazonasFiresTi
 
 %.pdf:%.md
 	pandoc $< -o $@ $(OPTS)
-	evince $@		
+	open $@		
 
 AmazonasFires.pdf: AmazonasFires.md margins.sty 
 	pandoc $< -o $@ $(OPTS)
 		
 Appendices.pdf: Appendices.md 
 	pandoc -H Appendices.sty --bibliography GlobalFireTippingPoints.bib --citeproc --csl=oikos.csl $^ -o $@
-	evince $@		
+	open $@		
 
 AmazonasFires.docx: AmazonasFires.md makefile
 	pandoc $< -o $@ $(OPTS)

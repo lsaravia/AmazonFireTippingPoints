@@ -3,9 +3,9 @@
 //
 // Define start and end ee.Dates.
 var startDate = ee.Date('2000-01-01');
-var endDate = ee.Date('2021-04-01');
+var endDate = ee.Date('2023-01-01');
 
-var col =  ee.ImageCollection("MODIS/006/MCD64A1")
+var col =  ee.ImageCollection('MODIS/061/MCD64A1')
              .select('BurnDate');
 
 
@@ -42,12 +42,10 @@ Map.addLayer(congo.simplify(1))
 congo = congo.simplify(1);
 
 // create years and export for every year
-var years = Array.apply(null, {length: 22}).map(Number.call, Number) // sequence of 16 numbers
+var years = Array.apply(null, {length: 23}).map(Number.call, Number) // sequence of 16 numbers
             .map(function(number){
               return exportImagePerYear(col, number + 2000)}); // add 2000 for each year
-
-var scale = col.first().projection().nominalScale().getInfo();
-print('Scale', scale);
+print('Years', years)
 
 // function to export
 function exportImagePerYear(col, startYear) {
@@ -62,6 +60,7 @@ function exportImagePerYear(col, startYear) {
     return clipped.rename(dateString)
   };
   var burned_area = colFilt.map(clipToRegion);
+  var projection = burned_area.first().projection().getInfo();
 
   //var check = ee.Image(burned_area.first());
   //Map.addLayer(check, {palette: ['000000', '00FFFF'], max: 366}, 'check');
@@ -87,7 +86,8 @@ function exportImagePerYear(col, startYear) {
   Export.image.toDrive({
     image: evi_img,
     description: 'BurnedAreaAmazon'+String(startYear),
-    scale: scale,
+    crs: projection.crs,
+    crsTransform: projection.transform,
     region: congo,
     fileFormat: 'GeoTIFF',
     formatOptions: {

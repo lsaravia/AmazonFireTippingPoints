@@ -17,16 +17,14 @@ require(lubridate)
 
 # Data Path
 #
-# Data Path
-#
 if( Sys.info()['nodename'] =="ls-pro") {
   
   data_path <- "~/Academicos/GitProjects/AmazonTippingPoint/Data"
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
   data_path <- "~/GitProjects/AmazonTippingPoint/Data"
-
+} else if(Sys.info()['nodename'] =="MacLeonardo.local") {                     # Mac Pro
+  data_path <- "/Users/leonardosaravia/Academicos/GitProjects/AmazonTippingPoint/Data"  
 }
-
 
 file_pattern <- "^BurnedAreaAmazon20"
 fire_bricks <- list.files(path=data_path,pattern=file_pattern)
@@ -380,6 +378,20 @@ draw(gam03b,residuals=T)
 appraise(gam03b) 
 summary(gam03b)
 gam.check(gam03b)
+
+gam03bc <- gam(bF ~ te(tmmx,month, bs =c("tp","tp"), k =c(12,12) ), data=pr,method="REML",
+             family = Gamma,
+             cor=corAR1(form=~ month )
+
+             )
+draw(gam03bc,residuals=T) 
+appraise(gam03bc) 
+summary(gam03bc)
+gam.check(gam03bc)
+AIC(gam03b,gam03bc)
+#
+# Adding temporal autocorrelation has no effect on the model - so we don't use it!
+#
 
 # Gaussian
 #

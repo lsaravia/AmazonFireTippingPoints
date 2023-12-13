@@ -22,16 +22,23 @@ lapply(needed_packages, function(x) { if(!require(x,character.only = TRUE)) inst
 
 theme_set(theme_bw())
 source("R/functions.r")
-
 # Data Path
 #
 if( Sys.info()['nodename'] =="ls-pro") {
   
-  data_path <- "~/Academicos/GitProjects/AustraliaTippingPoint/Data"
+  data_path <- "~/Academicos/GitProjects/AmazonTippingPoint/Data"
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
-  data_path <- "~/GitProjects/AustraliaTippingPoint/Data"
-
+  data_path <- "~/GitProjects/AmazonTippingPoint/Data"
+} else if(Sys.info()['nodename'] =="MacLeonardo.local") {                     # Mac Pro
+  data_path <- "/Users/leonardosaravia/Academicos/GitProjects/AmazonTippingPoint/Data"  
 }
+
+
+file_pattern <- "^BurnedAreaAmazon20"
+fire_bricks <- list.files(path=data_path,pattern=file_pattern)
+fire_bricks
+region_name  <- str_match(fire_bricks, "^BurnedArea(.*?)20\\d{2}")[1,2]
+total_forest <- 31364191
 
 #
 # NetLogo 
@@ -40,16 +47,27 @@ if( Sys.info()['nodename'] =="ls-pro") {
 
 if( Sys.info()['nodename'] =="ls-pro") {
   simfolder <- "/home/leonardo/Academicos/GitProjects/fireNL"
+  netlogopath <- file.path("/home/leonardo/NetLogo")  # Linux
+  modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
+
+} else if(Sys.info()['nodename'] =="MacLeonardo.local") {                     # Mac Pro
+  simfolder <- "/Users/leonardosaravia/Academicos/GitProjects/fireNL"  
+  netlogopath <- file.path("/Applications/NetLogo\ 6.3.0")                   
+  Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/liberica-jdk-17.jdk/Contents/Home")
+  modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
 
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
   simfolder <- "/home/leonardo/GitProjects/fireNL"
+  netlogopath <- file.path("/home/leonardo/NetLogo")  # Linux
+  modelpath <- file.path("/home/leonardo/NetLogo/models", "DynamicFireForest.nlogo")
+  #modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
 }
 
+message(paste("NetLogo path:",netlogopath))
+message(paste("Model   path:",modelpath))
 
 # Unix default NetLogo installation path (adjust to your needs!):
 #
-netlogopath <- file.path("/home/leonardo/NetLogo")
-modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
 outpath <- file.path(simfolder,"Simulations")
 
 # If not defined set the JAVA version of your local 
@@ -58,12 +76,10 @@ if(Sys.getenv("JAVA_HOME")==""){
   ## "/usr/lib/jvm/java-8-oracle"
 }
 
-nl <- nl(nlversion = "6.2",
+nl <- nl(nlversion = "6.3",
          nlpath = netlogopath,
          modelpath = modelpath,
          jvmmem = 2048)
-
-
 
 ```
 
