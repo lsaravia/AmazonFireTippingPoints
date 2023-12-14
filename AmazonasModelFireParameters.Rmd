@@ -834,6 +834,89 @@ gdpp_exp %>% ggplot(aes(date,fit)) + geom_line() +theme_bw() + scale_colour_viri
   geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + ggtitle("RCP 8.5") 
 ggsave("figure/Amazon_bF_RCP8.5_Complete.png",width=8,height=6,units="in",dpi=600)
 
-
 ```
 
+
+## Calculate parameters for increased deforestation increase forest_growth 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+best_parm <- readRDS(file.path("Simulations", "bestFittedExponentsAmazon21yearsPost.rds"))
+ignition_prob <- readRDS("Data/ignition_prob.rds") 
+
+meanBf <- round(mean(ignition_prob$bF),7)                 # test the mean value = 8.43e-05
+
+rangeBf <- round(range(ignition_prob$bF),7)
+
+# Supongamos que el 5% del bosque es pastizal con un Forest_growth = 365 es decir que vuelve a crecer en un año
+# el 100% tiene un Forest_growth de 5835.70 es decir que vuelve a crecer en 16 años promedio
+# El 95% restante es bosque con un $p$ = .05 * 1/365 + .95 * 1/Intact_growth  = 1/5835.70   
+# Intact_growth = 1/(.05 * 1/365 + .95 * 1/Intact_growth) 
+
+prop_pasto <- 0.05
+growth_pasto <- 365
+
+# Derivation
+#
+# prop_pasto/growth_pasto + (1-prop_pasto) /Intact_growth = 1/ Forest_growth
+#   (1-prop_pasto) /Intact_growth = 1/ Forest_growth - prop_pasto/growth_pasto
+#   (1-prop_pasto) / (1/ Forest_growth - prop_pasto/growth_pasto) =  Intact_growth 
+
+
+best_parm %>% mutate(Intact_growth = (1-prop_pasto) / (1/Forest_growth - prop_pasto/growth_pasto),
+                     mean_theta = 1/(Forest_growth * meanBf / 30 )
+                     ) %>% group_by(method) %>% summarise(across(where(is.numeric),mean))
+
+# we used loclinear method
+#
+Intact_growth = 36239.
+# 1/(36239 * meanBf / 30 ) = 9.82  ! very low theta of the original forest
+# 
+
+# We keep fixed the mean_theta
+#
+mean_theta <- (prop_pasto/growth_pasto + (1-prop_pasto) * 1/Intact_growth)/( meanBf /30 )
+mean_theta
+incBf <- lapply( seq(from=0.05, by=0.003, length.out=20), function(i){
+  meanBf <- (i/growth_pasto + (1-i) * 1/Intact_growth)/( mean_theta /30 )
+  Forest_growth <- 1/(i/growth_pasto + (1-i) /Intact_growth )
+  data.frame(meanBf,Forest_growth)
+})
+incBf <- do.call(rbind,incBf)
+incBf %>% mutate(delta = meanBf / lag(meanBf)) %>% summarise(mean(delta,na.rm=TRUE))
+
+# Roughly 3.6% increase in the meanBf for year 1.036
+incBf %>% mutate(delta = Forest_growth / lag(Forest_growth)) %>% summarise(mean(delta,na.rm=TRUE))
+
+# Roughly 0.97 decrease in the Forest_growth for year
+
+incBf <- sapply( seq(from=0.05, by=0.006, length.out=20), function(i){
+  meanBf <- (i/growth_pasto + (1-i) * 1/Intact_growth)/( mean_theta /30 )
+})
+
+data.frame(incBf) %>% mutate(delta = incBf / lag(incBf)) %>% summarise(mean(delta,na.rm=TRUE))
+
+#
+# Add to Bf the annual increase 
+# 
+
+gdpp_exp <- read_csv("Data/Predicted_bF_rcp45.csv")
+
+# Multiply fit field by the increasing factor
+gdpp_exp <- gdpp_exp %>% 
+  mutate(Bf_def = if_else(date >= "2022-01-01", fit * (1 + 0.038 * (year(date) - 2021)), fit))
+
+gdpp_exp %>% ggplot(aes(date,fit)) + 
+  geom_line(alpha = 0.5) +  # Adjust the transparency of the first line
+  theme_bw() + 
+  scale_colour_viridis_d() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7)) +   
+  ylab("𝑓") + 
+  geom_ribbon(aes(x = date, ymin = lcl, ymax = ucl), alpha = 0.3) + 
+  ggtitle("RCP 4.5 + Deforestation induced increase") + 
+  geom_line(aes(date, Bf_def), color = "#04ff00", alpha = 0.5,linewidth=1)  # Adjust the transparency of the second line
+ggsave("figure/Amazon_bF_RCP4.5_Deforested.png",width=8,height=6,units="in",dpi=600)
+
+names(gdpp_exp) 
+write_csv(gdpp_exp %>% select(date,Bf_def,se.fit,ucl,lcl) , "Data/Predicted_bF_rcp45_def.csv")
+
+```

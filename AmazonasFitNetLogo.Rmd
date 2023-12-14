@@ -810,7 +810,8 @@ best_parm <- bind_rows(best_parm, resabc$unadj.values %>% as_tibble() %>% mutate
 best_parm <- best_parm %>% mutate(powexp =  (1 - 2 * forest_dispersal_distance ) / (1 - forest_dispersal_distance ))
 
 saveRDS(best_parm, file.path("Simulations", "bestFittedExponentsAmazon21yearsPost.rds"))
-
+#
+# best_parm <- readRDS(file.path("Simulations", "bestFittedExponentsAmazon21yearsPost.rds"))
 #
 # Mean of posteriori with theta calculated with the mean ignition probability
 #
@@ -1141,19 +1142,17 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostfittedBF.rds"))
 * RCP 4.5
 * Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
 
-* New run with se, added se to the filename 
 
-
-```{r sim_simple449postRCP45_amazon59_60se, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_amazon59_60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
 disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
 grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
 ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
-disp_best <- disp_best[1:100]
-grow_best <- grow_best[1:100]
-ini_best <- ini_best[1:100]
+disp_best <- disp_best[41:100]
+grow_best <- grow_best[41:100]
+ini_best <- ini_best[41:100]
 # eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
 # ymd("1980-11-01") + days(eval_times)
 
@@ -1162,7 +1161,7 @@ ymd("1980-11-01") + days(eval_times)
 
 # Previous simulations Amazon59years449PostRcp45_60 & Amazon59years449PostRcp45
 #
-nl@experiment <- experiment(expname="Amazon59years449PostRcp45_se",
+nl@experiment <- experiment(expname="Amazon59years449PostRcp45_60",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -1185,7 +1184,7 @@ nl@experiment <- experiment(expname="Amazon59years449PostRcp45_se",
                                                "Periodicity" = "false",
                                                "Fire-probability" = 1E-6,
                                                "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
-                                               "use-fire-prob-se" = "true"
+                                               "use-fire-prob-se" = "false"
                                              ))
 
 
@@ -1295,7 +1294,7 @@ nl@experiment <- experiment(expname="Amazon59years449PostRcp85_60",
                                                "Periodicity" = "false",
                                                "Fire-probability" = 1E-6,
                                                "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
-                                               "use-fire-prob-se" = "true"
+                                               "use-fire-prob-se" = "false"
                                              ))
 
 

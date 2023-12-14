@@ -1,10 +1,23 @@
 # Supplementary Information
 
+## Estimation of increments in the probability of ignition by year
+
+I assume that the fiited parameters are an average of two kinds of vegetation, the vegetation that grows after deforestation that has a very fast recover, and the original forest that has a very low recover so $p$ is lower, and $\theta$ is constant over the fitted period.
+
+Let's assume that 20% of the amazon forest is deforested and that 5% burns annually thus the estimated probability of forest growth is the mean value of
+the deforested vegetation and the original forest. 
+
+p_estimated = 0.05 * p_deforested + (1-0.05) p_original
+
+As we know p_estimated and we can assume that the vegetation that growths after deforestation is an annual grassland so p_deforested = 1/365 thus we can calculate p_original ~ 2.8e-05
+
+Then we can assume a mean deforestation of 0.03% and add annually that proportion to the deforested percent that burns annually, then each year we have 0.003 increment in the proportion of forests that burns and recover annually, fixing p_original we can estimate the variation in p_estimated due to deforestation and If we assume that the $theta = p/f$ is constant as this is the period from which we fitted the data. Then we can estimate the increase in the $f$ due to deforestation, which for a 0.03% anual deforestation would be 1.036 by year, and for 0.06% annual deforestation 1.06 by year. 
+
 ## Amazonas monthly fires and fire size distribution
 
-![Region of study: the Amazon Basin](figure/AmazonasRegion.png)
+![Region of study: the Amazon biome](figure/AmazonasRegion.png)
 
-![Total monthly fire size for the Amazon basin as a percent of the region area. Estimated with MODIS burned area product](figure/Amazon_TotSize_Month.jpg)
+![Total monthly fire size for the Amazon biome as a percent of the region area. Estimated with MODIS burned area product](figure/Amazon_TotSize_Month.jpg)
 
 \newpage
 
@@ -214,5 +227,6 @@ Table: Summary of the second ABC posterior parameter distribution. We selected t
 
 ![Flammable Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show the median and the 95% percentile based on the fitted parameter distribution.](figure/Amazon_ForestPercent_theta61_RCP45-85.png)
 
+![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Deforested.png)
 
 

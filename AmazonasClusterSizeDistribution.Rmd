@@ -30,7 +30,8 @@ if( Sys.info()['nodename'] =="ls-pro") {
   data_path <- "~/Academicos/GitProjects/AmazonTippingPoint/Data"
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
   data_path <- "~/GitProjects/AmazonTippingPoint/Data"
-
+} else if(Sys.info()['nodename'] =="MacLeonardo.local") {                     # Mac Pro
+  data_path <- "/Users/leonardosaravia/Academicos/GitProjects/AmazonTippingPoint/Data"  
 }
 
 
@@ -839,7 +840,19 @@ if(file.exists(patch_size_pfname)) {
   stop("No patch file size by period")
 }
 
+#
+# Total Area in pixels 31364191
+#
+total_forest <- 31364191
+
 hansen_def <- read_csv("Data/ForesLossbyYearAmazon.csv") %>% mutate(percent_deforested=loss/totalForestArea)
+
+mean(hansen_def$percent_deforested)
+max(hansen_def$percent_deforested)
+#
+# Mean  0.003765483
+# Max   0.007240066
+#
 
 p1 <- patch_sizes_p %>% filter(date>2000, date<2023) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
@@ -876,5 +889,27 @@ p1 %>% ggplot(  aes(date,tot_patch, label=label ))+ geom_line(alpha=0.8,color="r
 
 cor.test(p1$percent_deforested,p1$tot_patch)
 cor.test(p1$deforested_prevyear,p1$tot_patch)
+
+#
+# Deforestation vs Ignition probability
+#
+require(lubridate)
+ignition_prob <- readRDS("Data/ignition_prob.rds")
+p2 <- ignition_prob %>% mutate(year=year(date)) %>% filter(year>2000, year<2023) %>% group_by(year) %>% 
+  summarize(bF=mean(bF)) %>% mutate( label =as.character(year)) %>% inner_join(hansen_def, by=c("year"="year")) %>% mutate( deforested_prevyear = lag(percent_deforested))
+
+p2 %>% ggplot(  aes(percent_deforested,bF, label=label,color=year ))+ geom_point(size=2) + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Annual deforestation (%)") +  
+      ylab("Ignition Probability") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel() 
+
+p2 %>% ggplot(  aes(deforested_prevyear,bF, label=label,color=year ))+ geom_point(size=2) + theme_bw() +
+      scale_color_viridis_c(guide=NULL)  + 
+      xlab("Previous year annual deforestation (%)") +  
+      ylab("Ignition Probability") +  
+      theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel() 
+
+
 
 ```
