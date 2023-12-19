@@ -1363,7 +1363,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59post.rds"))
 
 Amazon59years449PostRcp45_def1 = [1:10]
 
-```{r sim_simple449postRCP45_deforest59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_deforest59_1, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -1381,7 +1381,7 @@ ymd("1980-11-01") + days(eval_times)
 
 # Previous simulations Amazon59years449PostRcp45_60 & Amazon59years449PostRcp45
 #
-nl@experiment <- experiment(expname="Amazon59years449PostRcp45_def2",
+nl@experiment <- experiment(expname="Amazon59years449PostRcp45_def1",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
