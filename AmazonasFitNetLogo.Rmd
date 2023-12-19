@@ -55,20 +55,24 @@ total_forest <- 31364191
 if( Sys.info()['nodename'] =="ls-pro") {
   simfolder <- "/home/leonardo/Academicos/GitProjects/fireNL"
   netlogopath <- file.path("/home/leonardo/NetLogo")  # Linux
-  modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
 
 } else if(Sys.info()['nodename'] =="MacLeonardo.local") {                     # Mac Pro
   simfolder <- "/Users/leonardosaravia/Academicos/GitProjects/fireNL"  
   netlogopath <- file.path("/Applications/NetLogo\ 6.4.0")                   
   Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/liberica-jdk-17.jdk/Contents/Home")
-  modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
+
+} else if(Sys.info()['nodename'] =="Mac-mini.local") {                     # Mac Pro
+  simfolder <- "/Users/leonardosaravia/GitProjects/fireNL"  
+  netlogopath <- file.path("/Applications/NetLogo\ 6.4.0")                   
+  Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/liberica-jdk-17.jdk/Contents/Home")
 
 } else if(Sys.info()['nodename'] =="biologia2018") {                     # Server UNGS
   simfolder <- "/home/leonardo/GitProjects/fireNL"
   netlogopath <- file.path("/home/leonardo/NetLogo")  # Linux
-  modelpath <- file.path("/home/leonardo/NetLogo/models", "DynamicFireForest.nlogo")
-  #modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
+  #modelpath <- file.path("/home/leonardo/NetLogo/models", "DynamicFireForest.nlogo")
+  Sys.setenv(JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64")
 }
+modelpath <- file.path(simfolder, "DynamicFireForest.nlogo")
 
 message(paste("NetLogo path:",netlogopath))
 message(paste("Model   path:",modelpath))
@@ -77,11 +81,6 @@ message(paste("Model   path:",modelpath))
 #
 outpath <- file.path(simfolder,"Simulations")
 
-# If not defined set the JAVA version of your local 
-if(Sys.getenv("JAVA_HOME")==""){
-  Sys.setenv(JAVA_HOME = "/usr/lib/jvm/java-11-openjdk-amd64")
-  ## "/usr/lib/jvm/java-8-oracle"
-}
 
 nl <- nl(nlversion = "6.4",
          nlpath = netlogopath,
@@ -1143,7 +1142,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonPostfittedBF.rds"))
 * Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
 
 
-```{r sim_simple449postRCP45_amazon59_60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_amazon59_60, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -1355,6 +1354,89 @@ plan(sequential)
 
 saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59post.rds"))
 ```
+
+# Simulations with best parameters and patch size distribution RCP 4.5 (2021 - 2059) with Deforestation 
+
+* wordl_width = 450 
+* RCP 4.5
+* Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
+
+Amazon59years449PostRcp45_def1 = [1:10]
+
+```{r sim_simple449postRCP45_deforest59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+
+best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
+
+disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
+grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
+ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
+disp_best <- disp_best[1:10]
+grow_best <- grow_best[1:10]
+ini_best <- ini_best[1:10]
+# eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
+# ymd("1980-11-01") + days(eval_times)
+
+eval_times <- as.numeric(lapply(0:58, function(x){ymd("2001-12-31") + years(x) - ymd("1980-11-01") }))
+ymd("1980-11-01") + days(eval_times)
+
+# Previous simulations Amazon59years449PostRcp45_60 & Amazon59years449PostRcp45
+#
+nl@experiment <- experiment(expname="Amazon59years449PostRcp45_def2",
+                            outpath=outpath,
+                            repetition=1,
+                            tickmetrics="true",
+                            idsetup="setup",
+                            idgo="go",
+                            #idrunnum="nlrx-experiment",
+                            runtime=0,
+                            evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
+                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365","median-fire-interval" ),
+                            variables = list("forest-dispersal-distance" = list(values=disp_best),
+                                             "Forest-growth" = list(values=grow_best),
+                                             "Initial-forest-density" = list(values=ini_best)
+                            ),
+                            constants = list("world-width" = 449,
+                                             "world-height" = 449,
+                                               "fire-prob-filename"="\"Data/Predicted_bF_rcp45_def.csv\"",
+                                               "Save-view" =  "false",
+                                               "video" = "false",
+                                               "end-simulation"= 28918,
+                                               "Periodicity" = "false",
+                                               "Fire-probability" = 1E-6,
+                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
+                                               "use-fire-prob-se" = "false",
+                                               "decrease-forest-growth" = 0.97
+                                             ))
+
+
+#
+# Run 10 times 
+#
+nl@simdesign <- simdesign_distinct(nl=nl,
+                               nseeds=10)
+
+# run in Paralell 
+#
+#
+# Total number of jobs = nseeds * split = 10*4 
+# Each job runs parameter input matrix / split = nrow(nl@simdesign@siminput) / split =  300 / 4 
+#
+plan(multisession)
+tic()
+results <- run_nl_all(nl,split = 1)
+toc()
+plan(sequential)
+names(results)
+
+#
+# Write the output 
+#
+setsim(nl, "simoutput") <- results 
+write_simoutput(nl)
+
+```
+
+
 
 # Compare with data with simulations period 2000-2020
 
