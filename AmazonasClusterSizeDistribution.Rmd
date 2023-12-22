@@ -821,7 +821,7 @@ for (i in 1:1000) {
 ```
 
 
-# Load Deforestation Rates from Hansen 2013 (NOT USED IN THE PAPER)
+# Load Deforestation Rates from Hansen 2013 
 
 * Plots of previous year % deforestation vs total Fire size
 

@@ -97,6 +97,8 @@ Finally, we ran the model with the final posterior parameter distribution, the i
 
 We used the posterior parameter distribution set and the predictions of the parameter $f$ under RCP4.5 and RCP8.5 to make simulations up to 2060. We started simulations in the year 1980 as in the fitting procedure, but instead of using $f$ derived directly from data we used the $f$ obtained from the GAM model, allowing us to compare actual and predicted fires using the same method to obtain $f$. 
 
+To approximate the effect of deforestation using this model, we assumed that the fitter parameters are an average of two vegetation types, 1) the vegetation that grows after deforestation that has a higher probability of ignition $f$ and rapid recovery so the growth probability $p$ is also higher 2) the original forest with lower $f$ and also lower $p$. This way, we can roughly calculate an increase in the average $p$ and $f$ due to deforestation after the fitted period (check the supplementary material for details). We estimated the mean deforestation rate for the Amazon biome using the Hansen remote sensing product [@Hansen2013], updated until 2021. We applied this to the RCP4.5 scenario, showing the increase in $f$ after 2021 in Figure S23.
+
 ## Results
 
 ### Fire patterns from MODIS data

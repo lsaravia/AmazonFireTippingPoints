@@ -1366,7 +1366,7 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59post.rds"))
 * RCP 4.5
 * Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
 
-Amazon59years449PostRcp45_def1 = [1:10]
+Amazon59years449PostRcp45_def1 = [1:60]
 
 ```{r sim_simple449postRCP45_deforest59_1, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
@@ -1375,9 +1375,9 @@ best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rd
 disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
 grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
 ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
-disp_best <- disp_best[1:10]
-grow_best <- grow_best[1:10]
-ini_best <- ini_best[1:10]
+disp_best <- disp_best[1:60]
+grow_best <- grow_best[1:60]
+ini_best <- ini_best[1:60]
 # eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
 # ymd("1980-11-01") + days(eval_times)
 
@@ -1428,7 +1428,7 @@ nl@simdesign <- simdesign_distinct(nl=nl,
 #
 plan(multisession)
 tic()
-results <- run_nl_all(nl,split = 1)
+results <- run_nl_all(nl,split = 4)
 toc()
 plan(sequential)
 names(results)
