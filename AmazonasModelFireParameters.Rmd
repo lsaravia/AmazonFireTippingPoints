@@ -905,7 +905,7 @@ gdpp_exp <- read_csv("Data/Predicted_bF_rcp45.csv")
 
 # Multiply fit field by the increasing factor
 gdpp_exp <- gdpp_exp %>% 
-  mutate(Bf_def = if_else(date >= "2022-01-01", fit * (1 + 0.038 * (year(date) - 2021)), fit))
+  mutate(Bf_def = if_else(date >= "2022-01-01", fit * (1 + 0.036 * (year(date) - 2021)), fit))
 
 gdpp_exp %>% ggplot(aes(date,fit)) + 
   geom_line(alpha = 0.5) +  # Adjust the transparency of the first line

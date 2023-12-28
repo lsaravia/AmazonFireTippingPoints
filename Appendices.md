@@ -1,18 +1,18 @@
 # Supplementary Information
 
-## Estimation of increments in the probability of ignition by year
+## Estimation of increments in the probability of ignition after the fitted period 
 
-We assume that the fitted parameters are an average of two kinds of vegetation, the vegetation that grows after deforestation that has a very fast recover thus the parameter $p$ is higher, and the original forest that has a very low recover so $p$ is lower. The cocient $\theta=p/f$ is assumed constant over the fitted period.
+We assume that the fitted parameters are the result of an average of two kinds of vegetation, the vegetation that grows after deforestation that has a very fast recover/growth thus the parameter $p$ is higher, and the original forest that has a very low recover so $p$ is lower. The average cocient $\theta=p/f$ is assumed constant.
 
-Let's assume that 20% of the amazon forest is deforested and that a quarter of this area a global 5% burns annually, thus the estimated probability of forest growth ($p_{\text{estimated}}$) is calculated as the weighted mean of the deforested vegetation and the original forest. 
+Following [@Lovejoy2018] estimation let's assume that 20% of the amazon forest is deforested and that a quarter of this area, a global 5% burns annually, thus the estimated probability of forest growth ($p_{\text{estimated}}$) is calculated as the weighted mean of the deforested vegetation and the original forest. 
 
 $p_{\text{estimated}} = 0.05 \times p_{\text{deforested}} + 0.95 \times p_{\text{original}}$
 
 As we know $p_{\text{estimated}}$ and we can assume that the vegetation that growths post-deforestation resembles an annual grassland, we can set $p_{\text{deforested}} = 1/365$. Consequently, estimating $p_{\text{original}}$ to be approximately $2.8 \times 10^{-5}$, check the source code "AmazonasModelFireParameted.Rmd" for detailed calculations.
 
-Then we estimated a mean deforestation of 0.03% annually, so each year we have 0.003 increment in the proportion of foreststhat burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
+Then we estimated a mean deforestation of 0.03% annually, so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
 
-Given the assumption that $\theta = p/f$ remains constant within the fitted data period, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting increase in $f$ approximates 1.036 per year, while a rate of 0.06% leads to an increase of 1.06 per year.
+Given the assumption that $\theta = p/f$ remains constant within the fitted data period, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
 The resulting $f$ can be observed in the figure S23. 
 
 ## Amazonas monthly fires and fire size distribution
