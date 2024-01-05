@@ -921,4 +921,28 @@ ggsave("figure/Amazon_bF_RCP4.5_Deforested.png",width=8,height=6,units="in",dpi=
 names(gdpp_exp) 
 write_csv(gdpp_exp %>% select(date,Bf_def,se.fit,ucl,lcl) , "Data/Predicted_bF_rcp45_def.csv")
 
+#
+# Add to Bf the annual increase due to deforestation at 0.03% 
+# 
+
+gdpp_exp <- read_csv("Data/Predicted_bF_rcp85.csv")
+
+# Multiply fit field by the increasing factor
+gdpp_exp <- gdpp_exp %>% 
+  mutate(Bf_def = if_else(date >= "2022-01-01", fit * (1 + 0.036 * (year(date) - 2021)), fit))
+
+gdpp_exp %>% ggplot(aes(date,fit)) + 
+  geom_line(alpha = 0.5) +  # Adjust the transparency of the first line
+  theme_bw() + 
+  scale_colour_viridis_d() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7)) +   
+  ylab("𝑓") + 
+  geom_ribbon(aes(x = date, ymin = lcl, ymax = ucl), alpha = 0.3) + 
+  ggtitle("RCP 4.5 + Deforestation induced increase") + 
+  geom_line(aes(date, Bf_def), color = "#04ff00", alpha = 0.5,linewidth=1)  # Adjust the transparency of the second line
+ggsave("figure/Amazon_bF_RCP8.5_Deforested.png",width=8,height=6,units="in",dpi=600)
+
+names(gdpp_exp) 
+write_csv(gdpp_exp %>% select(date,Bf_def,se.fit,ucl,lcl) , "Data/Predicted_bF_rcp85_def.csv")
+
 ```

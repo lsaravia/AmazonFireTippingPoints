@@ -1364,13 +1364,13 @@ saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59post.rds"))
 
 * wordl_width = 450 
 * RCP 4.5
-* Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated to files
+* Have to run the first 40 [1:40] and then the last 60 [41:100] so I generated 2 files
 
 Amazon59years449PostRcp45_def1 = [1:60]
 Amazon59years449PostRcp45_def2 = [61:100]
 
 
-```{r sim_simple449postRCP45_deforest59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_deforest59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
@@ -1451,7 +1451,7 @@ write_simoutput(nl)
 #
 list.files(outpath,"Amazon59years449PostRcp45.*\\.csv")
 
-sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def1_distinct.csv"),skip=0)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def2_distinct.csv"),skip=0)
 #sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def2_distinct.csv"),skip=0))
 
 #
@@ -1471,9 +1471,129 @@ plan(sequential)
 pexp %>% filter(type=="pl") %>% mutate(tot_patch= tot_patch/(450*450)*100)  %>% 
          summarise(up_b=quantile(tot_patch,0.975),lo_b=quantile(tot_patch,0.025),tot_patch=median(tot_patch))
 
+# Load previous simulations and bind the total file
+#
+pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds")) 
+saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds"))
+```
 
 
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds"))
+# Simulations with best parameters and patch size distribution RCP 8.5 (2021 - 2059) with Deforestation 
+
+* wordl_width = 450 
+* RCP 8.5
+* Have to run the first 40 [1:60] and then the last 40 [61:100] so I generated 2 files
+
+Amazon59years449PostRcp85_def1 = [1:60]
+Amazon59years449PostRcp85_def2 = [61:100]
+
+
+```{r sim_simple449postRCP85_deforest59_1, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+
+best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
+
+disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
+grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
+ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
+disp_best <- disp_best[1:60]
+grow_best <- grow_best[1:60]
+ini_best <- ini_best[1:60]
+# eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
+# ymd("1980-11-01") + days(eval_times)
+
+eval_times <- as.numeric(lapply(0:58, function(x){ymd("2001-12-31") + years(x) - ymd("1980-11-01") }))
+ymd("1980-11-01") + days(eval_times)
+
+# Previous simulations Amazon59years449PostRcp45_60 & Amazon59years449PostRcp45
+#
+nl@experiment <- experiment(expname="Amazon59years449PostRcp85_def1",
+                            outpath=outpath,
+                            repetition=1,
+                            tickmetrics="true",
+                            idsetup="setup",
+                            idgo="go",
+                            #idrunnum="nlrx-experiment",
+                            runtime=0,
+                            evalticks= eval_times,          # ymd("2011-12-31")  - ymd("1980-11-01") + 1
+                            metrics=c("Date", "burned-by-month","active-burned","Percent-forest","fire-probability","burned-clusters 365","median-fire-interval" ),
+                            variables = list("forest-dispersal-distance" = list(values=disp_best),
+                                             "Forest-growth" = list(values=grow_best),
+                                             "Initial-forest-density" = list(values=ini_best)
+                            ),
+                            constants = list("world-width" = 449,
+                                             "world-height" = 449,
+                                               "fire-prob-filename"="\"Data/Predicted_bF_rcp85_def.csv\"",
+                                               "Save-view" =  "false",
+                                               "video" = "false",
+                                               "end-simulation"= 28918,
+                                               "Periodicity" = "false",
+                                               "Fire-probability" = 1E-6,
+                                               "eval-burned-clusters"=paste0("\"[",paste(eval_times,collapse=" "),"]\""),
+                                               "use-fire-prob-se" = "false",
+                                               "decrease-forest-growth" = 0.97
+                                             ))
+
+
+#
+# Run 10 times 
+#
+nl@simdesign <- simdesign_distinct(nl=nl,
+                               nseeds=10)
+
+# run in Paralell 
+#
+#
+# Total number of jobs = nseeds * split = 10*4 
+# Each job runs parameter input matrix / split = nrow(nl@simdesign@siminput) / split =  300 / 4 
+#
+plan(multisession)
+tic()
+results <- run_nl_all(nl,split = 4)
+toc()
+plan(sequential)
+names(results)
+
+#
+# Write the output 
+#
+setsim(nl, "simoutput") <- results 
+write_simoutput(nl)
+
+```
+
+# Calculate patch distributions from best fitted parameteres forced with RCP 8.5 and deforestation
+
+```{r calcPatchDistSimRCP85postDef, echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',eval=TRUE}
+
+# Read previous simulations for RCP 8.5 and fitted parameters
+#
+list.files(outpath,"Amazon59years449PostRcp85.*\\.csv")
+
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp85_def1_distinct.csv"),skip=0)
+#sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def2_distinct.csv"),skip=0))
+
+#
+# Calculate power law exponents and max/total patch size by year 
+#
+pexp <- tibble()
+
+plan(multisession)
+p_df <- future_lapply( 1:nrow(sim) , function(i){
+  df <- netlogo_evaluate_patch_distr(sim$burned_clusters_365[i]) %>%
+    mutate(world_width=sim$world_width[i], forest_dispersal_distance=sim$forest_dispersal_distance[i],Forest_growth=sim$Forest_growth[i],Date=sim$Date[i],random_seed=sim$random_seed[i],
+           Percent_forest=sim$Percent_forest[i], median_fire_interval= sim$median_fire_interval[i]) %>%
+    dplyr::select(world_width,forest_dispersal_distance,Forest_growth,Date,random_seed, everything())
+})
+pexp <- bind_rows(p_df)
+plan(sequential)
+pexp %>% filter(type=="pl") %>% mutate(tot_patch= tot_patch/(450*450)*100)  %>% 
+         summarise(up_b=quantile(tot_patch,0.975),lo_b=quantile(tot_patch,0.025),tot_patch=median(tot_patch))
+
+saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59postDef.rds"))
+# Load previous simulations and bind the total file
+#
+#pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds")) 
+#saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds"))
 ```
 
 
@@ -1825,11 +1945,12 @@ pexp %>% group_by(RCP,theta,year) %>% filter( type == "pl", year>2000,decade!="D
       xlab("Year") + ylab("Total Fire size%") +
       theme(axis.text.x = element_text(angle = 45, hjust=.8)) +
       theme(legend.position = c(0.8, 0.88)) + geom_ribbon(aes(ymin=lo_b,ymax=up_b),alpha=0.2,linetype=0) + facet_wrap(~RCP,nrow=2) + geom_point(data=pdata,color="black")
-ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85.png",width=8,height=6,units="in",dpi=600)
+#ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85Def.png",width=8,height=6,units="in",dpi=600)
 
-
-
-p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(theta=factor(if_else(decade=="Data","Data",as.character(theta))), decade=if_else(decade=="Data", "2001-2021",decade))
+# No Deforestation 4.5 8.5 old plot
+#
+p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(theta=factor(if_else(decade=="Data","Data",as.character(theta))), decade=if_else(decade=="Data", "2001-2021",decade)) %>% filter( RCP != "4.5 + Def")
 
 p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta ))+ geom_point(alpha=0.5) + theme_bw() +
       scale_color_viridis_d(name="")  + 
@@ -1839,6 +1960,35 @@ p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2
 #  theme(legend.position="bottom")
     theme(legend.justification=c(1,1), legend.position=c(.99,1))
 ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45-85.png",width=8,height=6,units="in",dpi=600)
+
+# Deforestation only 4.5
+#
+p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(theta=factor(if_else(decade=="Data","Data",as.character(theta))), decade=if_else(decade=="Data", "2001-2021",decade)) %>% filter(RCP == "4.5" | RCP == "4.5 + Def")
+
+p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta ))+ geom_point(alpha=0.5) + theme_bw() +
+      scale_color_viridis_d(name="")  + 
+      xlab("Max Fire size (%)") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_grid( RCP ~ decade,drop=TRUE) +
+#  theme(legend.position="bottom")
+    theme(legend.justification=c(1,1), legend.position=c(.99,1))
+ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45_Def.png",width=8,height=6,units="in",dpi=600)
+
+
+# Deforestation only 8.5
+#
+p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(theta=factor(if_else(decade=="Data","Data",as.character(theta))), decade=if_else(decade=="Data", "2001-2021",decade)) %>% filter(RCP == "8.5" | RCP == "8.5 + Def")
+
+p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta ))+ geom_point(alpha=0.5) + theme_bw() +
+      scale_color_viridis_d(name="")  + 
+      xlab("Max Fire size (%)") +  
+      ylab("Total Size (%)") +  
+      theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_grid( RCP ~ decade,drop=TRUE) +
+#  theme(legend.position="bottom")
+    theme(legend.justification=c(1,1), legend.position=c(.99,1))
+ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP85_Def.png",width=8,height=6,units="in",dpi=600)
+
+
 
 #
 # Power Law exponent VER ACA
