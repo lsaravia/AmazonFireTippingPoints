@@ -8,12 +8,17 @@ Following [@Lovejoy2018] estimation let's assume that 20% of the amazon forest i
 
 $p_{\text{estimated}} = 0.05 \times p_{\text{deforested}} + 0.95 \times p_{\text{original}}$
 
-As we know $p_{\text{estimated}}$ and we can assume that the vegetation that growths post-deforestation resembles an annual grassland, we can set $p_{\text{deforested}} = 1/365$. Consequently, estimating $p_{\text{original}}$ to be approximately $2.8 \times 10^{-5}$, check the source code "AmazonasModelFireParameted.Rmd" for detailed calculations.
+As we know $p_{\text{estimated}}$ with a mean value of $1/5835.70$ and we can assume that the vegetation that growths post-deforestation resembles an annual grassland, we can set $p_{\text{deforested}} = 1/365$.   
+Consequently, 
 
-Then we estimated a mean deforestation of 0.03% annually, so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
+$p_{\text{original}} = \frac{p_{\text{estimated}} - 0.05 \times p_{\text{deforested}}}{0.95}$
+
+estimating $p_{\text{original}}= 2.8 e-05$, check the source code "AmazonasModelFireParameted.Rmd" for detailed calculations.
+
+Then we estimated a mean deforestation of 0.03% annually, from Hansen remote sensing product [@Hansen2013], so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
 
 Given the assumption that $\theta = p/f$ remains constant within the fitted data period, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
-The resulting $f$ can be observed in the figure S23. 
+The resulting $f$ can be observed in the figure S23 for RCP 4.5 and figure S24 for RCP 8.5. 
 
 ## Amazonas monthly fires and fire size distribution
 
@@ -231,4 +236,8 @@ Table: Summary of the second ABC posterior parameter distribution. We selected t
 
 ![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Deforested.png)
 
+
+![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Deforested.png)
+
+## Bibliography
 

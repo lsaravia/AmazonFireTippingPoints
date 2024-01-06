@@ -1,6 +1,6 @@
 OPTS= -H margins.sty --bibliography GlobalFireTippingPoints.bib --citeproc --csl=oikos.csl --pdf-engine=xelatex 
 
-all: AmazonasFires.pdf Appendices.pdf AmazonasFires_preprint.pdf AmazonasFiresTitle.pdf AmazonasFiresMain.pdf
+all: AmazonasFires.pdf Appendices.pdf AmazonasFires_preprint.pdf AmazonasFiresTitle.pdf AmazonasFiresMain.pdf AmazonasFiresSubmitted2.tex
  
 
 %.pdf:%.md
@@ -19,3 +19,7 @@ AmazonasFires.docx: AmazonasFires.md makefile
 			
 AmazonasFires_preprint.pdf: AmazonasFires.md nolineno.sty 
 	pandoc $< -o $@ -H nolineno.sty --bibliography GlobalFireTippingPoints.bib --pdf-engine=xelatex --citeproc --csl=oikos.csl		
+
+
+%.tex:%.md
+	pandoc $< -o $@ $(OPTS)
