@@ -1,10 +1,10 @@
 # Supplementary Information
 
-## Estimation of increments in the probability of ignition after the fitted period 
+## Estimation of increments in the probability of ignition after the fitted period due to deforestation 
 
 We assume that the fitted parameters are the result of an average of two kinds of vegetation, the vegetation that grows after deforestation that has a very fast recover/growth thus the parameter $p$ is higher, and the original forest that has a very low recover so $p$ is lower. The average cocient $\theta=p/f$ is assumed constant.
 
-Following [@Lovejoy2018] estimation let's assume that 20% of the amazon forest is deforested and that a quarter of this area, a global 5% burns annually, thus the estimated probability of forest growth ($p_{\text{estimated}}$) is calculated as the weighted mean of the deforested vegetation and the original forest. 
+Following [@Lovejoy2018] estimation let's assume that 20% of the amazon forest is deforested and that a quarter of this area, a global 5% burns annually. This is a very conservative assumption, if we would assume a greater proportion the effect would also be greater. Thus the estimated probability of burned forest growth ($p_{\text{estimated}}$) is calculated as the weighted mean of the deforested vegetation and the original forest. 
 
 $p_{\text{estimated}} = 0.05 \times p_{\text{deforested}} + 0.95 \times p_{\text{original}}$
 
@@ -13,11 +13,11 @@ Consequently,
 
 $p_{\text{original}} = \frac{p_{\text{estimated}} - 0.05 \times p_{\text{deforested}}}{0.95}$
 
-estimating $p_{\text{original}}= 2.8 e-05$, check the source code "AmazonasModelFireParameted.Rmd" for detailed calculations.
+estimating $p_{\text{original}}= 2.8 e-05$, check the file "AmazonasModelFireParameted.Rmd" for the source code of the calculations.
 
 Then we estimated a mean deforestation of 0.03% annually, from Hansen remote sensing product [@Hansen2013], so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
 
-Given the assumption that $\theta = p/f$ remains constant within the fitted data period, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
+Given the assumption that $\theta = p/f$ remains constant, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
 The resulting $f$ can be observed in the figure S23 for RCP 4.5 and figure S24 for RCP 8.5. 
 
 ## Amazonas monthly fires and fire size distribution
@@ -238,6 +238,9 @@ Table: Summary of the second ABC posterior parameter distribution. We selected t
 
 
 ![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Deforested.png)
+
+
+![Total annual size of fires vs maximum monthly fire size % relative to the area of the region, data, predictions and predictions including deforestation. The data column was estimated using the MODIS burned area product. The predictions by decade were estimated with a fitted model using a monthly ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), here only RCP8.5. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_TotSizeVsMax_year_theta61_RCP85_Def.png)
 
 ## Bibliography
 
