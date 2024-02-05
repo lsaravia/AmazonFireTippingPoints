@@ -1488,16 +1488,16 @@ Amazon59years449PostRcp85_def1 = [1:60]
 Amazon59years449PostRcp85_def2 = [61:100]
 
 
-```{r sim_simple449postRCP85_deforest59_1, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP85_deforest59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=FALSE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
 disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
 grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
 ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
-disp_best <- disp_best[1:60]
-grow_best <- grow_best[1:60]
-ini_best <- ini_best[1:60]
+disp_best <- disp_best[61:100]
+grow_best <- grow_best[61:100]
+ini_best <- ini_best[61:100]
 # eval_times <- as.numeric(lapply(0:9, function(x){ymd("2011-12-31") + years(x) - ymd("1980-11-01") }))
 # ymd("1980-11-01") + days(eval_times)
 
@@ -1506,7 +1506,7 @@ ymd("1980-11-01") + days(eval_times)
 
 # Previous simulations Amazon59years449PostRcp45_60 & Amazon59years449PostRcp45
 #
-nl@experiment <- experiment(expname="Amazon59years449PostRcp85_def1",
+nl@experiment <- experiment(expname="Amazon59years449PostRcp85_def2",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -1569,8 +1569,7 @@ write_simoutput(nl)
 #
 list.files(outpath,"Amazon59years449PostRcp85.*\\.csv")
 
-sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp85_def1_distinct.csv"),skip=0)
-#sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def2_distinct.csv"),skip=0))
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp85_def2_distinct.csv"),skip=0)
 
 #
 # Calculate power law exponents and max/total patch size by year 
@@ -1589,11 +1588,11 @@ plan(sequential)
 pexp %>% filter(type=="pl") %>% mutate(tot_patch= tot_patch/(450*450)*100)  %>% 
          summarise(up_b=quantile(tot_patch,0.975),lo_b=quantile(tot_patch,0.025),tot_patch=median(tot_patch))
 
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59postDef.rds"))
+#saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP85_59postDef.rds"))
 # Load previous simulations and bind the total file
 #
-#pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds")) 
-#saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP45_59postDef.rds"))
+pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP85_59postDef.rds")) 
+saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP85_59postDef.rds"))
 ```
 
 
