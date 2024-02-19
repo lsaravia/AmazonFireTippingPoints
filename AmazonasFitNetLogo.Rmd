@@ -1682,7 +1682,9 @@ prow <- plot_grid(
   p3 ,
   p4 ,
   align = 'vh',
-  nrow= 2
+  nrow= 2,
+  labels = c('A.', 'B.', 'C.', 'D.'),
+  label_fontface = "plain"
   )
 prow
 

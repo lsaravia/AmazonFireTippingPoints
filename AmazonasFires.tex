@@ -116,9 +116,9 @@
 \section{Modelling Amazon fire regimes under climate change
 scenarios}\label{modelling-amazon-fire-regimes-under-climate-change-scenarios}
 
-Leonardo A. Saravia \textsuperscript{1} \textsuperscript{5}, Korinna
-Allhoff \textsuperscript{4}, Ben Bond-Lamberty \textsuperscript{2},
-Samir Suweis \textsuperscript{3}
+Leonardo A. Saravia \textsuperscript{1} \textsuperscript{5}, Korinna T.
+Allhoff \textsuperscript{2} \textsuperscript{3}, Ben Bond-Lamberty
+\textsuperscript{4}, Samir Suweis \textsuperscript{5}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -126,15 +126,19 @@ Samir Suweis \textsuperscript{3}
   Centro Austral de Investigaciones Científicas (CADIC-CONICET),
   Ushuaia, Argentina.
 \item
+  University of Hohenheim, Institute of Biology, FG Eco-Evolutionary
+  Modelling (190m), Stuttgart, Germany
+\item
+  KomBioTa -- Center for Biodiversity and Integrative Taxonomy,
+  University of Hohenheim \& State Museum of Natural History, Stuttgart,
+  Germany
+\item
   Pacific Northwest National Laboratory, Joint Global Change Research
   Institute, 5825 University Research Court \#3500, College Park, MD
   20740, USA
 \item
   Laboratory of Interdisciplinary Physics, Department of Physics and
   Astronomy ``G. Galilei'', University of Padova, Padova, Italy
-\item
-  University of Hohenheim, Institute of Biology, FG eco-evolutionary
-  modelling (190m), Stuttgart, Germany
 \item
   Corresponding author e-mail lasaravia@untdf.edu.ar, ORCID
   https://orcid.org/0000-0002-7911-4398
@@ -146,67 +150,74 @@ Samir Suweis \textsuperscript{3}
 
 Fire is one of the most important disturbances of the earth-system,
 shaping the biodiversity of ecosystems and particularly forests.
-Climatic change and other anthropogenic drivers such as deforestation,
-land use change, could produce potentially abrupt changes in fire
-regimes, triggering more profound transformations like the transition
-from forests to savannah or grasslands ecosystems. Large biodiversity
-loss could be produced if these transitions occur. The interplay between
-climate change and deforestation might intensify fire ignition and
-spread, potentially giving rise to more extensive, intense, and frequent
-fires. In this work, we use a simple forest-fire model and analyze the
-possible changes in the Amazon region's fire regime that depend on
-climate change-related variables. We explored the model behavior and
-find that there are two possible regime changes: a critical regime that
-implies high variability in fire extension and mega-fires, and an
-absorbing phase transition which would produce the extinction of the
-forest and transition to a different vegetation state. We parameterize
-the model using remote sensing data on fire extension and temperature.
-As an initial outcome, the model demonstrates proficiency in predicting
-past fires. We introduced the influence of scenaries with deforestation
-and 21st-century climate projections. Our findings suggest that the
-Amazon region is not currently nearing any of these regime changes but
-does predict a consistent increase in fire extension mainly induced by
-deforestation. Thus, stoping deforestation could be an important factor
-to diminish the potential for drastic alterations in tropical forest of
-the Amazon region.
+Climatic change and other anthropogenic drivers such as deforestation
+and land use change could produce abrupt changes in fire regimes,
+potentially triggering transition from forests to savannah or grasslands
+ecosystems with large accompanying biodiversity losses. The interplay
+between climate change and deforestation might intensify fire ignition
+and spread, potentially giving rise to more extensive, intense, and
+frequent fires, but this is highly uncertain. We use a simple
+forest-fire model to analyze the possible changes in the Amazon region's
+fire regime that depend on climate change-related variables. We first
+explored the model behavior and found that there are two possible regime
+changes: a critical regime that implies high variability in fire
+extension and mega-fires, and an absorbing phase transition which would
+produce the extinction of the forest and transition to a different
+vegetation state. We parameterize the model using remote sensing data on
+fire extension and temperature, and show that it demonstrates
+proficiency in predicting past fires. We found two possible regime
+changes under 21st-century scenaries of deforestation and climate
+change: a critical regime that implies high variability in fire
+extension and mega-fires, and an absorbing phase transition which would
+produce the extinction of the forest and transition to a different
+vegetation state. Our findings suggest that the Amazon region is not
+currently nearing any of these regime changes but predict a consistent
+increase in fire extension mainly induced by deforestation. Thus,
+stoping deforestation could be an important factor to diminish the
+potential for drastic alterations in tropical forests of the Amazon
+region.
 
 \subsection{Introduction}\label{introduction}
 
-Very few regions in the terrestrial biosphere are unaffected by fire.
-Fires caused directly or indirectly by human activities (Bowman et al.
-2020) have different characteristics from natural fires, including in
-spatial pattern, severity, burn frequency and seasonality, producing
-contrasting ecological consequences (Steel et al. 2021). Recent years
-have seen an increase in fire intensity and extension in different
-regions (Bowman et al. 2020, Pivello et al. 2021), partially
-attributable to the fact we are experiencing a biosphere temperature
-that is 1°C above historical records (Masson-Delmotte et al. 2021);
-also, it is hypothesized that this intensification could reduce the
-spatial and temporal variation in fire regimes, called pyrodiversity
-(Kelly and Brotons 2017), that in turn will generate substantial
-reductions in biodiversity and ecosystem processes such as carbon
-storage (Dieleman et al. 2020, Furlaud et al. 2021). It is likely that
-the most affected regions will be the ones in which fire has been
-historically rare or absent. In regions such as tropical forests (Barlow
-et al. 2020), extreme fires could trigger extensive biodiversity loss as
-well as major ecosystems changes as transitions from forest to savannah
-or shrublands (Hirota et al. 2011, Fairman et al. 2015).
+Few regions in the terrestrial biosphere are unaffected by fire. Fires
+caused directly or indirectly by human activities (Bowman et al. 2020)
+have different characteristics from natural fires, including in spatial
+pattern, severity, burn frequency and seasonality, producing contrasting
+ecological consequences (Steel et al. 2021). Recent years have seen an
+increase in fire intensity and extension in different regions (Bowman et
+al. 2020, Pivello et al. 2021), partially attributable to the fact we
+are experiencing a biosphere temperature that is 1°C above historical
+records (Masson-Delmotte et al. 2021); it is hypothesized that this
+intensification could reduce the spatial and temporal variation in fire
+regimes, called pyrodiversity (Kelly and Brotons 2017), that in turn
+will generate substantial reductions in biodiversity and ecosystem
+processes such as carbon storage (Dieleman et al. 2020, Furlaud et al.
+2021). It is likely that the most affected regions will be the ones in
+which fire has been historically rare or absent. In regions such as
+tropical forests (Barlow et al. 2020), extreme fires could trigger
+extensive biodiversity loss as well as major ecosystems changes such as
+transitions from forest to savannah or shrublands (Hirota et al. 2011,
+Fairman et al. 2015).
 
 Fires in the Amazon region were historically rare, due to the ability of
 old-growth forest to maintain enough moisture to prevent fire spread,
 even after prolonged drought periods (Uhl and Kauffman 1990). Human
-activities such as deforestation and land-use change over the past 40
-years have produced the conditions for fire to become much more frequent
-and widespread across the basin (Alencar et al. 2011, Aragão et al.
-2018, Cardil et al. 2020). Droughts are predicted to increase due to
-climatic change, and have the potential to interact with human
+activities, specifically deforestation and resulting land-use changes
+over the past four decades, have created conditions conducive to more
+frequent and widespread fires across the basin (Alencar et al. 2011,
+Aragão et al. 2018, Cardil et al. 2020). Another significant factor
+contributing to this phenomenon is the predicted increase in droughts
+due to climatic change. Droughts can interact with deforestation,
+potentially exacerbating land cover conversion and creating a dangerous
+positive feedback loop (Barlow et al. 2020). Additionally, human
 activities such as secondary vegetation slash-and-burn and cyclical
-ﬁre-based pasture cleaning (Aragão et al. 2018). Although deforestation
-rates were substantially reduced until 2018 (Feng et al. 2021), previous
-deforestation activities may provide sufficient ignition sources for
-fire to expand into adjacent forests (Aragão et al. 2018). This process
-could increase the importance of fires unrelated to deforestation
-(Aragão et al. 2014).
+fire-based pasture cleaning can serve as ignition sources for forest
+fires (Aragão et al. 2018). Despite substantial reductions in
+deforestation rates until 2018 (Feng et al. 2021), previous
+deforestation activities may still provide sufficient ignition sources
+for fires to expand into adjacent forests (Aragão et al. 2018). This
+process could elevate the significance of fires unrelated to
+deforestation (Aragão et al. 2014).
 
 Different models of fire for the Amazon have been developed to predict
 regime changes under climate change scenarios. Here, we define a regime
@@ -228,65 +239,68 @@ entire dynamical system (Levin and Durret 1996).
 Simple models of fire have been used as an example of self-organized
 criticality (SOC), where systems can self-organize into a state
 characterized by power-laws in different model outputs. For example, the
-forest fire model of Drossel \& Schwabl Drossel and Schwabl (1992) (DSM)
-was proposed to show SOC in relation to the size distribution of
-disturbance events (Jensen 1998). Power-laws imply scale invariance,
-meaning that there is no characteristic scale in the model. Later it was
-shown that DSM does not exhibit true scale invariance (Grassberger 2002)
-and that the system needs to be somewhat tuned to observe criticality
-(Bonachela and Muñoz 2009). These facts diminished its theoretical
-attractiveness, but the model could be still of high practical
-relevance. Some modifications of the Drossell \& Schwabl (DSM) model
-have been used to predict fire responses to climate change (Pueyo 2007),
-and other DSM variants can reproduce features observed in empirical
-studies (Ratz 1995) such as the power-law distributions of the fire
-sizes, the size and shape of unburned areas and the relationship between
-annual burned area and diversity of ecological stages (Zinck and Grimm
-2009). An analysis of different models showed that the key for
-reproducing all these patterns was changing the scale of grid cells to
-represent several hectares, and the `memory effect': flammability
-increases with the time since the last fire at a given site (Zinck and
-Grimm 2009, Zinck et al. 2011). But the exponent of the fire size
-distribution observed in different ecoregions still cannot be reproduced
-by these models.
+forest fire model of Drossel and Schwabl (1992) (DSM) was proposed to
+show SOC in relation to the size distribution of disturbance events
+(Jensen 1998). Power-laws imply scale invariance, meaning that there is
+no characteristic scale in the model. Later it was shown that DSM does
+not exhibit true scale invariance (Grassberger 2002) and that the system
+needs to be somewhat tuned to observe criticality (Bonachela and Muñoz
+2009). These facts diminished its theoretical attractiveness, but the
+model could still be of high practical relevance. Some modifications of
+the Drossell \& Schwabl (DSM) model have been used to predict fire
+responses to climate change (Pueyo 2007), and other DSM variants can
+reproduce features observed in empirical studies (Ratz 1995) such as the
+power-law distributions of the fire sizes, the size and shape of
+unburned areas and the relationship between annual burned area and
+diversity of ecological stages (Zinck and Grimm 2009). An analysis of
+different models showed that the key for reproducing all these patterns
+was changing the scale of grid cells to represent several hectares, and
+the `memory effect': flammability increases with the time since the last
+fire at a given site (Zinck and Grimm 2009, Zinck et al. 2011). However,
+the exponent of the fire size distribution observed in different
+ecoregions still cannot be reproduced by these models.
 
-These simple models could have critical behaviour characterized by
-power-law distribution in fire sizes and other model outputs. Such
-dynamics can be explained in terms of percolation theory (Stauffer and
-Aharony 1994) where there is a transition between two states: one where
-propagation of fires occurs, and another where it is very limited. The
-narrow region where the transition occurs is the critical point,
-characterized by an order parameter (fire size) that depends on some
-external control parameter (e.g.~ignition probability) (Solé and
-Bascompte 2006). An example of this transition could be the case of the
-recent Australia 2019-2020 mega-fires (Nolan et al. 2020), which had
-devastating consequences for biodiversity and ecosystem functioning
-(Kelly et al. 2020). Historically, indigenous fire stewardship in
-Australian landscapes maintained flammable forest in a disconnected
-state by producing frequent small scale fires ({``Biodiversity in
-flames''} 2020), thereby preventing high intensity fires and protecting
-biodiversity. This regime was disrupted by fire suppression related to
-European colonization land-use change (Hoffman et al. 2021) and climate
-(Adams et al. 2020), pushing the system towards a critical regime
-(Nicoletti et al. 2023) with less ecosystem resilience to extreme fires.
-These kinds of extreme events are very difficult to predict by Earth
-system models that do not fully incorporate the dynamic of fuel
-accumulation and vegetation dynamics or their effects on biodiversity
-and ecosystem services (Sanderson and Fisher 2020).
+The simple models mentioned above could have critical behaviour
+characterized by power-law distribution in fire sizes and other model
+outputs. Such dynamics can be explained in terms of percolation theory
+(Stauffer and Aharony 1994) where there is a transition between two
+states: one where propagation of fires occurs, and another where it is
+very limited. The narrow region where the transition occurs is the
+critical point, characterized by an order parameter (fire size) that
+depends on some external control parameter (e.g.~ignition probability)
+(Solé and Bascompte 2006). An example of this transition could be the
+case of the recent Australia 2019-2020 mega-fires (Nolan et al. 2020),
+which had devastating consequences for biodiversity and ecosystem
+functioning (Kelly et al. 2020). Historically, indigenous fire
+stewardship in Australian landscapes maintained flammable forest in a
+disconnected state by producing frequent small scale fires
+({``Biodiversity in flames''} 2020), thereby preventing high intensity
+fires and protecting biodiversity. This regime was disrupted by fire
+suppression related to European colonization land-use change (Hoffman et
+al. 2021) and climate (Adams et al. 2020), pushing the system towards a
+critical regime (Nicoletti et al. 2023) with less ecosystem resilience
+to extreme fires. These kinds of extreme events are very difficult to
+predict by Earth system models that do not fully incorporate the dynamic
+of fuel accumulation and vegetation dynamics or their effects on
+biodiversity and ecosystem services (Sanderson and Fisher 2020).
 
 The objective of this work is to model and predict the changes in fire
 regimes of the Amazon region using a simple spatial stochastic fire
 model, based on variables like precipitation and temperature that are
-included in climate change scenarios. By doing this we are assuming that
-the emergent dynamics can be described by a process of slow accumulation
-of fuel and rapid discharge produced by the fires. We first analyse the
-fire dynamics of the last 20 years in the region with the MODIS burnt
-area product to check our main assumption and derive an ignition
-probability. Then we predict the ignition probability up to the year
-2060 based on different greenhouse gas Representative Concentration
-Pathways. Finally, using the model forced with the ignition probability,
-we predict and analyse the possible changes in the modelled fire regimes
-for the Amazon, including the influence of deforestation on model
+included in climate change scenarios. By doing this we assume that the
+emergent dynamics can be described by a process of slow accumulation of
+fuel and rapid discharge produced by the fires. More precisely, we
+initially reconstruct past fire patterns by utilizing the NASA
+Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt area
+product. This step serves to verify our main assumption and derive an
+ignition probability. Subsequently, in the second step, we predict the
+ignition probability up to the year 2060 based on different greenhouse
+gas Representative Concentration Pathways. The third step involves
+simulations to explore the behavior of the Fire model. In the fourth
+step, we fit the Fire Model to the observed MODIS fire patterns.
+Finally, utilizing the model forced with the ignition probability, we
+predict and analyze potential changes in the modeled fire regimes for
+the Amazon, taking into account the influence of deforestation on model
 parameters.
 
 \subsection{Methods}\label{methods}
@@ -300,22 +314,23 @@ Brazil (Cardil et al. 2020), and the whole area is thought to be a
 crucial tipping element of the Earth-system (Staver et al. 2011, Lenton
 and Williams 2013).
 
-\subsubsection{Fire data and parameters}\label{fire-data-and-parameters}
+\subsubsection{Reconstruction of past fire patterns from MODIS
+data}\label{reconstruction-of-past-fire-patterns-from-modis-data}
 
 We estimated the monthly burned areas from 2001 to the end of 2021 using
 the NASA Moderate-Resolution Imaging Spectroradiometer (MODIS) burnt
 area Collection 6 product MCD64A1 (Giglio et al. 2016), which has a 460
 m pixel resolution. We used Google Earth Engine with the JavaScript
 programming language to download the data restricted to the region of
-interest (See source code availability below). Each image represents the
+interest (see source code availability below). Each image represents the
 burned pixels as 1 and the non-burned as 0. We then calculated the
 burned clusters using 4 nearest neighbours (Von Neumann neighbourhood)
 and the Hoshen--Kopelman algorithm (Hoshen and Kopelman 1976). Each
 cluster contains contiguous pixels burned within a month and this
 represents a fire event \(S\), allowing us to calculate the number and
 sizes of fire clusters by month. We estimated the probability of
-ignition \(f\) as \(f(t) = \frac{|S_t|}{T}\), where \(|\ |\) denotes the
-number of clusters, \(S_t\) that start in the month \(t\) (if a fire
+ignition \(f\) as \(f(t) = \frac{|S_t|}{T}\), where \(|\S_t|\) denotes
+the number of clusters \(S_t\) that start in the month \(t\) (if a fire
 started in the previous month we avoided it to remove possible double
 counting), and \(T\) is total number of pixels in the region, to allow
 comparisons with the fire model.
@@ -339,8 +354,8 @@ the exponential distribution using the Vuong's test was significant with
 p\textless0.05; if p\textgreater=0.05 we assumed that the two
 distributions cannot be differentiated.
 
-\subsubsection{Modelling the probability of
-ignition}\label{modelling-the-probability-of-ignition}
+\subsubsection{Fitting of ignition
+parameter}\label{fitting-of-ignition-parameter}
 
 We calculated the monthly ignition probability \(f\) and related it to
 monthly precipitation (\(ppt\)), maximum temperature (\(T_{max}\)) and a
@@ -349,12 +364,12 @@ global and regional fire activity models (Huang et al. 2015, Turco et
 al. 2018, Fonseca et al. 2019, Wei et al. 2020). More variables were
 used in these models, but we are constrained by the variables available
 in the Climate Projections (see below). We obtained environmental data
-from the TerraClimate dataset (Abatzoglou et al. 2018), doing an average
-over the region of study, aiming to represent the influence of regional
+from the TerraClimate dataset (Abatzoglou et al. 2018), averaging over
+the region of study, aiming to represent the influence of regional
 climate over \(f\). We evaluated an increasingly complex series of
 generalized additive models (GAMs), assuming a Gaussian distribution and
 transformed \(f\) to logarithms, because it had a highly skewed
-distribution. Additionally we fitted the same models assuming a Gamma
+distribution. We also fitted the same models assuming a Gamma
 distribution and no transformation for \(f\). For all the models we used
 thin plate regression splines (Pedersen et al. 2019) as smoothing terms,
 and for interactions between environmental variables we used tensor
@@ -378,10 +393,12 @@ RMSE = \(\sqrt{\frac{1}{n} \sum_{i=1}^n (f_i - \hat{f_i})^2}\)
 
 Where \(f_i\) is the observed ignition probability \(f\) at month \(i\),
 \(\hat{f_i}\) the predicted \(f\) and \(n\) the total number of months
-used for predictions. We used the model with smaller MAE and RMSE to
-obtain predictions of the ignition probability up to 2060. Driving data
-were obtained from the NASA Earth Exchange Global Daily Downscaled
-Climate Projections NEX-GDPP
+used for predictions. We selected the model with the smallest Mean
+Absolute Error (MAE) and Root Mean Square Error (RMSE) to generate
+predictions of the ignition probability up to 2060. These predictions
+serve as input for the fire model, as explained in more detail further
+below. Driving data were obtained from the NASA Earth Exchange Global
+Daily Downscaled Climate Projections NEX-GDPP
 (https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp)(Thrasher
 et al. 2012), which were estimated with General Circulation Models (GCM)
 runs conducted under the Coupled Model Intercomparison Project Phase 5
@@ -392,9 +409,13 @@ of ignition up to 2060 using the fitted GAM across two of the four
 Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5
 (Meinshausen et al. 2011). Such RCPs are greenhouse gas concentration
 trajectories adopted by the IPCC and used for climate modelling and
-research (Moss et al. 2010).
+research (Moss et al. 2010). RCP4.5 represents an intermediate scenario,
+indicating a peak in emissions around 2040 followed by a decline. On the
+other hand, RCP8.5 depicts a scenario where emissions persistently
+increase throughout the 21st century.
 
-\subsubsection{Fire Model}\label{fire-model}
+\subsubsection{Fire Model definition and
+exploration}\label{fire-model-definition-and-exploration}
 
 Conceptually the model represents two key biological processes: forest
 burning and forest recovery. We assume that the forest layer represents
@@ -405,11 +426,11 @@ is killed - rather, it represents the consumption of flammable fuels.
 The regrowth or recovery process simulates vegetation re-establishing
 flammable biomass over time.
 
-The model uses a 2-dimensional lattice to represent the spatial region.
-Each site in the lattice can be in one of three different states: an
-empty or burned site, a flammable forest (called forest for short), or a
-burning forest. The lattice is updated in parallel, according to the
-following steps:
+The model uses a two-dimensional lattice to represent the spatial
+region. Each site in the lattice can be in one of three different
+states: an empty or burned site, a flammable forest (called forest for
+short), or a burning forest. The lattice is updated in parallel,
+according to the following steps:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -425,7 +446,9 @@ following steps:
   power-law dispersal kernel with exponent \(de\).
 \item
   A random site can catch fire spontaneously with probability \(f\),
-  i.e., this probability changes by month, reflecting the fire season.
+  i.e., which varies monthly to reflect the fire season. This parameter
+  is fitted to fire data for predictions, global change scenarios, and
+  deforestation scenarios (refer to the previous section for details).
 \end{enumerate}
 
 We assumed absorbing boundary conditions and a lattice size of 450x450
@@ -441,96 +464,101 @@ kernels (Clark et al. 2005, Seri et al. 2012).
 This model is very similar to the Drossel-Schwabl (DSM) forest fire
 model (Drossel and Schwabl 1992): it exhibits critical behaviour when
 \(\theta = p/f\) tends to \(\infty\), and thus must satisfy the
-condition that \(f << p\), as is generally observed in natural systems.
-The model involves the separation between three time scales: the fast
-burning of forest clusters, the slow recovery of forest, and the even
-slower rate of fire ignitions. Then in the critical regime there is a
-slow accumulation of forest that forms connected clusters, and
-eventually as the ignition probability is very low these clusters
-connect the whole lattice--- here is the link with percolation theory
-(Stauffer and Aharony 1994)--- and a single ignition event can produce
-big fires. After this, the density of the forest becomes very low and
-the accumulation cycle begins again. This regime is characterized by
-wide fluctuations in the size of fires and the density of trees, with
-both following approximately power-law size distributions. If the
-ignition probability \(f\) is too high fires are frequent, forest sites
-become disconnected and small fires, with a characteristic size,
-dominate the system.
+condition that \(f << p\). This condition means that the chances of an
+empty site turning into forest are much higher than the chances of a
+healthy forest site catching fire spontaneously, as is generally
+observed in natural systems. The model involves the separation between
+three time scales: the fast burning of forest clusters, the slow
+recovery of forest, and the even slower rate of fire ignitions. Then in
+the critical regime there is a slow accumulation of forest that forms
+connected clusters, and eventually as the ignition probability is very
+low these clusters connect the whole lattice--- here is the link with
+percolation theory (Stauffer and Aharony 1994)--- and a single ignition
+event can produce large fires. After this, the density of the forest
+becomes very low and the accumulation cycle begins again. This regime is
+characterized by wide fluctuations in the size of fires and the density
+of trees, with both following approximately power-law size
+distributions. If the ignition probability \(f\) is too high fires are
+frequent, forest sites become disconnected and small fires, with a
+characteristic size, dominate the system.
 
 One of the features not present in the original forest fire model is
-that forests can have long-distance dispersal, ecologically this
-determines population spread, the colonization of empty habitats and the
-assembly of local communities (Nathan et al. 2008). The inclusion of
+that forests can have long-distance dispersal; ecologically, this
+determines population spread, the colonization of empty habitats, and
+the assembly of local communities (Nathan et al. 2008). The inclusion of
 long distance dispersal can modify the distribution of forest clusters,
 the distribution of fire sizes, and the dynamics of the model (Marco et
-al. 2011).
-
-When forest dispersal is limited mainly to nearest neighbours, forest
-recovery produces clusters that tend to coalesce and form uniform
-clusters with few or no isolated forest sites. When the forest burns,
-these isolated forest sites are the points from where the forest
-recovers (assuming no external colonization); when these are not present
-there is an increased probability that the forest becomes extinct. When
-dispersal is long-distance there is an important number of isolated
-forest sites, thus decreasing the probability of forest extinction. All
-these processes are particularly important when \(\theta\) is low and
-fires are smaller but more frequent. In dynamical terms there is a
-critical extinction value \(\theta_{ext}\), when
-\(\theta < \theta_{ext}\) the forest become extinct, but the critical
-value depends on the dispersal distance governed by \(de\).
+al. 2011). When forest dispersal is limited mainly to nearest
+neighbours, forest recovery produces clusters that tend to coalesce and
+form uniform clusters with few or no isolated forest sites. When the
+forest burns, these isolated forest sites are the points from where the
+forest recovers (assuming no external colonization); when these are not
+present there is an increased probability that the forest becomes
+extinct. With long-distance dispersal, there is an important number of
+isolated forest sites, thus decreasing the probability of forest
+extinction (Figure S13). These processes are particularly important when
+\(\theta\) is low and fires are smaller but more frequent. In dynamical
+terms there is a critical extinction value \(\theta_{ext}\), when
+\(\theta < \theta_{ext}\) the forest become extinct. However, the
+critical value depends on the dispersal distance governed by \(d_e\). At
+higher \(d_e\), the dispersal distance is smaller, the forest patches
+are more compact and isolated, leading to a higher probability of
+complete burning and a lower \(\theta_{ext}\).
 
 The second feature not present in the original forest fire model is
-seasonality. In natural systems, there is a period of the year when
-environmental conditions produce an increase in the fire ignition
-probability, and during the rest of the year there is a much lower
-probability of fires. This forces a periodic accumulation of forest and
-a short period of intense fires which is called the fire season. Thus,
-the model has a short period of low \(\theta_{min}\) and a longer period
-of high \(\theta_{max}\). If both the minimum and maximum \(\theta\) are
-in the critical region, the model behaviour, in the long run, will be
-like the critical regime with maximum fire sizes in the fire season.
-When \(\theta_{max}\) is in the critical and \(\theta_{min}\) outside
-the critical zone, the model's dynamics regime could have more extreme
-fires (i.e.~be more similar to the critical regime) than an equivalent
-non-seasonal model. If both \(\theta\) are outside the critical region
-the dynamics could be close to the critical extinction zone, but in this
-case, seasonal differences in fire sizes will be less pronounced.
+seasonality. In natural systems, certain times of the year exhibit
+environmental conditions that significantly increase the probability of
+fire ignition, while during the remaining periods, the probability of
+fires is much lower. This results in a periodic cycle of forest
+accumulation and a brief duration of intense fires, commonly known as
+the fire season. Consequently, the model incorporates a short period
+characterized by a low \(\theta_{min}\) and a longer period with a high
+\(\theta_{max}\). When both the minimum and maximum \(\theta\) values
+fall within the critical region, the model's long-term behavior
+resembles the critical regime, with maximum fire sizes occurring during
+the fire season. If \(\theta_{max}\) is within the critical region and
+\(\theta_{min}\) is outside it, the model's dynamics may exhibit more
+extreme fires (similar to the critical regime) compared to an equivalent
+non-seasonal model. Conversely, when both \(\theta\) values are outside
+the critical region, the dynamics may approach the critical extinction
+zone. In this scenario, seasonal differences in fire sizes are less
+pronounced.
 
 Increasing the length of the fire season as predicted in climate change
 scenarios (Pausas and Keeley 2021) will produce the model to spend more
 time at a lower \(\theta\) decreasing the connectivity of the forest and
 the size of fires. Moreover, this could increase the possibility of
-critical extinction if \(\theta_{max} - \theta_{min}\) are below
-\(\theta_{ext}\). In this work we are assuming that the forest is
-flammable forest; the extinction of this state could mean that
-environmental conditions become wetter and the forest does not burn
-anymore. If environmental conditions become dryer the extinction of
-forest probably means a transition to another type of vegetation and
-then the conditions to apply this model will no longer hold.
+critical extinction if both \(\theta_{max} and \theta_{min}\) are below
+\(\theta_{ext}\). In this work we assume that the forest is flammable
+forest; the extinction of this state could mean that environmental
+conditions become wetter and the forest does not burn anymore. If
+environmental conditions become drier, the extinction of forest probably
+means a transition to another type of vegetation and then the conditions
+to apply this model will no longer hold.
 
-We made a set of exploratory simulations, with a range of parameters
-compatible with what we found for the Amazon region, to characterize the
-previously described regimes (Table S3). Using a lattice size of 450x450
-sites, we ran the simulations for 60 years with an initial forest
-density of 0.3 (we found that different initial conditions gave similar
-results), and used the final 40 years to estimate the total annual fire
-size, the maximum cluster fire size, the distribution of fire sizes, and
-the total number of fires. To determine the cluster fire sizes and
-distributions we used the same methods described previously for the
-MODIS fire data. We ran a factorial combination of dispersal exponent
-\(de\) and \(\theta\) and 10 repetitions of each parameter set. First,
-we ran the experiment with \(\theta\) fixed, keeping the ignition
-probability \(f\) constant, and then repeated the experiment with
-seasonality: we simulated a fire season of 3 months each year
-multiplying \(f\) by 10. A dispersal exponent \(de>>1\)
-(e.g.~\(de=102\)) is equivalent to a dispersal to the nearest
-neighbours, while \(de=2.0155\) corresponds to a mean dispersal distance
-of 66 sites (Table S3), i.e.~long range dispersal.
+We conducted a set of exploratory simulations, with a range of
+parameters compatible with what we found for the Amazon region, to
+characterize the previously described regimes (Table S3). Using a
+lattice size of 450x450 sites, we ran the simulations for 60 years with
+an initial forest density of 0.3 (we found that different initial
+conditions gave similar results), and used the final 40 years to
+estimate the total annual fire size, the maximum cluster fire size, the
+distribution of fire sizes, and the total number of fires. To determine
+the cluster fire sizes and distributions we used the same methods
+described previously for the MODIS fire data. We ran a factorial
+combination of dispersal exponent \(de\) and \(\theta\) and 10
+repetitions of each parameter set. First, we ran the experiment with
+\(\theta\) fixed, keeping the ignition probability \(f\) constant, and
+then repeated the experiment with seasonality: we simulated a fire
+season of 3 months each year multiplying \(f\) by 10. A dispersal
+exponent \(de>>1\) (e.g.~\(de=102\)) is equivalent to a dispersal to the
+nearest neighbours, while \(de=2.0155\) corresponds to a mean dispersal
+distance of 66 sites (Table S3), i.e.~long range dispersal.
 
 \subsubsection{Fire Model Fitting}\label{fire-model-fitting}
 
 As we already estimated the \(f\) parameter from the 21 years of MODIS
-data, we only needed to estimate the dispersal exponent \(de\) and the
+data, and only needed to estimate the dispersal exponent \(de\) and the
 probability \(p\) of forest growth. This parameter \(p\) is expressed as
 \(r=1/p\), representing the average number of days for forest to
 recover. For this estimation we duplicated the extension of the
@@ -545,35 +573,36 @@ To explore the parameter space we used Latin-hypercube sampling (Fang et
 al. 2005) with parameter ranges \(2.5 - 2.00035\) for \(de\) (equivalent
 to a mean dispersal distance range of 3 - 290 sites) and \(365 - 7300\)
 days for \(r\). As the model has a long transient period, we could
-suppose that the system is in a transient state thus we also estimated
-the initial forest density as a parameter with a range of densities of
-0.2 - 0.7. We used 600 samples and 10 repeated simulations of the model
-for each sample, totalling 6000 simulations. We select the best
-parameter set using Approximate Bayesian Computation (ABC) (Csilléry et
-al. 2010, 2012) comparing the relative monthly fire size i.e the
-absolute size divided by the total number of sites (the number of MODIS
-pixels for the Amazon basin or the number of lattice sites for
-simulations) with model predictions using euclidean distance. During an
-initial test, we observed that the peaks in the model were delayed by
-2-3 months; the same happens in more realistic process based models
-(Thonicke et al. 2010), and as we were not interested in predicting the
-exact seasonal fire patterns, instead of using the complete monthly time
-series we used the monthly maximum fire size of the year. We validated
-this choice using a random model simulation with known parameters as
-data and verifying that we recover the parameters (see source code). The
-second step of our fitting procedure was to use power-law fire
-distribution to perform another ABC; to do this we ran 10 simulations
-for each of the parameter sets in the posterior distribution and then
-calculated the fire cluster distributions using the same methods
-explained previously. We use ABC to select a second posterior parameter
-distribution compared to the median value of the power-law exponent from
-MODIS data. The tolerance (proportion of results accepted nearest the
-target values) for both ABC procedures was set at 0.05.
+suppose that the system is in a transient state, and thus we also
+estimated the initial forest density as a parameter with a range of
+densities of 0.2 - 0.7. We used 600 samples and 10 repeated simulations
+of the model for each sample, totalling 6000 simulations, and selected
+the best parameter set using Approximate Bayesian Computation (ABC)
+(Csilléry et al. 2010, 2012) by comparing the relative monthly fire size
+--- i.e the absolute size divided by the total number of sites (the
+number of MODIS pixels for the Amazon basin or the number of lattice
+sites for simulations) -- with model predictions using Euclidean
+distance. During an initial test, we observed that the peaks in the
+model were delayed by 2-3 months; the same happens in more realistic
+process based models (Thonicke et al. 2010), and as we were not
+interested in predicting the exact seasonal fire patterns, so instead of
+using the complete monthly time series we used the monthly maximum fire
+size of the year. We validated this choice using a random model
+simulation with known parameters as data and verifying that we could
+recover the parameters (see source code). The second step of our fitting
+procedure was to use power-law fire distribution to perform another ABC;
+to do this we ran 10 simulations for each of the parameter sets in the
+posterior distribution and then calculated the fire cluster
+distributions using the same methods explained previously. We use ABC to
+select a second posterior parameter distribution compared to the median
+value of the power-law exponent from MODIS data. The tolerance
+(proportion of results accepted nearest the target values) for both ABC
+procedures was set at 0.05.
 
 Finally, we ran the model with the final posterior parameter
 distribution, the ignition probability estimated from the MODIS data,
 and the ignition probability estimated with the GAM model for the period
-2000-2020, to check if the data fit with the range of predictions. We
+2000-2021, to check if the data fit with the range of predictions. We
 performed the ABC using a lattice size of 450x450 sites, and as we used
 relative values (e.g.~absolute fire size divided by the total number of
 sites) the model does not represent a defined scale.
@@ -587,38 +616,22 @@ procedure, but instead of using \(f\) derived directly from data we used
 the \(f\) obtained from the GAM model, allowing us to compare actual and
 predicted fires using the same method to obtain \(f\).
 
-Besides our model does not include explicitly the effect of
-deforestation, we can make an approximation variating the parameters in
-time as deforestation increases. We fitted the parameters of the model
-to the whole region, assuming one type of flamable forest. But the
-parameters can be thought as an average of two vegetation types, 1) the
-vegetation that grows after deforestation that has a higher probability
-of ignition \(f\) and rapid recovery so the growth probability \(p\) is
-also higher 2) the original forest with lower \(f\) and also lower
-\(p\). Thus as deforestation increases, we can roughly calculate the
-increase in the average \(p\) and \(f\) due to deforestation after the
-fitted period (check the supplementary material for details). We
-estimated the mean deforestation rate for the Amazon biome using the
-Hansen remote sensing product (Hansen et al. 2013), updated until 2021.
-We applied this to the RCP4.5 scenario, showing the increase in \(f\)
-after 2021 in Figure S23.
-
-Besides our model does not explicitly account for deforestation's
-impact; however, we approximate this by dynamically adjusting parameters
-as deforestation intensifies. Initially fitted to the entire region
-based on a singular flammable forest type assumption, these parameters
-reflect an average between two vegetation categories: 1)
-post-deforestation vegetation, featuring higher ignition probability
-(\(f\)) and faster recovery (associated with higher growth probability,
-\(p\)); and 2) the original forest, with lower \(f\) and \(p\) values.
-Consequently, escalating deforestation leads to an estimated rise in the
-average \(p\) and \(f\) values beyond the fitted period (refer to
-supplementary material for more details). Leveraging the Hansen remote
-sensing product (Hansen et al. 2013) updated until 2021, we calculated
-the mean deforestation rate for the Amazon biome. Subsequently, under
-RCP4.5 and RCP8.5 scenarios, we demonstrate the potential impact of
-deforestation on the model's predictions. The estimated increase in
-\(f\) post-2021 is shown in Figures S23 \& S24.
+Our model also does not explicitly account for deforestation's impact;
+however, we approximate this by dynamically adjusting parameters as
+deforestation intensifies. Initially fitted to the entire region based
+on a singular flammable forest type assumption, these parameters reflect
+an average between two vegetation categories: 1) post-deforestation
+vegetation, featuring higher ignition probability (\(f\)) and faster
+recovery (associated with higher growth probability, \(p\)); and 2) the
+original forest, with lower \(f\) and \(p\) values. Consequently,
+escalating deforestation leads to an estimated rise in the average \(p\)
+and \(f\) values beyond the fitted period (refer to supplementary
+material for more details). Leveraging the Hansen remote sensing product
+(Hansen et al. 2013) updated until 2021, we calculated the mean
+deforestation rate for the Amazon biome. Subsequently, under RCP4.5 and
+RCP8.5 scenarios, we demonstrate the potential impact of deforestation
+on the model's predictions. The estimated increase in \(f\) post-2021 is
+shown in Figures S19 \& S20.
 
 \subsection{Results}\label{results}
 
@@ -637,11 +650,11 @@ constant, \(\alpha\) the exponent and have an extra parameters:
 \(S=x_{min}\), which is the minimum value for which the power-law holds.
 The constant \(c\) is given by the normalization requirement (Newman
 2005). Only 6 of 20 years exhibit fire sizes following a power law
-distribution (Table S1), and some of such distributions have a range
-{[}\(S_{max} - x_{min}\){]} with the highest values compared to the
-years without power-laws, but there are also years with power-law and
-small range. These two extremes represent a pattern that we also observe
-in the fire model.
+distribution (Table S1, Figures S3-S5), and some of such distributions
+have a range {[}\(S_{max} - x_{min}\){]} with the highest values
+compared to the years without power-laws, but there are also years with
+power-law and small range. These two extremes represent a pattern that
+we also observe in the fire model.
 
 \begin{figure}
 \centering
@@ -656,14 +669,14 @@ and 2011 where this cycle can be clearly observed.}
 \end{figure}
 
 \subsubsection{Fitting of ignition
-parameter}\label{fitting-of-ignition-parameter}
+parameter}\label{fitting-of-ignition-parameter-1}
 
 We fitted GAM models for the ignition probability \(f\) with single
 variables, combinations of two interacting variables, and one month
 lags, the best model with lower \(AIC\) and lower MAE and RMSE was the
-Gaussian with the interaction \(T_{max} * m\) (Table S2). For the GAM
-fitted to the complete dataset we observe that the model does not
-capture the most extreme years of \(f\) (Figure S7), but the model
+Gaussian with the interaction \(T_{max} * m\) (Table S2, Figure S6). For
+the GAM fitted to the complete dataset we observe that the model does
+not capture the most extreme years of \(f\) (Figure S7), but the model
 fitted for the first years (\textless{} 2018) predicted the rest of the
 data well (Figure S8).
 
@@ -694,16 +707,16 @@ effect of increasing the frequency of power-law distribution for
 \(\theta\) (Table S5); this pattern was also observed in the MODIS data.
 
 In the simulations with \(\theta = 25\) and 250 and with shorter
-dispersal distances, the forest density tends to decrease and
-eventually, it reaches zero, marking the absorbing phase transition
-reported for this type of model (Nicoletti et al. 2023), meaning that in
-these cases the parameter \(\theta\) was below the critical point
-\(\theta_{ext}\) and produce the forest extinction (Figure S11).
-Increasing the dispersal distance produces higher forest density, while
-seasonality has the opposite effect. In the case of high dispersal and
-low \(\theta\) and seasonality, we are again below \(\theta_{ext}\).
-Note that forest density is the so-called active component of the model
-and represents the flammable forest.
+dispersal distances, the forest density tends to decrease and eventually
+reaches zero, marking the absorbing phase transition reported for this
+type of model (Nicoletti et al. 2023); this means that in these cases
+the parameter \(\theta\) was below the critical point \(\theta_{ext}\)
+and so produces forest extinction (Figure S11). Increasing the dispersal
+distance produces higher forest density, while seasonality has the
+opposite effect. In the case of high dispersal and low \(\theta\) and
+seasonality, we are again below \(\theta_{ext}\) (Figures S12 \& S13).
+Note once again that forest density is the so-called active component of
+the model and represents the flammable forest.
 
 \begin{figure}
 \centering
@@ -742,24 +755,25 @@ average \(\theta\) of the final posterior distribution have a mean of 61
 a range between 9 and 910, which is a low-intermediate range,
 considering the parameter range we used for the model exploration.
 
-When observing the predictions without temporal structure (Figure 3),
-the model simulated with the ignition probability \(f\) calculated from
-the data, and \(f\) estimated using the GAM model, yielded results
-consistent with the observed data range. The predicted total fire size
-showed a very good match with the data, while the predicted number of
-fires was slightly higher. The maximum fire size (\(S_{max}\)) was
-moderately higher, and the power-law exponent (\(\alpha\)) of the fire
-size distribution was lower (Figure 3). These results are interrelated
-because a lower \(\alpha\) indicates larger fire events (Figure 3). The
-model exhibited an extended range with a few very large fires, which was
-expected due to the nonlinear nature of the model and the number of
-simulations (around 100 for each observed data).
+When examining predictions without temporal structure (Figure 3), both
+models, one simulated with the ignition probability (\(f\)) calculated
+from the data and the other with \(f\) estimated using the GAM model,
+produced results consistent with the observed data range. Comparing
+medians, the predicted total fire size closely matched the data (Figure
+3A), while the predicted number of fires was slightly higher (Figure
+3C). The maximum fire size (\(S_{max}\)) was moderately elevated (Figure
+3B), and the power-law exponent (\(\alpha\)) of the fire size
+distribution was lower (Figure 3D). It's worth noting that these results
+are interconnected, as a lower \(\alpha\) signifies larger fire events.
+The model exhibited an extended range with a few very large fires, an
+outcome expected due to the nonlinear nature of the model and the number
+of simulations (around 100 for each observed data).
 
 \begin{figure}
 \centering
 \includegraphics{figure/Amazon_ModelVsData_SimulGAM.png}
 \caption{Predictions of the fire model compared with observed data for
-the years 2001-2020. We used best-fit parameters, the ignition
+the years 2001-2021. We used best-fit parameters, the ignition
 probability from MODIS, and the ignition probability from the estimated
 GAM models (Simul GAM), and run 100 simulations of the model. To make
 them comparable we divided all the outputs (except power law exponent)
@@ -770,17 +784,17 @@ medians.}
 \subsubsection{Fire model predictions}\label{fire-model-predictions}
 
 The modelled temporal series, based on the \(f\) from the GAM model for
-the 2001-2021 period, shows a wide 95th percentile interval that
+the 2001-2021 period, exhibits a 95th percentile interval that
 encompasses almost all the fire data (with the exception of the 2010
 extreme fire). The median of the series suggests a decreasing trend in
 annual fires over this time period (Figure 4). This decrease, along with
 inter-annual fluctuations, is also apparent in the observational fire
-data shown in Figure 1. Specifically, the data indicate that the most
-extensive fires occurred in the first decade from 2001-2010, while the
-subsequent period from 2011-2021 experienced substantially less
-extensive burning. After 2021, the model utilizes General Circulation
-Model (GCM) predictions to estimate the fire ignition \(f\), and a mean
-rate of deforestation from data.
+data shown in Figure 1. Specifically, the most extensive fires occurred
+in the first decade from 2001-2010, while the subsequent period from
+2011-2021 experienced substantially less extensive burning. After 2021,
+the model utilizes General Circulation Model (GCM) predictions to
+estimate the fire ignition \(f\), and a mean rate of deforestation from
+data.
 
 Under both RCP scenarios in the absence of deforestation, a consistent
 pattern emerges with a gradual rise in the total annual fires. However,
@@ -813,7 +827,7 @@ in extreme fires and total annual fire occurrences. Incorporating
 deforestation into the analysis revealed a significant escalation in
 both the sizes of maximum fires and the overall total fire size. Figure
 5 illustrates the trend observed for RCP 4.5, which is also akin to that
-depicted in Figure S25 for RCP 8.5. Both RCP scenarios exhibit a similar
+depicted in Figure S21 for RCP 8.5. Both RCP scenarios exhibit a similar
 pattern.
 
 \begin{figure}
@@ -826,39 +840,39 @@ burned area product. The predictions by decade were estimated with a
 fitted model using a monthly ignition probability calculated with data
 from General Circulation Models under two greenhouse gas emissions
 scenarios known as Representative Concentration Pathways (RCPs), here
-only RCP4.5 and RCP8.5 is shown in the SI. For the years 2001-2020 the
-ignition probability was estimated from actual data.}
+only RCP4.5 and RCP8.5 is shown in the figure S21. For the years
+2001-2021 the ignition probability was estimated from actual data.}
 \end{figure}
 
 \subsection{Discussion}\label{discussion}
 
 Based on spatial forest-fire dynamics, the model fitted to actual data
 and the predictions up to 2060 suggest that the Amazon fire dynamics are
-driven to an increase in total annual and extreme fires mainly by the
-influence of deforestation. In addition, the model predicts a reduction
-of extreme anual fires under climate change forcing alone, that might be
+driven to an increase in total annual and extreme fires that are mainly
+caused by deforestation. In addition, the model predicts a reduction of
+extreme anual fires under climate change forcing alone. This might be
 due to the double average that we used for the General Circulation
 Models (GCM): we averaged the tempertature over the spatial extension of
-the region and over all the 21 GCM. When we used the actual data ---also
-averaged over the region--- the model predicts in the range of observed
-extreme fires. So we hypothesize that increased temporal variability of
-the ignition probability could produce an increase in the extreme fires
-not captured by the model due to the smoothed nature of the CGM data.
-The increase in median tendency of the annual fires under a constant
-deforestation scenario seems a more robust prediction, however, and is
-in line with the predicted increase in fire weather conditions for the
-area (Abatzoglou et al. 2019).
+the region and over all the 21 GCMs. When we used the actual data
+---also averaged over the region--- the model predicts in the range of
+observed extreme fires. For this reason, we hypothesize that increased
+temporal variability of the ignition probability could produce an
+increase in the extreme fires not captured by the model due to the
+smoothed nature of the CGM data. The increase in median tendency of the
+annual fires under a constant deforestation scenario seems a more robust
+prediction, however, and is in line with the predicted increase in fire
+weather conditions for the area (Abatzoglou et al. 2019).
 
 A critical regime would imply far more extreme fires and an absorbing
-phase transition could signal an imminent forest-savanna transition,
-without extreme fires but with more frequent fires. The actual and
-predicted fire regime seems to lie between these regimes. This model
-does not explicitly includes deforestation or slash and burn and other
-agricultural areas---these are implicitly represented in the flammable
-forest state---and thus the continuous increase of these land uses
-represented in the deforestation scenarios, combined with the increase
-in the probability of ignition \(f\) and produce important changes in
-the Amazonian fire regime.
+phase transition that could signal an imminent forest-savanna
+transition, without extreme fires but with more frequent fires. The
+actual and predicted fire regime seems to lie between these regimes.
+This model does not explicitly includes deforestation or slash and burn
+and other agricultural areas---these are implicitly represented in the
+flammable forest state---and thus the continuous increase of these land
+uses represented in the deforestation scenarios, combined with the
+increase in the probability of ignition \(f\) and produce important
+changes in the Amazonian fire regime.
 
 Similar models have been used to fit fire data and determine if the
 system is in a critical regime. For example, Zinck et al. (Zinck et al.
@@ -928,32 +942,11 @@ Amazon (Aragão et al. 2018). Besides that Cardil (2020) found that in
 2018 most of the fires (85\%) were produced in areas deforested in 2018.
 The fitted parameters, forced with the ignition probability estimated
 from actual data are incompatible with such a high proportion, but are
-near the proportion observed in previous years, as previously mention a
-model incorporating explicit parameters for the deforested areas would
-be needed to resolve this. Using the inverse od the \(p\) parameter the
-model also predicts that the forest will be recovered between 13 and 19
-years, close to the 23 years suggested by Alencar (Alencar et al. 2011).
-
-The forest state in the model represents the flammable forest, as
-undisturbed tropical forest in the Amazon is thought to be not flammable
-and with a very low probability of natural fires (Fonseca et al. 2019),
-but deforested areas are flammable and our fitted parameters represent
-an average of these types. The proportion these types are changing,
-however, due to the increased edges of undisturbed forest with human
-degraded forest and other land uses (Aragão et al. 2018). Fire is still
-produced by human activities (Barlow et al. 2020) and starts from the
-transportation network and from the outside regions (Brando et al.
-2019). These human-induced fires can invade standing forest and if
-climate change makes forests hotter and drier it will become more
-capable of sustaining more extensive fires (Brando et al. 2019). These
-changes are considered in our model through the variation of the
-proportion of forest that burns and is deforested, but we keep the
-average \(\theta\) on the fitted values, besides the range of variation
-in \(\theta\) is higher for the scenarios with deforestation, a change
-of regime of the model is not expected, besides that as the magnitud of
-fires increases the probability that forest loose its capacity to
-recover from frequent fires and droughts will be higher (Brando et al.
-2019).
+near the proportion observed in previous years. A model incorporating
+explicit parameters for the deforested areas would be needed to resolve
+this. Using the inverse of the \(p\) parameter the model also predicts
+that the forest will be recovered between 13 and 19 years, close to the
+23 years suggested by Alencar (Alencar et al. 2011).
 
 The forest state in our model symbolizes flammable forest, given that
 undisturbed tropical forest in the Amazon is generally considered
@@ -967,14 +960,13 @@ and external regions (Barlow et al. 2020). These fires can encroach upon
 standing forest, and if climate change renders forests hotter and drier,
 they may sustain more extensive fires (Brando et al. 2019). Our model
 incorporates these changes by varying the proportion of forest that
-burns and is deforested, while maintaining the average \(\theta\) within
-the fitted values. Thus, although the range of variation in \(\theta\)
-is higher for scenarios with deforestation, given that the results
-without deforestation and far from a regime change, is expected also
-that the deforestation scenarios have the same behavior . Additionally,
-as the magnitude of fires increases, the probability of forests losing
-their capacity to recover from frequent fires and droughts rises (Brando
-et al. 2019).
+burns and is deforested. Thus, besides the range of variation in
+\(\theta\) is higher for the scenarios with deforestation, but as we
+maintain the average \(\theta\) constant at the fitted values, is
+expected also that the deforestation scenarios are far from a critical
+regime as without deforestation. Additionally, as the magnitude of fires
+increases, the probability of forests losing their capacity to recover
+from frequent fires and droughts rises (Brando et al. 2019).
 
 Several studies propose that a deforestation rate ranging from 20\% to
 40\% in the Amazon could trigger a swift transition to non-forest
