@@ -809,13 +809,16 @@ minimum fire occurrences.
 \begin{figure}
 \centering
 \includegraphics{figure/Amazon_TotSize_year_theta61_RCP45-85Def.png}
-\caption{Time series of predictions of the fire model including
-deforestation, compared with observed data for the years 2001-2060. We
-used best-fit parameters distribution, the ignition probability from the
-estimated GAM models based on actual data up to 2021 and based on RCP
-4.5, 8.5 afterwards. The points are the actual data, the line the median
-of simulations with 95\% confidence interval bands. All the outputs are
-relative to the total area.}
+\caption{Time series of predictions of the fire model without (left) and
+with (right) deforestation, compared with observed data for the years
+2001-2060. We used best-fit parameters distribution, the ignition
+probability derived from GAM models estimated using actual data up to
+2021, and projections based on General Circulation Models (GCMs)
+following two greenhouse gas emissions scenarios, namely Representative
+Concentration Pathways (RCPs) 4.5 and 8.5 for subsequent years. The data
+points represent actual observations, while the line denotes the median
+of simulations with accompanying 95\% confidence interval bands. All
+outputs are presented relative to the total area.}
 \end{figure}
 
 The trends depicted in the total annual versus maximum fire plot by
@@ -847,34 +850,38 @@ only RCP4.5 and RCP8.5 is shown in the figure S21. For the years
 \subsection{Discussion}\label{discussion}
 
 Based on spatial forest-fire dynamics, the model fitted to actual data
-and the predictions up to 2060 suggest that the Amazon fire dynamics are
-driven to an increase in total annual and extreme fires that are mainly
-caused by deforestation. In addition, the model predicts a reduction of
-extreme anual fires under climate change forcing alone. This might be
-due to the double average that we used for the General Circulation
-Models (GCM): we averaged the tempertature over the spatial extension of
-the region and over all the 21 GCMs. When we used the actual data
----also averaged over the region--- the model predicts in the range of
-observed extreme fires. For this reason, we hypothesize that increased
-temporal variability of the ignition probability could produce an
-increase in the extreme fires not captured by the model due to the
-smoothed nature of the CGM data. The increase in median tendency of the
-annual fires under a constant deforestation scenario seems a more robust
-prediction, however, and is in line with the predicted increase in fire
-weather conditions for the area (Abatzoglou et al. 2019).
+successfully reproduces past fire patterns and provides insights into
+the future dynamics of Amazon fires. The predictions up to year 2060
+suggest that the Amazon fire dynamics are driven to an increase in total
+annual and extreme fires mainly caused by deforestation. Surprisingly,
+this increase was mainly driven by deforestation and did not occur under
+a scenario of climatic forcing alone. In fact, in the latter case, the
+model actually predicts a reduction of extreme annual fires.
+
+This las result might be due to a double average that we used for the
+General Circulation Models (GCM): we averaged the tempertature over the
+spatial extension of the region and over all the 21 GCMs. When we used
+the actual data ---also averaged over the region--- the model predicts
+in the range of observed extreme fires. For this reason, we hypothesize
+that increased temporal variability of the ignition probability could
+produce an increase in the extreme fires not captured by the model due
+to the smoothed nature of the CGM data. The increase in the median
+tendency of the annual fires under deforestation scenarios seems a more
+robust prediction, however. It is in line with the predicted increase in
+fire weather conditions for the area (Abatzoglou et al. 2019).
 
 A critical regime would imply far more extreme fires and an absorbing
 phase transition that could signal an imminent forest-savanna
 transition, without extreme fires but with more frequent fires. The
 actual and predicted fire regime seems to lie between these regimes.
-This model does not explicitly includes deforestation or slash and burn
+This model does not explicitly include deforestation or slash-and-burn
 and other agricultural areas---these are implicitly represented in the
 flammable forest state---and thus the continuous increase of these land
 uses represented in the deforestation scenarios, combined with the
 increase in the probability of ignition \(f\) and produce important
 changes in the Amazonian fire regime.
 
-Similar models have been used to fit fire data and determine if the
+Similar models have been used to fit fire data and determine if a given
 system is in a critical regime. For example, Zinck et al. (Zinck et al.
 2011) found that some regions of Canada have experienced a change in the
 fire regime from a non-critical to critical. They argued that the
@@ -884,34 +891,38 @@ model to represent fire propagation as a stochastic birth-death process.
 This means modelling fire as a contact process (Oborny et al. 2007) that
 develops over the forest sites; the same concept was further explored
 concerning the recent Australian mega-fires (Nicoletti et al. 2023).
-Here we took a different approach: as in the DSM in our model fire
-spread is deterministic, and we added what we think are the minimal
+Here we took a different approach: as in the DSM our model is based on
+deterministic spread of fire, and we added what we think are the minimal
 processes needed for more realism: seasonality and forest dispersal
-distance. We agree with Zinck et al. (Zinck et al. 2011) that an
-extension of the original DSM was needed to represent fire process
-observed in ecosystems, but also that not all complexity can or should
-be added; it is necessary to keep the model tractable in order to
-e.g.~perform parameter-space exploration. Similar models including a
-deforested state with different ignition \(f\) and recovery \(p\)
-probabilties should be built and a rigorous comparison between these
-types of fire models would be needed to determine which mechanisms are
-most important to represent.
+distance. We agree with Zink et al. (2011) that an extension of the
+original DSM was needed to represent fire processes observed in
+ecosystems, but we also argue that not all complexity can or should be
+added. In fact, it is necessary to keep the model tractable in order to
+e.g.~perform parameter-space explorations. Our model is consequently
+phenomenological, in the sense that it does not include all mechanisms
+present at local scales but still tries to predict fire dynamics at
+broad scales. Our results identify deforestation as a key driving force
+for changes in the fire regime. We therefore suggest that future model
+versions including a deforested state with different ignition \(f\) and
+recovery \(p\) probabilities should be built to allow for a rigorous
+comparision between these types of fire models. Such a comparison
+clearly goes beyond the scope of the present study but would be needed
+to gain deeper insights into the role of deforestation.
 
-Our model is phenomenological, in the sense that it does not include all
-mechanisms present at local scales but tries to predict fire dynamics at
-broad scales. One of the advantages of this kind of model is that it can
-be applied to different systems. This is the case of the original DSM
-model which has been applied to brain activity and rainfalls (Palmieri
-and Jensen 2020). In these two systems there are cycles of loading and
-discharge, a broad region where the fluctuations peak as the critical
-behaviour is established, and not a critical point with a very sharp
-transition as the theory of second order phase transitions suggests
-(Stauffer and Aharony 1994). The temporal dependence of the parameters
+One of the advantages of this kind of model is that it can be applied to
+different systems. This is the case of the original DSM model which has
+been applied to brain activity and rainfalls (Palmieri and Jensen 2020).
+In these two systems there are cycles of loading and discharge, a broad
+region where the fluctuations peak as the critical behaviour is
+established, and not a critical point with a very sharp transition as
+the theory of second order phase transitions suggests (Stauffer and
+Aharony 1994). A similar behaviour occurs in our model version, but not
+in the original DSM, due to the temporal dependence of the parameters
 imposed by the fire seasons, where during some months there is a higher
-ignition probability \(f\), changes the control parameters with respect
-to the DMS model since, in fact, we do not observe a transition for a
-specific value of the \(\theta\) parameter. Our results suggest that
-instead of having a specific fine-tuning to observe critical fire
+ignition probability \(f\). This changes the control parameters with
+respect to the DMS model since, in fact, we do not observe a transition
+for a specific value of the \(\theta\) parameter. Our results suggest
+that instead of having a specific fine-tuning to observe critical fire
 spread, a critical region similar to a ``Griffiths phase'' may be
 present in our model. Originally defined in statistical physics (Moretti
 and Muñoz 2013), a Griffiths phase represents an extended region in the
@@ -934,19 +945,18 @@ potentially yielding different effects during extreme events. Our model,
 which incorporates the influence of drought using actual and predicted
 temperatures to estimate the probability of ignition (\(f\)), supports
 the hypothesis that nonlinear effects play a substantial role in fire
-dynamics.
+dynamics. Using the inverse of the \(p\) parameter the model also
+predicts that the forest will be recovered between 13 and 19 years,
+close to the 23 years suggested by Alencar (Alencar et al. 2011).
 
-It has been observed that deforestation as a cause of fires is becoming
-secondary, with droughts becoming primary producers of fires in the
-Amazon (Aragão et al. 2018). Besides that Cardil (2020) found that in
-2018 most of the fires (85\%) were produced in areas deforested in 2018.
-The fitted parameters, forced with the ignition probability estimated
-from actual data are incompatible with such a high proportion, but are
-near the proportion observed in previous years. A model incorporating
-explicit parameters for the deforested areas would be needed to resolve
-this. Using the inverse of the \(p\) parameter the model also predicts
-that the forest will be recovered between 13 and 19 years, close to the
-23 years suggested by Alencar (Alencar et al. 2011).
+It has been observed that while droughts are considered the primary
+cause of fires in the Amazon, deforestation is becoming the secondary
+(Aragão et al. 2018). Besides, Cardil (2020) found that in 2018 most of
+the fires (85\%) were produced in areas deforested in 2018. The fitted
+parameters, forced with the ignition probability estimated from actual
+data are incompatible with such a high proportion, but are near the
+proportion observed in previous years. A model incorporating explicit
+parameters for the deforested areas would be needed to resolve this.
 
 The forest state in our model symbolizes flammable forest, given that
 undisturbed tropical forest in the Amazon is generally considered
@@ -984,15 +994,16 @@ tropical forest collapsing into a savanna.
 
 \subsection{Acknowledgements}\label{acknowledgements}
 
-LAS is grateful to the Universidad Nacional de General Sarmiento for
-financial support (Project 30/1139), to the Agencia Nacional de
-Promoción Científica y Tecnológica (PICT 2020-SERIEA-02628) and Santiago
-R. Doyle for getting the computational resources used in this work.
+LAS expresses gratitude to the Universidad Nacional de General Sarmiento
+(Project 30/1139) and the Agencia Nacional de Promoción Científica y
+Tecnológica (PICT 2020-SERIEA-02628) for their financial support.
+Special thanks are extended to Santiago R. Doyle for providing the
+computational resources utilized in this work.
 
 \subsection{Authors' contributions}\label{authors-contributions}
 
-LAS, BBL, and SS conceived the ideas and designed methodology; LAS
-collected the data; LAS wrote the code; LAS, BBL and SS analysed the
+LAS, BBL, and SS conceived the ideas. All authors designed methodology;
+LAS collected the data; LAS wrote the code; LAS, BBL and SS analysed the
 data; LAS led the writing of the manuscript. All authors contributed
 critically to the drafts and gave final approval for publication.
 
