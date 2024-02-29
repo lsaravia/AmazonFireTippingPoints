@@ -541,3 +541,9 @@ Simpler models based on equilibrium concepts, on the other hand, have long been 
 consisting of large variability of fires between years and extremely large cluster fire sizes that follow a power-law distribution. <!--  This is against reduction of pyrodiversity you mention in the introduction -->
 
 
+
+---
+@SilvaJunior2020
+
+
+Deforestation levels in the Brasilian Amazonas are in 2020 44% below the levels of 1996-2005 [@SilvaJunior2020] this could explain the reducion  
