@@ -2,7 +2,7 @@
 
 ## Estimation of increments in the probability of ignition after the fitted period due to deforestation 
 
-We make the assumption that the fitted parameters result from an average of two distinct types of vegetation: the first type represents vegetation that regrows rapidly after deforestation, characterized by swift recovery and growth, leading to a higher parameter $p$. On the other hand, the second type represents the original forest, which exhibits slow recovery, resulting in a lower $p$. Additionally, the vegetation with rapid growth is more flammable than the forest, leading to a higher value for $f$. By fitting the model with both types of vegetation, we can assume that the average $\theta = p/f$ remains constant. This assumption allows us to calculate the variations in both $p$ and $f$.
+We make the assumption that the fitted parameters result from an average of two distinct types of vegetation: the first type represents vegetation that regrows rapidly after deforestation, characterized by swift recovery and growth, leading to a higher parameter $p$. On the other hand, the second type represents the original forest, which exhibits slow recovery, resulting in a lower $p$. Additionally, Following deforestation, the regrown vegetation in these areas tends to be more flammable than the original forest due to increased dryness [@Cardil2020]. Human-disturbed regions often exhibit higher susceptibility to fires compared to undisturbed forests [@Aragao2018;@Cochrane2001]. This leads to a higher value for $f$.  By fitting the model with both types of vegetation, we can assume that the average $\theta = p/f$ remains constant. This assumption allows us to calculate the variations in both $p$ and $f$.
 
 Following [@Lovejoy2018] estimation let's assume that 20% of the amazon forest is deforested and that a quarter of this area, a global 5% burns annually. This is a very conservative assumption, if we would assume a greater proportion the effect would also be greater. Thus the estimated probability of burned forest growth ($p_{\text{estimated}}$) is calculated as the weighted mean of the deforested vegetation and the original forest. 
 
@@ -18,7 +18,7 @@ please check the file "AmazonasModelFireParameted.Rmd" for the source code of th
 Then we estimated a mean deforestation of 0.03% annually, from Hansen remote sensing product [@Hansen2013], so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
 
 Given the assumption that $\theta = p/f$ remains constant, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
-The resulting $f$ can be observed in the figure S23 for RCP 4.5 and figure S24 for RCP 8.5. 
+The resulting $f$ can be observed in the figure S19 for RCP 4.5 and figure S20 for RCP 8.5. 
 
 ## References 
 
