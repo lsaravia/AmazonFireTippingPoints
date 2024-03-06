@@ -1983,8 +1983,8 @@ ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45-85.png",width=8,height=6,u
 #
 p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(theta=factor(if_else(decade=="Data","Data",as.character(theta))), decade=if_else(decade=="Data", "2001-2021",decade)) %>% filter(RCP == "4.5" | RCP == "4.5 + Deforestation")
 
-p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta ))+ geom_point(alpha=0.5) + theme_bw() +
-      scale_color_viridis_d(name="")  + 
+p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta, shape=theta ))+ geom_point(alpha=0.6) + theme_bw() +
+      scale_color_viridis_d(name="")  + scale_shape(name="") +
       xlab("Max Fire size (%)") +  
       ylab("Total Size (%)") +  
       theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_grid( RCP ~ decade,drop=TRUE) +

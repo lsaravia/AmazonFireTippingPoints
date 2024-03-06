@@ -419,13 +419,13 @@ pexp %>% group_by(forest_dispersal_distance,theta,Date) %>% filter( type == "pl"
 # Max fire vs Total size 
 #
 #
-
+cols <- viridisLite::viridis(3)
 facet_labels <- c("A.", "B.", "C.", "D.")
 names(facet_labels) <- c("fixed1", "fixed66", "seasonal1", "seasonal66")
 pexp %>% group_by(forest_dispersal_distance,theta,Date) %>% filter( type == "pl") %>%  
       mutate(forest_dispersal_distance=factor(round(forest_dispersal_distance)),theta = factor(theta),cluster= paste0(sim_type,forest_dispersal_distance)) %>%  
-      ggplot(  aes(max_patch,tot_patch, color=theta ))+ geom_point(alpha=0.5) + theme_bw() +
-      scale_color_viridis_d(name=expression(~theta)) + 
+      ggplot(  aes(max_patch,tot_patch, color=theta, shape=theta ))+ geom_point(alpha=0.7) + theme_bw() +
+      scale_color_manual(values=cols,name=expression(~theta)) + scale_shape(name=expression(~theta)) +
       xlab("Maximum fire size (%)") +  
       ylab("Total Size (%)") +  
       theme(axis.text.x = element_text(angle = 0, hjust = 1))  +  
