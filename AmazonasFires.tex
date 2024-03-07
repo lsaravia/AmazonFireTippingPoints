@@ -242,18 +242,18 @@ not exhibit true scale invariance (Grassberger 2002) and that the system
 needs to be somewhat tuned to observe criticality (Bonachela and Muñoz
 2009). These facts decreased its theoretical attractiveness, but the
 model could still be of high practical relevance. Some modifications of
-the Drossell \& Schwabl (DSM) model have been used to predict fire
-responses to climate change (Pueyo 2007), and other DSM variants can
-reproduce features observed in empirical studies (Ratz 1995) such as the
-power-law distributions of the fire sizes, the size and shape of
-unburned areas and the relationship between annual burned area and
-diversity of ecological stages (Zinck and Grimm 2009). An analysis of
-different models showed that the key for reproducing all these patterns
-was changing the scale of grid cells to represent several hectares, and
-the `memory effect': flammability increases with the time since the last
-fire at a given site (Zinck and Grimm 2009, Zinck et al. 2011). However,
-the exponent of the fire size distribution observed in different
-ecoregions cannot still be reproduced by these models.
+the DSM model have been used to predict fire responses to climate change
+(Pueyo 2007), and other DSM variants can reproduce features observed in
+empirical studies (Ratz 1995) such as the power-law distributions of the
+fire sizes, the size and shape of unburned areas and the relationship
+between annual burned area and diversity of ecological stages (Zinck and
+Grimm 2009). An analysis of different models showed that the key for
+reproducing all these patterns was changing the scale of grid cells to
+represent several hectares, and the `memory effect': flammability
+increases with the time since the last fire at a given site (Zinck and
+Grimm 2009, Zinck et al. 2011). However, the exponent of the fire size
+distribution observed in different ecoregions cannot still be reproduced
+by these models.
 
 The simple models mentioned above could have critical behaviour
 characterized by a power-law distribution in fire sizes and other model
@@ -283,20 +283,29 @@ Fisher 2020).
 The objective of this work is to model and predict the changes in fire
 regimes in the Amazon region using a simple spatial stochastic fire
 model, based on variables like precipitation and temperature that are
-included in climate change scenarios. We thus assume that the emergent
-dynamics can be described by a process of slow accumulation of fuel and
-rapid discharge produced by the fires. More precisely, we initially
-reconstruct past fire patterns using the NASA Moderate-Resolution
-Imaging Spectroradiometer (MODIS) burnt area product. This step serves
-to verify our main assumption and to derive an ignition probability.
-Subsequently, in the second step, we predict the ignition probability up
-to the year 2060 based on different greenhouse gas Representative
-Concentration Pathways. The third step involves simulations to explore
-the behavior of the Fire model. In the fourth step, we fit the Fire
-Model to the observed MODIS fire patterns. Finally, utilizing the model
-forced with the ignition probability, we predict and analyze potential
-changes in the modeled fire regimes for the Amazon, taking into account
-the influence of deforestation on model parameters.
+included in climate change scenarios. Our hypothesis is that climate
+change could drive Amazonian fire regime near a critical region, leading
+to more extreme fires. We thus assume that the emergent dynamics can be
+described by a process of slow accumulation of fuel and rapid discharge
+produced by the fires. More precisely, we initially reconstruct past
+fire patterns using the NASA Moderate-Resolution Imaging
+Spectroradiometer (MODIS) burnt area product. This step serves to verify
+our main assumption and to derive an ignition probability. Subsequently,
+in the second step, we predict the ignition probability up to the year
+2060 based on different greenhouse gas Representative Concentration
+Pathways. The third step involves simulations to explore the behavior of
+the Fire model. In the fourth step, we fit the Fire Model to the
+observed MODIS fire patterns. Finally, utilizing the model forced with
+the ignition probability, we predict and analyze potential changes in
+the modeled fire regimes for the Amazon, taking into account the
+influence of deforestation on model parameters.
+
+We will employ a modified DSM forest fire model (Drossel and Schwabl
+1992), incorporating elements of long-distance forest dispersal and
+seasonality. Notably, the methodology involving the prediction of
+ignition probability under diverse global change scenarios and
+subsequent application to force the fire model represents a novel
+approach, as far as we are aware.
 
 \subsection{Methods}\label{methods}
 
@@ -370,7 +379,7 @@ interactions between environmental variables we used tensor products,
 using restricted maximum likelihood (REML) to ﬁt to the data (Pedersen
 et al. 2019). All these procedures were available in the R package
 \textbf{mgcv} (Wood 2017) and all source code is available in the
-repository \url{https://github.com/lsaravia/AmazonFireTippingPoints}.
+repository \url{https://}.
 
 We selected the best models using \(AIC\) (Wood 2017). To evaluate the
 predictive power of the models, we split the data set into a training
@@ -417,7 +426,10 @@ forest cover), as the focus is on modeling fire spread dynamics. When a
 site is burned in the model, it does not necessarily mean that all
 vegetation is killed - rather, it represents the consumption of
 flammable fuels. The regrowth or recovery process simulates vegetation
-re-establishing flammable biomass over time.
+re-establishing flammable biomass over time. The model lacks a spatially
+explicit representation of the deforestation process. This deliberate
+simplification was made to maintain model simplicity and ensure a more
+manageable fitting procedure for the current scope of the research.
 
 The model uses a two-dimensional lattice to represent the spatial
 region. Each site in the lattice can be in one of three different
@@ -454,26 +466,26 @@ lattice (Marco et al. 2011). The choice of a power-law dispersal is
 justified because forests dispersion generally exhibits fat-tailed
 kernels (Clark et al. 2005, Seri et al. 2012).
 
-This model is very similar to the Drossel-Schwabl (DSM) forest fire
-model (Drossel and Schwabl 1992): it exhibits critical behaviour when
-\(\theta = p/f\) tends to \(\infty\), and thus must satisfy the
-condition that \(f << p\). This condition means that the chances of an
-empty site turning into forest are much higher than the chances of a
-healthy forest site catching fire spontaneously, as is generally
-observed in natural systems. The model involves the separation between
-three time scales: the fast burning of forest clusters, the slow
-recovery of forest, and the even slower rate of fire ignition. Then in
-the critical regime there is a slow accumulation of forest that forms
-connected clusters, and eventually as the ignition probability is very
-low these clusters connect the whole lattice--- here is the link with
-percolation theory (Stauffer and Aharony 1994)--- and a single ignition
-event can produce large fires. After this, the density of the forest
-becomes very low and the accumulation cycle begins again. This regime is
-characterized by wide fluctuations in the size of fires and the density
-of trees, with both following approximately power-law size
-distributions. If the ignition probability \(f\) is too high fires are
-frequent, forest sites become disconnected and small fires, of
-characteristic size, dominate the system.
+This model is very similar to the DSM forest fire model (Drossel and
+Schwabl 1992): it exhibits critical behaviour when \(\theta = p/f\)
+tends to \(\infty\), and thus must satisfy the condition that
+\(f << p\). This condition means that the chances of an empty site
+turning into forest are much higher than the chances of a healthy forest
+site catching fire spontaneously, as is generally observed in natural
+systems. The model involves the separation between three time scales:
+the fast burning of forest clusters, the slow recovery of forest, and
+the even slower rate of fire ignition. Then in the critical regime there
+is a slow accumulation of forest that forms connected clusters, and
+eventually as the ignition probability is very low these clusters
+connect the whole lattice--- here is the link with percolation theory
+(Stauffer and Aharony 1994)--- and a single ignition event can produce
+large fires. After this, the density of the forest becomes very low and
+the accumulation cycle begins again. This regime is characterized by
+wide fluctuations in the size of fires and the density of trees, with
+both following approximately power-law size distributions. If the
+ignition probability \(f\) is too high fires are frequent, forest sites
+become disconnected and small fires, of characteristic size, dominate
+the system.
 
 One of the features not present in the original forest fire model is
 that forests can have long-distance dispersal; ecologically, this
