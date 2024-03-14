@@ -135,7 +135,7 @@ The trends depicted in the total annual versus maximum fire plot by decade (Figu
 
 ## Discussion 
 
-Based on spatial forest-fire dynamics, the model fitted to actual data successfully reproduces past fire patterns and provides insights into the future dynamics of Amazon fires. The predictions up to year 2060 suggest that the Amazon fire dynamics are driven to an increase in total annual and extreme fires mainly caused by deforestation. Surprisingly, this increase did not occur under a scenario of climatic forcing alone. In fact, in the latter case, the model actually predicts a reduction of extreme annual fires. 
+Based on spatial forest-fire dynamics, the model fitted to actual data successfully reproduces past fire patterns and provides insights into the future dynamics of Amazon fires. The predictions up to year 2060 suggest that the Amazon fire dynamics are driven to an increase in total annual and extreme fires mainly caused by deforestation. Surprisingly, this increase did not occur under a scenario of climatic forcing alone. In fact, in the latter case, the model actually predicts a reduction of extreme annual fires and a slight increase in annual fire size. 
 
 This last result might be due to a double average that we used for the General Circulation Models (GCM): we averaged the tempertature over the spatial extension of the region and over all the 21 GCMs. When we used the actual data ---also averaged over the region--- the model predicts in the range of observed extreme fires. For this reason, we hypothesize that increased temporal variability of the ignition probability could produce an increase in the extreme fires not captured by the model due to the smoothed nature of the CGM data. 
 
