@@ -1,22 +1,5 @@
 # Modelling Amazon fire regimes under climate change scenarios
 
-Leonardo A. Saravia ^1^ ^5^, Korinna T. Allhoff ^2^ ^3^, Ben Bond-Lamberty ^4^, Samir Suweis ^5^
-
-1. Centro Austral de Investigaciones Científicas (CADIC-CONICET), Ushuaia, Argentina.
-
-2. University of Hohenheim, Institute of Biology, FG Eco-Evolutionary Modelling (190m), Stuttgart, Germany 
-
-3. KomBioTa – Center for Biodiversity and Integrative Taxonomy, University of Hohenheim & State Museum of Natural History, Stuttgart, Germany
-
-4. Pacific Northwest National Laboratory, Joint Global Change Research Institute, 5825 University Research Court #3500, College Park, MD 20740, USA 
-
-5. Laboratory of Interdisciplinary Physics, Department of Physics and Astronomy "G. Galilei", University of Padova, Padova, Italy
-
-6. Corresponding author e-mail lasaravia@untdf.edu.ar, ORCID https://orcid.org/0000-0002-7911-4398
-
-\newpage
-
-
 ## Abstract
 
 Fire is one of the most important disturbances of the earth-system, shaping the biodiversity of ecosystems and particularly forests. Climatic change and other anthropogenic drivers such as deforestation and land use change could produce abrupt changes in fire regimes, potentially triggering transition from forests to savannah or grasslands ecosystems with large accompanying biodiversity losses. The interplay between climate change and deforestation might intensify fire ignition and spread, potentially giving rise to more extensive, intense, and frequent fires, but this is highly uncertain. We use a simple forest-fire model to analyze the possible changes in the Amazon region's fire regime that depend on climate change-related variables. We first explored the model behavior and found that there are two possible regime changes: a critical regime that implies high variability in fire extension and mega-fires, and an absorbing phase transition which would produce the extinction of the forest and transition to a different vegetation state. We parameterize the model using remote sensing data on fire extension and temperature, and show that it demonstrates proficiency in predicting past fires. Upon considering 21st-century climate projections and deforestation scenarios, our findings suggest that the Amazon region is not currently nearing any of these regime changes but predict a consistent increase in fire extension mainly induced by deforestation. Therefore, stopping deforestation could be an important factor in reducing the potential for drastic alterations in tropical forests of the Amazon region.
@@ -179,19 +162,7 @@ While droughts are considered the primary cause of fires in the Amazon, deforest
 
 The forest state in our model symbolizes flammable forest, given that undisturbed tropical forest in the Amazon is generally considered non-flammable with a very low probability of natural fires [@Fonseca2019]. In contrast, deforested areas are flammable, and our fitted parameters encapsulate an average of these scenarios. The proportion of these types is changing due to increased interfaces between undisturbed forest, human-degraded forest, and other land uses [@Aragao2018]. Human-induced fires persist, originating from the transportation network and external regions [@Barlow2020]. These fires can invade standing forest, and if climate change makes forests hotter and drier, they may sustain more extensive fires [@Brando2019]. Our model incorporates these changes by varying the proportion of forest that burns and is deforested. Thus, besides the range of variation in $\theta$ is higher for the scenarios with deforestation, but as we maintain the average $\theta$ constant at the fitted values, it is also expected that the deforestation scenarios are far from a critical regime as without deforestation. Additionally, as the magnitude of fires increases, the probability of forests losing their capacity to recover from frequent fires and droughts increases [@Brando2019].
 
-Several studies propose that a deforestation rate ranging from 20% to 40% in the Amazon could trigger a swift transition to non-forest ecosystems [@Lovejoy2018; @Nobre2016]. Currently, around 20% of the Amazon's forest has been lost since the 1960s, and environmental signals suggest ongoing fluctuations in the system [@Lovejoy2018]. Dynamic analysis indicates proximity to a transition point [@Saravia2018a]. However, our model suggests that the fire regime will not undergo a significant change solely due to climate change; instead, deforestation emerges as the more influential driver. Our primary conclusion is that if deforestation and degradation in the Amazon decrease, the region could exhibit improved resilience against predicted climate change, mitigating the risk of the Amazonian tropical forest collapsing into a savanna. Moreover, asserting the safety of the Amazon solely by halting deforestation is not warranted. Synergies between climate and land use disturbances, as indicated in a recent study by @Flores2024, propose a safe boundary with a cap of 10% accumulated deforestation. Achieving this threshold necessitates extensive restoration efforts to rehabilitate a significant portion of degraded forest. 
-
-## Acknowledgements
-
-LAS expresses gratitude to the Universidad Nacional de General Sarmiento (Project 30/1139) and the Agencia Nacional de Promoción Científica y Tecnológica (PICT 2020-SERIEA-02628) for their financial support. Special thanks are extended to Santiago R. Doyle for providing the computational resources utilized in this work.
-
-## Authors’ contributions
-
-LAS, BBL, and SS conceived the ideas. All authors designed methodology; LAS collected the data; LAS wrote the code; LAS, BBL and SS analysed the data; LAS led the writing of the manuscript. All authors contributed critically to the drafts and gave final approval for publication.
-
-## Data Availability Statement
-
-The source code and data are available at zenodo <https://doi.org/10.5281/zenodo.5703638> and Github <https://github.com/lsaravia/AmazonFireTippingPoints>.  Remote sensing MODIS data and climate data are available directly from NASA and Google Earth Engine. 
+Several studies propose that a deforestation rate ranging from 20% to 40% in the Amazon could trigger a swift transition to non-forest ecosystems [@Lovejoy2018; @Nobre2016]. Currently, around 20% of the Amazon's forest has been lost since the 1960s, and environmental signals suggest ongoing fluctuations in the system [@Lovejoy2018]. Dynamic analysis indicates proximity to a transition point [@Saravia2018a]. However, our model suggests that the fire regime will not undergo a significant change solely due to climate change; instead, deforestation emerges as the more influential driver. Our primary conclusion is that if deforestation and degradation in the Amazon decrease, the region could exhibit improved resilience against predicted climate change, mitigating the risk of the Amazonian tropical forest collapsing into a savanna. Moreover, asserting the safety of the Amazon solely by halting deforestation is not warranted. Synergies between climate and land use disturbances, as indicated in a recent study by @Flores2024, propose a safe boundary with a cap of 10% accumulated deforestation. Achieving this threshold necessitates extensive restoration efforts to rehabilitate a significant portion of degraded forest.
 
 
 ## References
