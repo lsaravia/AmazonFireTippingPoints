@@ -96,9 +96,9 @@ Table: Generalized additive models (GAMs) using a Gaussian and Gamma distributio
 
 ![Predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
 
-![Complete time series predictions of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Complete.png)
+![Complete time series of the monthly probability of ignition $f$ used in the simulations up to 2060, 95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenarios RCP 4.5 and RCP 8.5](figure/Amazon_bF_RCP_monthly.png)
 
-![Complete time series predictions  of the probability of ignition $f$ up to 2060, 95% confidence interval (grey band) and $f$ data (dots), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Complete.png)
+![Complete time series of the probability of ignition $f$ used in the simulations, averaged by year up to 2060, 95% confidence interval (grey band) and $f$ data (dots), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenarios RCP 4.5 and RCP 8.5](figure/Amazon_bF_RCP_year.png)
 
 <!-- Names of the CMIP5 models:  'ACCESS1-0', 'bcc-csm1-1', 'BNU-ESM', 'CanESM2', 'CCSM4', 'CESM1-BGC', 'CNRM-CM5', 'CSIRO-Mk3-6-0', 'GFDL-CM3', 'GFDL-ESM2G', 'GFDL-ESM2M', 'inmcm4', 'IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'MIROC-ESM', 'MIROC-ESM-CHEM', 'MIROC5', 'MPI-ESM-LR', 'MPI-ESM-MR', 'MRI-CGCM3', 'NorESM1-M'. -->
 

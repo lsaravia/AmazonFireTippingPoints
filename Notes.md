@@ -2,7 +2,7 @@
 
 Install Latex pkg --> sudo tlmgr install enumitem
 
-latexdiff AmazonasFiresSubmitted2.tex AmazonasFires.tex > Amazonasdiff.tex
+latexdiff AmazonasFiresMainSubmited4.tex AmazonasFiresMain.tex > Amazonasdiff.tex
 pdflatex Amazonasdiff.tex
 
 20% of amazon was lost 2020 and up to 40% to 2050 (@Feng2021 @Brando)

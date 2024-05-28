@@ -794,7 +794,6 @@ gdpp_exp %>% ggplot(aes(date,fit)) + geom_line() +theme_bw() + scale_colour_viri
 ggsave("figure/Amazon_bF_RCP4.5_Complete.png",width=8,height=6,units="in",dpi=600)
 
 
-
 # 
 # Predict and save bF for rcp85
 #
@@ -811,6 +810,22 @@ gdpp %>% ggplot(aes(date,bF)) + geom_point() +theme_bw() + scale_colour_viridis_
 ggsave("figure/Amazon_bF_RCP8.5_normal.png",width=8,height=6,units="in",dpi=600)
 
 gdpp %>% ggplot(aes(date,tmmx)) + geom_point() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7))+ ggtitle("RCP 8.5") 
+
+#
+# Both RCP in one and yearly f
+#
+if (!exists("gdpp_exp")) {
+  gdpp_exp <- read_csv("Data/Predicted_bF_rcp45.csv") %>% mutate(rcp="RCP 4.5") %>% 
+  bind_rows( read_csv("Data/Predicted_bF_rcp85.csv") %>% mutate(rcp="RCP 8.5") )
+}
+gdpp_exp %>% mutate(year=year(date)) %>% filter(year>='1980', year<'2060')  %>% ggplot(aes(date,fit)) + geom_line() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) +   ylab(expression(italic(f))) + 
+  geom_ribbon(aes(x=date,ymin=lcl,ymax=ucl),alpha=0.3) + facet_wrap(~rcp, ncol=1) 
+ggsave("figure/Amazon_bF_RCP_monthly.png",width=8,height=7,units="in",dpi=600)
+
+
+gdpp_exp %>% mutate(year=year(date)) %>% group_by(year,rcp) %>% summarise( fit = mean(fit), lcl=mean(lcl), ucl=mean(ucl) ) %>% filter(year>=1980, year<2060)  %>% ggplot(aes(year,fit)) + geom_line() +theme_bw() + scale_colour_viridis_d() + theme(axis.text.x = element_text(angle = 45, hjust = 1,size=7)) +   ylab(expression(italic(f))) + 
+  geom_ribbon(aes(x=year,ymin=lcl,ymax=ucl),alpha=0.3) + facet_wrap(~rcp, ncol=1) 
+ggsave("figure/Amazon_bF_RCP_year.png",width=8,height=7,units="in",dpi=600)
 
 #
 # Export Files for Netlogo Model
