@@ -1,3 +1,9 @@
+---
+title: "Supplementary Information"
+subtitle: "Modelling Amazon fire regimes under climate change scenarios"    
+output: 
+urlcolor: blue
+---
 # Supplementary Information
 
 ## Estimation of increments in the probability of ignition after the fitted period due to deforestation 
@@ -15,12 +21,12 @@ $p_{\text{original}} = \frac{p_{\text{estimated}} - 0.05 \times p_{\text{defores
 
 please check the file "AmazonasModelFireParameted.Rmd" for the source code of the calculations.
 
-Then we estimated a mean deforestation of 0.03% annually, from Hansen remote sensing product [@Hansen2013], so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
+Then we estimated a mean deforestation of 0.3% annually, from Hansen remote sensing product [@Hansen2013], so after the fitted period each year we have 0.003 increment in the proportion of forest that burns and recover annually, fixing $p_{\text{original}}$ we can estimate the variation in $p_{\text{estimated}}$ due to deforestation.
 
 Given the assumption that $\theta = p/f$ remains constant, we can estimate the growth in $f$ attributed to deforestation. For an annual deforestation rate of 0.03%, the resulting mean increase in $f$ 1.036 per year, while $\text{Forest growth} = 1/p$ ---which is the parameter we used in the model--- has a mean decrease of 0.97 per year.
 The resulting $f$ can be observed in the figure S19 for RCP 4.5 and figure S20 for RCP 8.5. 
 
-## References 
+### References 
 
 <div id="refs"></div>
 
@@ -29,11 +35,17 @@ The resulting $f$ can be observed in the figure S19 for RCP 4.5 and figure S20 f
 
 ## Amazonas monthly fires and fire size distribution
 
+### Study Region
+
 ![Region of study: the Amazon biome](figure/AmazonasRegion.png)
+
+### Total monthly fire size
 
 ![Total monthly fire size for the Amazon biome as a percent of the region area. Estimated with MODIS burned area product](figure/Amazon_TotSize_Month.jpg)
 
 \newpage
+
+### Best fitted fire size distribution
 
 | date  | type  | 1st par.   | 2nd par.   | $x_{min}$ | AICc       | range  | Vuong p-value |
 | ----: | :---- | ---------: | ---------: | ----:     | ---------: | -----: | -----------:  |
@@ -61,11 +73,17 @@ The resulting $f$ can be observed in the figure S19 for RCP 4.5 and figure S20 f
 
 Table: Best fitted fire size distribution according to the minimum AICc; where ln=lognormal, pexp=power law with exponential cut-off, pl=power-law, and exp=exponential; 1st par is the first parameter of the distribution (the exponent for power-law) and 2nd par the second parameter; $x_{min}$ is the minimum cluster size estimated for the power-law distribution (in number of pixels); range is the max cluster size minus $x_{min}$. The power-law distributions are also compared with the exponential distribution using the Vuong's test. 	
 
-![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2003 - 2008. Only the year 2007 corresponds to a power-law with a large range value](figure/Amazon_PatchDistr_2003-2008.png)
+### Inverse cumulative distribution of fire clusters 2003 - 2008
 
-![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2009 - 2014. The year 2010 corresponds to a power-law with large range, and the years 2009 and 2013 are power-laws with a smaller range](figure/Amazon_PatchDistr_2009-2014.png)
+![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2003 - 2008. Only the year 2007 corresponds to a power-law with a large range value](figure/Amazon_PatchDistr_2003-2008.png)\ 
 
-![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2015 - 2020. The year 2020 corresponds to a power-law with large range, and the year 2018 is a power-law with a smaller range](figure/Amazon_PatchDistr_2015-2020.png)
+### Inverse cumulative distribution of fire clusters 2009 - 2014
+
+![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2009 - 2014. The year 2010 corresponds to a power-law with large range, and the years 2009 and 2013 are power-laws with a smaller range](figure/Amazon_PatchDistr_2009-2014.png)\ 
+
+### Inverse cumulative distribution of fire clusters 2015 - 2020
+
+![Inverse cumulative distribution of fire clusters sizes and fitted distributions for the years 2015 - 2020. The year 2020 corresponds to a power-law with large range, and the year 2018 is a power-law with a smaller range](figure/Amazon_PatchDistr_2015-2020.png)\ 
 
 \newpage
 
@@ -89,23 +107,39 @@ Table: Best fitted fire size distribution according to the minimum AICc; where l
 
 Table: Generalized additive models (GAMs) using a Gaussian and Gamma distributions. Terms and comparisons using the Akaike criterion, and the mean absolute error (MAE) of predictions of the ignition probability $f$ leaving out different portions of data as explained in main text. Where we have the following monthly variables: $T^{max}_{m}$ is the maximum temperature for the actual month, $ppt_{m}$ monthly accumulated precipitation of the actual month, $ppt_{m-1}$ same as $ppt_{m}$ from the previous month, and $m$ is a seasonal term representing the actual month. To see the complete set of tried models please check the source code 'AmazonasModelFireParameters.Rmd'
 
-![Model check for the best GAM model of ignition probability $bF \sim T^{max}_m * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)
+### Model check for the best GAM model
+
+![Model check for the best GAM model of ignition probability $bF \sim T^{max}_m * m$ ](figure/Amazon_bF_GAMcheck_tmmx_month.jpg)\ 
+
+### Comparison of predicted $f$ vs MODIS data $f$ 
+
+![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ (black line), 95% confidence interval (grey band) and $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)\ 
+
+![Predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)\ 
+
+### Time series of $f$ used in simulations of the fire model
+
+![Complete time series of the monthly ignition probability $f$ used in simulations up to 2060, with 95% confidence intervals (grey band). The values before 2021 are based on actual data, while those after 2021 are predicted by the best GAM model using General Circulation Model (GCM) runs from the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the RCP 4.5 and RCP 8.5 greenhouse gas emissions scenarios.](figure/Amazon_bF_RCP_monthly.png)\ 
+
+![Complete time series of the monthly ignition probability $f$ used in simulations up to 2060, with 95% confidence intervals (grey band), predicted by the best GAM model using General Circulation Model (GCM) runs from the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the RCP 4.5 greenhouse gas emissions scenario. Retrospective model runs were used for the period before 2006.](figure/Amazon_bF_RCP_GCM_monthly.png)\ 
 
 
-![Comparison of the predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ (black line), 95% confidence interval (grey band) and $f$ data (dots) for the whole period 2001-2021](figure/Amazon_bF_prediction.jpg)
+### Time series of $f$ used in simulations of the fire model including deforestation
 
-![Predictions of the probability of ignition by the best GAM model $f \sim T^{max}_m * m$ using as training data the years < 2018, 95% confidence interval (grey band) and $f$ data (dots)](figure/Amazon_bF_prediction2018-2021.jpg)
+![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Deforested.png)
 
-![Complete time series of the monthly probability of ignition $f$ used in the simulations up to 2060, 95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenarios RCP 4.5 and RCP 8.5](figure/Amazon_bF_RCP_monthly.png)
 
-![Complete time series of the probability of ignition $f$ used in the simulations, averaged by year up to 2060, 95% confidence interval (grey band) and $f$ data (dots), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenarios RCP 4.5 and RCP 8.5](figure/Amazon_bF_RCP_year.png)
+![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Deforested.png)
+
 
 <!-- Names of the CMIP5 models:  'ACCESS1-0', 'bcc-csm1-1', 'BNU-ESM', 'CanESM2', 'CCSM4', 'CESM1-BGC', 'CNRM-CM5', 'CSIRO-Mk3-6-0', 'GFDL-CM3', 'GFDL-ESM2G', 'GFDL-ESM2M', 'inmcm4', 'IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'MIROC-ESM', 'MIROC-ESM-CHEM', 'MIROC5', 'MPI-ESM-LR', 'MPI-ESM-MR', 'MRI-CGCM3', 'NorESM1-M'. -->
 
 \newpage
 
 
-### Forest fire Model exploration 
+## Forest fire Model exploration 
+
+### Forest fire Model exploration parameters
 
 | $de$      | $f$        | $\theta$   |
 | --------: | ---------: | ---------: |
@@ -116,7 +150,7 @@ Table: Generalized additive models (GAMs) using a Gaussian and Gamma distributio
 
 Table: We ran an in-silico experiment using a factorial combination of dispersal exponent $de$ and $\theta$ and 10 repetitions of each parameter set. First we ran the experiment with $\theta$ fixed, keeping the ignition probability $f$ constant, then we repeated the experiment with seasonality: we simulate a fire season of 3 months each year multiplying $f$  by 10. The dispersal exponent $de=101$ is equivalent to a dispersal to the nearest neighbours, and $de=2.0155$ corresponds to a mean dispersal distance of 66 sites.
 
-
+### Forest fire Model exploration: Fire cluster size distributions 
 
 | Dispersal distance         | $\theta$ | Seasonality | Distr. type | n    | range    | mean fire cluster | exponent | freq  |
 | -------------------------: | -----:   | :--------   | :----       | ---: | -------: | ----------:       | ----:    | ----: |
@@ -167,6 +201,8 @@ Table: Fire cluster size distributions of the fire model with different paramete
 
 \newpage
 
+### Forest fire Model exploration: power-law fire distribution
+
 | Dispersal distance         | Seasonality | $\theta$ | n    | iqr   | range    | exponent | freq  |
 | -------------------------: | :--------   | -----:   | ---: | ----: | -------: | ----:    | ----: |
 | 1                          | fixed       | 25       | 1    | 0.00  | 42.00    | 3.36     | 0.06  |
@@ -182,8 +218,11 @@ Table: Fire cluster size distributions of the fire model with different paramete
 
 Table: Frequency of Fire cluster size distribution of the fire model with true power-law (Vuong's test p-value < 0.05) for different parameters, and with or without seasonality.  Where *n* is the number of cases and *freq* is the frequency of a particular distribution for the combination of parameters ; *iqr* is the interquartil range (a measure of variability) and exponent is the median exponent.
 
+### Forest fire Model exploration: density of the forest state
 
 ![Density of Forest obtained of Fire model simulations, measured at the last day of the year. The parameter $\theta$ was kept constant for **A** & **B** and dispersal exponent was $de=102$ (equivalent to nearest neighbours) and $de=2.0155$ respectively. **C** & **D**  are simulations with fire season where $\theta$ was divided by 10 during 3 months, which is the equivalent of multiplying the ignition probability $f$ by 10, with the same values for the dispersal exponent($de=102$ and $2.0155$)](figure/FireNL_ForestPercent_dispersal_theta_season.png)
+
+### Forest fire Model exploration: spatial patterns
 
 ![Spatial pattern of the forest fire model simulations with constant $\theta$. This shows the spatial state of the model after 40 years where, green colour is the forest state, brown is the burned state, and red are the active fires. **A** & **B** correspond to $\theta = 2500$ and dispersal exponent $de=102$ (equivalent to nearest neighbours) and $de=2.0155$. **C** & **D** Are simulations with $\theta=25$ and the same values for the dispersal exponent($de=102$ and $2.0155$).  ](figure/FireNL_450_theta25-2500_de102-20155_noseason.png)
 
@@ -193,8 +232,9 @@ Table: Frequency of Fire cluster size distribution of the fire model with true p
 \newpage
 
 
-### Forest fire model fitting 
+## Forest fire model fitting 
 
+### Summary of first ABC model selection
 
 | Name          | Initial forest density  | Dispersal distance         | Forest growth $(1/p)$  |
 | :------------ | ----------------------: | -------------------------: | -------------: |
@@ -206,11 +246,15 @@ Table: Frequency of Fire cluster size distribution of the fire model with true p
 
 Table: Summary of the first ABC posterior parameter distribution. This uses the annual maximum monthly fire size to select the 0.05% of the best parameters.
 
-![Monthly total MODIS estimated fire size (black line) and 95% percentiles of simulations (shade) of monthly fire time series using the fitted parameters (See table S6)](figure/Amazon_maxyear_PI95_450.png)
+### MODIS estimated fires vs simulations
 
-![Ten simulations of monthly fire time series using one set of the fitted parameters of the fire model (See table S6), the black line is the MODIS data. The parameters used are Initial forest density = 0.2, Dispersal distance = 83.41, Forest growth =  5004.71](figure/Amazon_maxyear_fitted_450.png)
+![Monthly total MODIS estimated fire size (black line) and 95% percentiles of simulations (shade) of monthly fire time series using the fitted parameters (See table S6)](figure/Amazon_maxyear_PI95_450.png)\ 
 
-![Total annual fires, predicted vs data using the first ABC posterior parameters](figure/Amazon_maxyear_dataVsPredicted_450.png)
+![Ten simulations of monthly fire time series using one set of the fitted parameters of the fire model (See table S6), the black line is the MODIS data. The parameters used are Initial forest density = 0.2, Dispersal distance = 83.41, Forest growth =  5004.71](figure/Amazon_maxyear_fitted_450.png)\ 
+
+![Total annual fires, predicted vs data using the first ABC posterior parameters](figure/Amazon_maxyear_dataVsPredicted_450.png)\ 
+
+### Final ABC model selection
 
 | Name          | Initial forest density  | Dispersal distance         | Forest_growth $(1/p)$ | Fire Size Power Law Exponent |
 | :------------ | ----------------------: | -------------------------: | -------------:        | ---------------------------: |
@@ -222,22 +266,23 @@ Table: Summary of the first ABC posterior parameter distribution. This uses the 
 Table: Summary of the second ABC posterior parameter distribution. We selected the model parameters with the median power law exponent $\alpha$ of the fire size distribution  closer to the median of the data (2.29). The summary of the power law exponent of fire size patch distribution is showed in the last column.
 
 
-![Power-law exponents versus parameters after the second ABC compared with the median power-law exponent from MODIS burned area product (red dashed line)](figure/Amazon_2ndABC_post_params.png)
+![Power-law exponents versus parameters after the second ABC compared with the median power-law exponent from MODIS burned area product (red dashed line)](figure/Amazon_2ndABC_post_params.png)\ 
 
 
 \newpage
 
-### Fire model predictions
+## Forest Fire model predictions
+
+### Flammable Forest state of the model for RCP 4.5 and 8.5
+
+![Flammable Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show the median and the 95% percentile based on the fitted parameter distribution.](figure/Amazon_ForestPercent_theta61_RCP45-85.png)\ 
 
 
-![Flammable Forest state of the model vs time using the ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), RCP4.5 and RCP8.5. Here we show the median and the 95% percentile based on the fitted parameter distribution.](figure/Amazon_ForestPercent_theta61_RCP45-85.png)
+### Annual fire size vs maximum for RCP 8.5
 
-![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP4.5](figure/Amazon_bF_RCP4.5_Deforested.png)
-
-
-![Complete time series predictions of the probability of ignition $f$ up to 2060 in black, with increased $f$ due to deforestation after 2021 in green,  95% confidence interval (grey band), before 2021 using the actual data, and after using General Circulation Models (GCM) runs conducted under the Coupled Model Intercomparison Project Phase 5 (CMIP5) for the greenhouse gas emissions scenario RCP8.5](figure/Amazon_bF_RCP8.5_Deforested.png)
+![Total annual size of fires vs maximum monthly fire size % relative to the area of the region, data, predictions and predictions including deforestation. The data column was estimated using the MODIS burned area product. The predictions by decade were estimated with a fitted model using a monthly ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), here only RCP8.5. For the years 2001-2021 the ignition probability was estimated from actual data.](figure/Amazon_TotSizeVsMax_year_theta61_RCP85_Def.png)\ 
 
 
-![Total annual size of fires vs maximum monthly fire size % relative to the area of the region, data, predictions and predictions including deforestation. The data column was estimated using the MODIS burned area product. The predictions by decade were estimated with a fitted model using a monthly ignition probability calculated with data from General Circulation Models under two greenhouse gas emissions scenarios known as Representative Concentration Pathways (RCPs), here only RCP8.5. For the years 2001-2020 the ignition probability was estimated from actual data.](figure/Amazon_TotSizeVsMax_year_theta61_RCP85_Def.png)
+### Fire model prediccions for $f$ estimated with TerraClimate vs $f$ estimated with CGM RCP 4.5
 
-
+![Time series of fire model predictions without deforestation, compared with observed data. Ignition probability was derived from GAM models based on Terra Climate data before 2022 (upper) and General Circulation Models under Representative Concentration Pathways (RCP) 4.5 plus retrospective simulations before year 2006 (lower panel). After 2021, both panels use GCM models to estimate ignition probability. The vertical dashed line marks the division between periods before and after 2021. Data points represent actual observations, while the solid line indicates the median of the simulations, with 95% confidence interval bands. All outputs are presented relative to the total area.](figure/Amazon_TotSize_year_theta61_RCP45-NoTerra.png)

@@ -11,7 +11,7 @@ AmazonasFires.pdf: AmazonasFires.md margins.sty
 	pandoc $< -o $@ $(OPTS)
 		
 Appendices.pdf: Appendices.md 
-	pandoc -H Appendices.sty --bibliography GlobalFireTippingPoints.bib --citeproc --csl=oikos.csl $^ -o $@
+	pandoc -H Appendices.sty --toc --toc-depth=3 --number-sections --bibliography GlobalFireTippingPoints.bib --citeproc --csl=oikos.csl $^ -o $@
 	open $@		
 
 AmazonasFiresMain.docx: AmazonasFiresMain.md makefile
