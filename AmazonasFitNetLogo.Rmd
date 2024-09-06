@@ -1606,16 +1606,16 @@ Amazon59years449PostRcp45_all1 = [1:60]
 Amazon59years449PostRcp45_all2 = [61:100]
 
 
-```{r sim_simple449postRCP45_All_59_2, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
+```{r sim_simple449postRCP45_All2_59, echo=FALSE, tidy=TRUE, message=FALSE, warning=FALSE, eval=TRUE}
 
 best <- readRDS(file.path("Simulations","bestFittedExponentsAmazon21yearsPost.rds"))
 
 disp_best <- best %>% dplyr::select(forest_dispersal_distance) %>% deframe()
 grow_best <- best %>% ungroup() %>% dplyr::select(Forest_growth) %>% deframe()
 ini_best  <- best %>% ungroup() %>% dplyr::select(Initial_forest_density) %>% deframe()
-disp_best <- disp_best[1:60]
-grow_best <- grow_best[1:60]
-ini_best <- ini_best[1:60]
+disp_best <- disp_best[61:100]
+grow_best <- grow_best[61:100]
+ini_best <- ini_best[61:100]
 
 #  from 2001 to 2060
 # 
@@ -1624,7 +1624,7 @@ ymd("1980-11-01") + days(eval_times)
 
 #
 #
-nl@experiment <- experiment(expname="Amazon59years449PostRcp45_all1",
+nl@experiment <- experiment(expname="Amazon59years449PostRcp45_all2",
                             outpath=outpath,
                             repetition=1,
                             tickmetrics="true",
@@ -1687,8 +1687,9 @@ write_simoutput(nl)
 #
 list.files(outpath,"Amazon59years449PostRcp45.*\\.csv")
 
-sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_all1_distinct.csv"),skip=0)
-#sim <- bind_rows(sim,read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_def2_distinct.csv"),skip=0))
+#sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_all1_distinct.csv"),skip=0)
+sim <- read_netlogo_simul(file.path(outpath,"Amazon59years449PostRcp45_all2_distinct.csv"),skip=0)
+
 
 #
 # Calculate power law exponents and max/total patch size by year 
@@ -1709,9 +1710,9 @@ pexp %>% filter(type=="pl") %>% mutate(tot_patch= tot_patch/(450*450)*100)  %>%
 
 # Load previous simulations and bind the total file
 #
-#pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds")) 
-#saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds"))
-saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds"))
+pexp0 <- readRDS(file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds")) 
+saveRDS(bind_rows(pexp0,pexp), file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds"))
+#saveRDS(pexp, file.path("Simulations", "simExponentsAmazonRCP45_59postAll.rds"))
 
 ```
 
