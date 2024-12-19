@@ -426,13 +426,14 @@ pexp %>% group_by(forest_dispersal_distance,theta,Date) %>% filter( type == "pl"
       mutate(forest_dispersal_distance=factor(round(forest_dispersal_distance)),theta = factor(theta),cluster= paste0(sim_type,forest_dispersal_distance)) %>%  
       ggplot(  aes(max_patch,tot_patch, color=theta, shape=theta ))+ geom_point(alpha=0.7) + theme_bw() +
       scale_color_manual(values=cols,name=expression(~theta)) + scale_shape(name=expression(~theta)) +
-      xlab("Maximum fire size (%)") +  
-      ylab("Total Size (%)") +  
+      xlab("maximum fire size (%)") +  
+      ylab("total size (%)") +  
       theme(axis.text.x = element_text(angle = 0, hjust = 1))  +  
       theme(legend.justification=c(1,0), legend.position=c(.99,0.01)) +
       facet_wrap(.~cluster, ncol = 2, labeller = labeller(cluster = as_labeller(facet_labels))) +   
         theme(strip.background = element_rect(fill = "white", color = "white"), strip.text.x = element_text(hjust = 0, size = 12)) 
-ggsave("figure/FireNL_TotSizeVsMaxSize_dispersal_theta_season.png",width=8,height=6,units="in",dpi=600)
+#ggsave("figure/FireNL_TotSizeVsMaxSize_dispersal_theta_season.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/FireNL_TotSizeVsMaxSize_dispersal_theta_season.pdf",width=8,height=6,units="in",dpi=600)
 
 
 

@@ -1771,18 +1771,18 @@ require(latex2exp)
 require(viridis)
 cols =viridis_pal()(3)
 
-p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,max_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) +    scale_color_viridis_d() +  ylab("Max Fire Size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2) + scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
+p1 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl", decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,max_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) +    scale_color_viridis_d() +  ylab("max fire size %") + xlab("")  +  stat_summary(fun.y=median, geom="point", size=2) + scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 #   scale_x_discrete(labels=c("Data", TeX("Simul Data $\\theta=110$"),TeX("Simul Data $\\theta=90$"), TeX("Simul GAM $\\theta=110$"),TeX"Simul GAM $\\theta=90$")))
 p1 
 #ggsave("figure/Amazon_Max_Size_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",year>2000) %>% ggplot(aes(decade,tot_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Total Fire Size %")  +  stat_summary(fun.y=median, geom="point", size=2) +
+p2 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",year>2000) %>% ggplot(aes(decade,tot_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("total fire size %")  +  stat_summary(fun.y=median, geom="point", size=2) +
   scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM","rejection"))
 
 p2
 #ggsave("figure/Amazon_Tot_Size_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,num_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("Number of Fires %")  +  stat_summary(fun.y=median, geom="point", size=2) +
+p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% ggplot(aes(decade,num_patch,fill=decade)) + geom_violin() + scale_fill_manual(guide=FALSE,values=cols) + scale_color_viridis_d() + xlab("") + ylab("number of fires %")  +  stat_summary(fun.y=median, geom="point", size=2) +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 #   scale_x_discrete(labels=c("Data", "Simul Data", TeX("Simul GAM $\\theta=90$"),TeX("Simul GAM $\\theta=110$")))
@@ -1790,7 +1790,7 @@ p3 <- pexp %>% group_by(random_seed,Date) %>% filter( type == "pl",decade %in% c
 p3
 #ggsave("figure/Amazon_Num_Fires_ModelVsData.png",width=8,height=6,units="in",dpi=600)
 
-p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data 90","Simul GAM 90"))) %>%  ggplot( aes(decade,expo,fill=decade)) + geom_violin() + scale_fill_manual(values=cols,guide=FALSE) +   ylab("Power Law Exponent")  +  stat_summary(fun.y=median, geom="point", size=2) + xlab("") +
+p4 <- pexp %>% group_by(decade,random_seed,Date) %>% filter( type == "pl",decade %in% c("Data","Simul Data","Simul GAM"),year>2000) %>% bind_rows(patch_dfp) %>% mutate(decade=fct_relevel(decade,c("Data","Simul Data 90","Simul GAM 90"))) %>%  ggplot( aes(decade,expo,fill=decade)) + geom_violin() + scale_fill_manual(values=cols,guide=FALSE) +   ylab("power law exponent")  +  stat_summary(fun.y=median, geom="point", size=2) + xlab("") +
    scale_x_discrete(labels=c("Data", "Simul Data","Simul GAM"))
 
 p4
@@ -1809,7 +1809,8 @@ prow <- plot_grid(
   )
 prow
 
-save_plot("figure/Amazon_ModelVsData_SimulGAM.png",prow,base_width=8,base_height=6,dpi=600)
+#save_plot("figure/Amazon_ModelVsData_SimulGAM.png",prow,base_width=8,base_height=6,dpi=600)
+save_plot("figure/Amazon_ModelVsData_SimulGAM.pdf",prow,base_width=8,base_height=6,dpi=600)
 
 #
 # Jitter plots ----> You have an idea of the number of points we are using
@@ -2018,7 +2019,7 @@ pexp %>% group_by(fct,theta,year) %>%
   geom_line(size=2) + 
   scale_color_viridis_d(guide="none") + 
   scale_fill_viridis_d(guide="none") +
-  xlab("Year") + ylab("Total Fire size%") +
+  xlab("year") + ylab("total fire size%") +
   theme(axis.text.x = element_text(angle = 45, hjust=.8)) +
   theme(legend.position = c(0.8, 0.88)) + 
   geom_ribbon(aes(ymin=lo_b,ymax=up_b),alpha=0.2,linetype=0) + 
@@ -2027,7 +2028,8 @@ pexp %>% group_by(fct,theta,year) %>%
   geom_vline(xintercept = 2021, linetype = "dashed", alpha = 0.5)
 
 
-ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85Def.png",width=8,height=6,units="in",dpi=600)
+#ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85Def.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_TotSize_year_theta61_RCP45-85Def.pdf",width=8,height=6,units="in",dpi=600)
 
 
 # No Deforestation 4.5 8.5 old plot
@@ -2049,12 +2051,13 @@ p1 <- pexp  %>% group_by(random_seed,Date) %>% filter( type == "pl") %>% mutate(
 
 p1 %>% ungroup() %>% mutate(decade=factor(decade),decade=fct_relevel(decade,c("2001-2021")), theta=fct_recode(theta, "Model"="61")) %>% ggplot(  aes(max_patch,tot_patch, color=theta, shape=theta ))+ geom_point(alpha=0.6) + theme_bw() +
       scale_color_viridis_d(name="")  + scale_shape(name="") +
-      xlab("Max Fire size (%)") +  
-      ylab("Total Size (%)") +  
+      xlab("max fire size (%)") +  
+      ylab("total size (%)") +  
       theme(axis.text.x = element_text(angle = 90, hjust = 1))  + facet_grid( RCP ~ decade,drop=TRUE) +
 #  theme(legend.position="bottom")
     theme(legend.justification=c(1,1), legend.position=c(.99,1))
-ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45_Def.png",width=8,height=6,units="in",dpi=600)
+#ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45_Def.png",width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_TotSizeVsMax_year_theta61_RCP45_Def.pdf",width=8,height=6,units="in",dpi=600)
 
 
 # Deforestation only 8.5

@@ -520,20 +520,24 @@ ggsave("figure/Amazon_Annual_TotSizeVsMaxSize.jpg",plot=p1,width=8,height=6,unit
 p1 <- patch_sizes_p %>% filter(date>2000, date<2022) %>% group_by(date) %>% 
   summarize(max_patch=max(size)/total_forest*100,tot_patch=sum(size)/total_forest*100) %>% 
   mutate( label =as.character(date)) %>%
+  mutate(
+    xend = lead(max_patch),  # Use `lead()` instead of `tail()`
+    yend = lead(tot_patch)
+  ) %>%
+  filter(!is.na(xend) & !is.na(yend)) %>%
    ggplot(  aes(max_patch,tot_patch, label=label,color=date ))+ geom_point(size=2) + theme_bw() +
     geom_curve(curvature = -0.2 , 
-                  aes(
-                    xend=c(tail(max_patch, n=-1), NA), 
-                    yend=c(tail(tot_patch, n=-1), NA)
-                  ),
+                  aes( xend=xend, yend=yend ),
                   arrow=arrow(length=unit(0.2,"cm"))
       ) +
       scale_color_viridis_c(guide=NULL)  + 
-      xlab("Maximum fire size (%)") +  
-      ylab("Total Size (%)") +  
+      xlab("maximum fire size (%)") +  
+      ylab("total size (%)") +  
       theme(axis.text.x = element_text(angle = 50, hjust = 1)) + geom_text_repel()
 p1
-ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+#ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.jpg",plot=p1,width=8,height=6,units="in",dpi=600)
+ggsave("figure/Amazon_Annual_TotSizeVsMaxSize_arrows.pdf",plot=p1,width=8,height=6,units="in",dpi=600)
+
 
 ```
 
